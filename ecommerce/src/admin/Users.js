@@ -91,9 +91,7 @@ function Users() {
                             <IconButton aria-label="edit">
                               <EditIcon color="primary" />
                             </IconButton>
-                            <IconButton aria-label="delete" onClick={() => deleteUser(user.id)}>
-                              <DeleteIcon color="secondary" />
-                            </IconButton>
+                           
                           </TableCell>
                         </TableRow>
                       ))}
