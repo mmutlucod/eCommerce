@@ -5,6 +5,7 @@ import MainPage from './admin/MainPage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Users from './admin/Users'
 import Orders from './admin/Orders'
+import Sellers from './admin/Sellers'
 import { AuthProvider } from './context/AuthContext';
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/adminpaneli" element={<MainPage />} />
           <Route path="/users" element={<Users/>} />
           <Route path="/orders" element={<Orders/>} />
+          <Route path="/sellers" element={<Sellers/>} />
         </Routes>
       </Router>
     </div>
