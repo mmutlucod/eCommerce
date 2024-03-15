@@ -198,9 +198,9 @@ const deleteProduct = async (req, res) => {
         }
 
         // Silme işlemi başarılıysa yanıt dön
-        res.status(200).json({ success: true, message: "Ürün başarıyla silindi." });
+        return res.status(200).json({ success: true, message: "Ürün başarıyla silindi." });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 //KATEGORİ
@@ -293,12 +293,12 @@ const deleteCategory = async (req, res) => {
     try {
         const deleted = await Category.destroy({ where: { id: id } });
         if (!deleted) {
-            res.status(404).json({ success: false, message: 'Silinecek kategori bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Silinecek kategori bulunamadı.' });
         }
-        res.status(200).json({ success: true, message: 'Kategori başarıyla silindi.' })
+        return res.status(200).json({ success: true, message: 'Kategori başarıyla silindi.' })
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 //KULLANICI
@@ -356,11 +356,11 @@ const deleteUser = async (req, res) => {
     try {
         const deleted = await User.destroy({ where: { user_id: id } });
         if (!deleted) {
-            res.status(404).json({ success: false, message: 'Silinecek kullanıcı bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Silinecek kullanıcı bulunamadı.' });
         }
-        res.status(200).json({ success: true, message: 'Kullanıcı başarıyla silindi.' });
+        return res.status(200).json({ success: true, message: 'Kullanıcı başarıyla silindi.' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 //MODERATOR
@@ -422,11 +422,11 @@ const deleteModerator = async (req, res) => {
         const deleted = Moderator.destroy({ where: { modertor_id: id } });
 
         if (!deleted) {
-            res.status(404).json({ success: false, message: 'Böyle bir moderatör bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Böyle bir moderatör bulunamadı.' });
         }
-        res.status(200).json({ success: true, message: 'Moderatör silindi.' });
+        return res.status(200).json({ success: true, message: 'Moderatör silindi.' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 //SİPARİŞLER
@@ -609,11 +609,11 @@ const deleteSeller = async (req, res) => {
         const deleted = await Seller.destroy({ where: { seller_id: id } });
 
         if (!deleted) {
-            res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
         }
-        res.status(200).json({ success: true, message: 'Satıcı başarıyla silindi.' });
+        return res.status(200).json({ success: true, message: 'Satıcı başarıyla silindi.' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 
