@@ -4,6 +4,7 @@ import Login from './admin/login';
 import MainPage from './admin/MainPage';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Users from './admin/Users'
+import Orders from './admin/Orders'
 import { AuthProvider } from './context/AuthContext';
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route path="/adminpaneli" element={<MainPage />} />
           <Route path="/users" element={<Users/>} />
+          <Route path="/orders" element={<Orders/>} />
         </Routes>
       </Router>
     </div>
