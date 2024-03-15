@@ -41,11 +41,11 @@ const login = async (req, res) => {
         });
 
         // Başarılı giriş yanıtı ve token dön
-        res.status(200).json({ message: 'Giriş başarılı.', token });
+        return res.status(200).json({ message: 'Giriş başarılı.', token });
     } catch (error) {
         // Hata yakalama ve loglama
         console.error('Giriş sırasında bir hata oluştu:', error);
-        res.status(500).json({ message: 'Sunucu hatası.' });
+        return res.status(500).json({ message: 'Sunucu hatası.' });
     }
 };
 const register = async (req, res) => {
@@ -68,10 +68,10 @@ const register = async (req, res) => {
             expiresIn: '1h', // Token süresi (örneğin 1 saat)
         });
 
-        res.status(201).json({ message: 'Kullanıcı başarıyla oluşturuldu.', user: newUser, token });
+        return res.status(201).json({ message: 'Kullanıcı başarıyla oluşturuldu.', user: newUser, token });
     } catch (error) {
         console.error('Kullanıcı kaydı sırasında bir hata oluştu:', error);
-        res.status(500).json({ message: 'Sunucu hatası.' });
+        return res.status(500).json({ message: 'Sunucu hatası.' });
     }
 };
 const listAdmins = async (req, res) => {
@@ -80,10 +80,10 @@ const listAdmins = async (req, res) => {
         const admins = await Admin.findAll();
 
         // Başarılı yanıtı dön
-        res.status(200).json(admins);
+        return res.status(200).json(admins);
     } catch (error) {
         // Hata durumunda hata mesajını döndür
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 //ÜRÜN
@@ -108,10 +108,10 @@ const getProducts = async (req, res) => {
         });
 
         // Başarılı yanıtı dön
-        res.status(200).json(products);
+        return res.status(200).json(products);
     } catch (error) {
         // Hata durumunda hata mesajını döndür
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const getProductsById = async (req, res) => {
@@ -144,10 +144,10 @@ const getProductsById = async (req, res) => {
         }
 
         // Ürün bulunursa, ürün bilgisini dön
-        res.status(200).json(product);
+        return res.status(200).json(product);
     } catch (error) {
         // Hata durumunda genel hata mesajını döndür
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const createProduct = async (req, res) => {
@@ -158,10 +158,10 @@ const createProduct = async (req, res) => {
         const product = await Product.create(req.body);
 
         // Ürün başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön
-        res.status(201).json({ success: true, message: 'Ürün başarıyla oluşturuldu.', product });
+        return res.status(201).json({ success: true, message: 'Ürün başarıyla oluşturuldu.', product });
     } catch (error) {
         // Ürün oluşturma işlemi sırasında bir hata oluşursa, hata mesajını döndür
-        res.status(500).json({ success: false, message: 'Ürün oluşturulurken bir hata oluştu.', error: error.message });
+        return res.status(500).json({ success: false, message: 'Ürün oluşturulurken bir hata oluştu.', error: error.message });
     }
 };
 
@@ -181,9 +181,9 @@ const editProduct = async (req, res) => {
         await product.update(updatedData);
 
         // Güncellenmiş ürün bilgisi ile yanıt dön
-        res.status(200).json({ success: true, message: "Ürün başarıyla güncellendi.", product });
+        return res.status(200).json({ success: true, message: "Ürün başarıyla güncellendi.", product });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 const deleteProduct = async (req, res) => {
@@ -224,9 +224,9 @@ const getCategories = async (req, res) => {
             ]
         });
 
-        res.status(200).json(categories);
+        return res.status(200).json(categories);
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const getCategoriesById = async (req, res) => {
@@ -250,12 +250,12 @@ const getCategoriesById = async (req, res) => {
             ]
         });
         if (!category) {
-            res.status(404).json({ success: false, message: 'Kategori bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Kategori bulunamadı.' });
         }
-        res.status(200).json(category);
+        return res.status(200).json(category);
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const createCategory = async (req, res) => {
@@ -264,10 +264,10 @@ const createCategory = async (req, res) => {
         const category = await Category.create(req.body);
 
         // Kategori başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön
-        res.status(201).json({ success: true, message: 'Kategori başarıyla oluşturuldu.', category });
+        return res.status(201).json({ success: true, message: 'Kategori başarıyla oluşturuldu.', category });
     } catch (error) {
         // Kategori oluşturma işlemi sırasında bir hata oluşursa, hata mesajını döndür
-        res.status(500).json({ success: false, message: 'Kategori oluşturulurken bir hata oluştu.', error: error.message });
+        return res.status(500).json({ success: false, message: 'Kategori oluşturulurken bir hata oluştu.', error: error.message });
     }
 }
 const editCategory = async (req, res) => {
@@ -282,10 +282,10 @@ const editCategory = async (req, res) => {
 
         await category.update(updatedData);
 
-        res.status(200).json({ success: true, message: 'Kategori başarıyla güncellendi.', category });
+        return res.status(200).json({ success: true, message: 'Kategori başarıyla güncellendi.', category });
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const deleteCategory = async (req, res) => {
@@ -306,10 +306,10 @@ const getUsers = async (req, res) => {
     try {
         const users = await User.findAll();
 
-        res.status(200).json(users);
+        return res.status(200).json(users);
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const getUsersById = async (req, res) => {
@@ -318,20 +318,20 @@ const getUsersById = async (req, res) => {
     try {
         const user = await User.findByPk(id);
         if (!user) {
-            res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' });
         }
-        res.status(200).json(user);
+        return res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const createUser = async (req, res) => {
     try {
         const user = await User.create(req.body);
 
-        res.status(201).json({ success: true, message: 'Kullanıcı başarıyla oluşturuldu.' }, user);
+        return res.status(201).json({ success: true, message: 'Kullanıcı başarıyla oluşturuldu.' }, user);
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const editUser = async (req, res) => {
@@ -341,14 +341,14 @@ const editUser = async (req, res) => {
         const user = await User.findByPk(id);
 
         if (!user) {
-            res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' });
         }
 
         await user.update(updatedData);
 
-        res.status(200).json({ success: true, message: 'Kullanıcı başarıyla güncellendi.' });
+        return res.status(200).json({ success: true, message: 'Kullanıcı başarıyla güncellendi.' });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const deleteUser = async (req, res) => {
@@ -368,10 +368,10 @@ const getModerators = async (req, res) => {
     try {
         const moderators = await Moderator.findAll();
 
-        res.status(200).json(moderators);
+        return res.status(200).json(moderators);
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const getModeratorsById = async (req, res) => {
@@ -380,23 +380,23 @@ const getModeratorsById = async (req, res) => {
         const moderator = await Moderator.findByPk(id);
 
         if (!moderator) {
-            res.status(404).json({ success: false, message: 'Moderatör bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Moderatör bulunamadı.' });
         }
 
-        res.status(200).json(moderator);
+        return res.status(200).json(moderator);
 
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const createModerator = async (req, res) => {
     try {
         const moderator = await Moderator.create(req.body);
 
-        res.status(201).json({ success: true, message: 'Moderatör oluşturuldu.', moderator });
+        return res.status(201).json({ success: true, message: 'Moderatör oluşturuldu.', moderator });
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const editModerator = async (req, res) => {
@@ -405,14 +405,14 @@ const editModerator = async (req, res) => {
         const moderator = await Moderator.findByPk(id);
 
         if (!moderator) {
-            res.status(404).json({ success: false, message: 'Moderatör bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Moderatör bulunamadı.' });
         }
         await moderator.update(req.body);
 
-        res.status(200).json({ success: true, message: 'Moderatör başarıyla güncellendi.' });
+        return res.status(200).json({ success: true, message: 'Moderatör başarıyla güncellendi.' });
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const deleteModerator = async (req, res) => {
@@ -457,9 +457,9 @@ const getOrders = async (req, res) => {
                 attributes: ['user_id', 'name', 'surname']
             }]
         });
-        res.status(200).json(orders);
+        return res.status(200).json(orders);
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const getOrderDetailsById = async (req, res) => {
@@ -492,10 +492,10 @@ const getOrderDetailsById = async (req, res) => {
             }]
         });
 
-        res.status(200).json(orderdetails);
+        return res.status(200).json(orderdetails);
 
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 
 }
@@ -506,15 +506,15 @@ const updateOrder = async (req, res) => {
         const order = await Order.findByPk(id);
 
         if (!order) {
-            res.status(404).json({ success: false, message: 'Sipariş bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Sipariş bulunamadı.' });
         }
 
         await order.update(req.body);
 
-        res.status(200).json({ success: true, message: 'Sipariş başarıyla güncellendi.' });
+        return res.status(200).json({ success: true, message: 'Sipariş başarıyla güncellendi.' });
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 //SATICI
@@ -538,10 +538,10 @@ const getSellers = async (req, res) => {
             ]
         });
 
-        res.status(200).json(sellers);
+        return res.status(200).json(sellers);
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const getSellerById = async (req, res) => {
@@ -566,24 +566,24 @@ const getSellerById = async (req, res) => {
         });
 
         if (!seller) {
-            res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
         }
 
 
-        res.status(200).json(seller);
+        return res.status(200).json(seller);
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const createSeller = async (req, res) => {
     try {
         const seller = await Seller.create(req.body);
 
-        res.status(201).json({ success: true, message: 'Satıcı oluşturuldu.', seller });
+        return res.status(201).json({ success: true, message: 'Satıcı oluşturuldu.', seller });
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const editSeller = async (req, res) => {
@@ -592,14 +592,14 @@ const editSeller = async (req, res) => {
         const seller = await Seller.findByPk(id);
 
         if (!seller) {
-            res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
         }
         await seller.update(req.body);
 
-        res.status(200).json({ success: true, message: 'Satıcı başarıyla güncellendi.' });
+        return res.status(200).json({ success: true, message: 'Satıcı başarıyla güncellendi.' });
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 
 }
