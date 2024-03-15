@@ -44,6 +44,7 @@ router.put('/sellers/:id', authMiddleware, adminController.editSeller);
 router.delete('/sellers/:id', authMiddleware, adminController.deleteSeller);
 
 router.get('/brands', authMiddleware, adminController.getBrands);
+router.get('/brands/:id', authMiddleware, adminController.getBrandById);
 router.post('/create-brand', authMiddleware, adminController.createBrand);
 router.put('/brands/:id', authMiddleware, adminController.editBrand);
 router.delete('/brands/:id', authMiddleware, adminController.deleteBrand);

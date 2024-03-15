@@ -648,6 +648,22 @@ const getBrands = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+const getBrandById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const brand = await Brand.findByPk(id);
+
+        if (!brand) {
+            return res.status(404).json({ success: false, message: 'Marka bulunamadı.' });
+        }
+
+
+        return res.status(200).json(brand);
+    }
+    catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
 const createBrand = async (req, res) => {
     try {
         const brand = await Brand.create(req.body);
@@ -694,6 +710,6 @@ module.exports = {
     getModerators, getModeratorsById, createModerator, editModerator, deleteModerator,
     getOrders, getOrderDetailsById, updateOrder,
     getSellers, getSellerById, createSeller, editSeller, deleteSeller,
-    getBrands, createBrand, editBrand, deleteBrand,
+    getBrands, getBrandById, createBrand, editBrand, deleteBrand,
 
 };
