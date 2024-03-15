@@ -20,7 +20,11 @@ import {
   TextField,
   DialogActions,
   Button,
-  Snackbar
+  Snackbar,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -34,6 +38,7 @@ function Brands() {
   const [openDialog, setOpenDialog] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [approvalStatuses, setApprovalStatuses] = useState([]);
   const [newBrand, setNewBrand] = useState({
     brand_name: '',
     description: '',
@@ -43,6 +48,7 @@ function Brands() {
 
   useEffect(() => {
     fetchBrands();
+    fetchApprovalStatuses();
   }, []);
 
   const handleSnackbarOpen = (message) => {
@@ -55,6 +61,14 @@ function Brands() {
       return;
     }
     setSnackbarOpen(false);
+  };
+  const fetchApprovalStatuses = async () => {
+    try {
+      const response = await api.get('/admin/approvalstatuses');
+      setApprovalStatuses(response.data);
+    } catch (error) {
+      console.error('Onay durumları çekilirken bir hata oluştu:', error);
+    }
   };
 
   const fetchBrands = async () => {
@@ -186,49 +200,54 @@ function Brands() {
                 </Card>
               </Grid>
             </Grid>
-          </Container>
-    
-          {/* Add/Edit Brand Dialog */}
-          <Dialog open={openDialog} onClose={handleCloseDialog}>
-            <DialogTitle>{editBrand ? 'Markayı Düzenle' : 'Marka Ekle'}</DialogTitle>
-            <DialogContent>
-              <TextField
-                autoFocus
-                margin="dense"
-                name="brand_name"
-                label="Marka Adı"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={editBrand ? editBrand.brand_name : newBrand.brand_name}
-                onChange={editBrand ? handleEditChange : handleChange}
-              />
-              <TextField
-                margin="dense"
-                name="description"
-                label="Açıklama"
-                type="text"
-                fullWidth
-                variant="outlined"
-                value={editBrand ? editBrand.description : newBrand.description}
-                onChange={editBrand ? handleEditChange : handleChange}
-              />
-              <TextField
-                margin="dense"
-                name="approval_status_id"
-                label="Onay Durumu ID"
-                type="number"
-                fullWidth
-                variant="outlined"
-                value={editBrand ? editBrand.approval_status_id : newBrand.approval_status_id}
-                onChange={editBrand ? handleEditChange : handleChange}
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseDialog}>İptal</Button>
-              <Button onClick={editBrand ? handleEditSubmit : handleSubmit}>{editBrand ? 'Güncelle' : 'Ekle'}</Button>
-            </DialogActions>
-          </Dialog>
+          </Container>    <Dialog open={openDialog} onClose={handleCloseDialog}>
+      <DialogTitle>{editBrand ? 'Markayı Düzenle' : 'Marka Ekle'}</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin="dense"
+          name="brand_name"
+          label="Marka Adı"
+          type="text"
+          fullWidth
+          variant="outlined"
+          // Value and onChange
+        />
+        <TextField
+          margin="dense"
+          name="description"
+          label="Açıklama"
+          type="text"
+          fullWidth
+          variant="outlined"
+          // Value and onChange
+        />
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Onay Durumu</InputLabel>
+          <Select
+            label="Onay Durumu"
+            name="approval_status_id"
+            value={editBrand ? editBrand.approval_status_id : newBrand.approval_status_id}
+            onChange={editBrand ? handleEditChange : handleChange}
+          >
+            
+            {approvalStatuses.map((status) => (
+              <MenuItem key={status.status_name} value={status.approval_status_id}>
+                {status.status_name}
+                {console.log(status)}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleCloseDialog}>İptal</Button>
+        <Button onClick={editBrand ? handleEditSubmit : handleSubmit}>
+          {editBrand ? 'Güncelle' : 'Ekle'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+
     
           {/* Snackbar for notifications */}
           <Snackbar
