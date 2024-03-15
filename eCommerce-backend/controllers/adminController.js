@@ -641,7 +641,12 @@ const deleteSeller = async (req, res) => {
 
 const getBrands = async (req, res) => {
     try {
-        const brands = await Brand.findAll();
+        const brands = await Brand.findAll({
+            include: [{
+                model: ApprovalStatus,
+                attributes: ['status_name']
+            }]
+        });
 
         return res.status(200).json(brands);
     } catch (error) {
@@ -651,7 +656,12 @@ const getBrands = async (req, res) => {
 const getBrandById = async (req, res) => {
     const { id } = req.params;
     try {
-        const brand = await Brand.findByPk(id);
+        const brand = await Brand.findByPk(id, {
+            include: [{
+                model: ApprovalStatus,
+                attributes: ['status_name']
+            }]
+        });
 
         if (!brand) {
             return res.status(404).json({ success: false, message: 'Marka bulunamadı.' });
