@@ -6,6 +6,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Users from './admin/Users'
 import Orders from './admin/Orders'
 import Sellers from './admin/Sellers'
+import Brands from './admin/Brands'
+import Categories from './admin/Categories'
 import { AuthProvider } from './context/AuthContext';
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           <Route path="/users" element={<Users/>} />
           <Route path="/orders" element={<Orders/>} />
           <Route path="/sellers" element={<Sellers/>} />
+          <Route path="/brands" element={<Brands/>} />
+          <Route path="/categories" element={<Categories/>} />
         </Routes>
       </Router>
     </div>

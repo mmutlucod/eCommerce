@@ -22,7 +22,13 @@ function MainPage() {
           }}
         >
           <List>
-              {[{ text: 'Ana Sayfa', icon: <DashboardIcon />, link: '/' }, { text: 'Kullanıcılar', icon: <GroupIcon />, link: '/users' }, { text: 'Siparişler', icon: <ShoppingCartIcon />, link: '/orders' }].map((item, index) => (
+              {[{ text: 'Ana Sayfa', icon: <DashboardIcon />, link: '/' }, { text: 'Kullanıcılar', icon: <GroupIcon />, link: '/users' },
+               { text: 'Siparişler', icon: <ShoppingCartIcon />, link: '/orders' },
+               { text: 'Markalar', icon: <ShoppingCartIcon />, link: '/brands' },
+               { text: 'Satıcılar', icon: <ShoppingCartIcon />, link: '/sellers' },
+               { text: 'Kategoriler', icon: <ShoppingCartIcon />, link: '/categories' },
+
+              ].map((item, index) => (
                 <ListItem button key={item.text} component={Link} to={item.link}>
                   <ListItemIcon>
                     {item.icon}
