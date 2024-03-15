@@ -100,7 +100,7 @@ function Brands() {
 
   const handleSubmit = async () => {
     try {
-      await api.post('/admin/brands', newBrand);
+      await api.post('/admin/create-brand', newBrand);
       fetchBrands();
       setNewBrand({
         brand_name: '',
