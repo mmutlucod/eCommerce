@@ -490,10 +490,9 @@ const getOrderDetailsById = async (req, res) => {
         const orderdetails = await Order.findByPk(id, {
             include: [{
                 model: OrderItem,
-                attributes: ['quantity'], // Ürün Adedi
+                attributes: ['quantity', 'price'], // Ürün Adedi
                 include: [{
                     model: sellerProduct, // Model isminin doğru olduğundan emin olun.
-                    attributes: ['price'], // Ürün Fiyatı
                     include: [
                         {
                             model: Seller,
