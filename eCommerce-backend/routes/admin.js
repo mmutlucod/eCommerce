@@ -49,4 +49,7 @@ router.post('/create-brand', authMiddleware, adminController.createBrand);
 router.put('/brands/:id', authMiddleware, adminController.editBrand);
 router.delete('/brands/:id', authMiddleware, adminController.deleteBrand);
 
+router.get('/approvalstatuses', adminController.getApprovalStatuses);
+router.get('/approvalstatuses/:id', adminController.getApprovalStatusById);
+
 module.exports = router;
