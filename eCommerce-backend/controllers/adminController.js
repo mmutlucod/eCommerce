@@ -698,7 +698,7 @@ const editBrand = async (req, res) => {
     }
 }
 const deleteBrand = async (req, res) => {
-    const { id } = req.params.id;
+    const { id } = req.params;
     try {
         const deleted = await Brand.destroy({ where: { brand_id: id } });
 
