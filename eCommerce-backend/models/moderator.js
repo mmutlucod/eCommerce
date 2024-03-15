@@ -12,7 +12,7 @@ const Moderator = sequelize.define('moderator', {
     name: Sequelize.STRING,
     surname: Sequelize.STRING,
     email: Sequelize.STRING,
-    phone: Sequelize.INTEGER,
+    phone: Sequelize.STRING,
     password: Sequelize.STRING
 })
 module.exports = Moderator;
