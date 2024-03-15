@@ -21,10 +21,14 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AdminNavbar from '../components/AdminNavbar';
 import api from '../api/api';
 import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
+import { Snackbar } from '@mui/material';
+import { green } from '@mui/material/colors';
 
 function Users() {
   const [users, setUsers] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+const [snackbarMessage, setSnackbarMessage] = useState('');
   const [newUser, setNewUser] = useState({
     name: '',
     surname: '',
@@ -36,7 +40,17 @@ function Users() {
   useEffect(() => {
     fetchUsers();
   }, []);
-
+  const handleSnackbarOpen = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+  
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
   const fetchUsers = async () => {
     try {
       const response = await api.get('/admin/users');
@@ -66,9 +80,7 @@ function Users() {
 
   const handleChange = (e) => {
     setNewUser({ ...newUser, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async () => {
+  };const handleSubmit = async () => {
     try {
       await api.post('/admin/create-user', newUser);
       fetchUsers();
@@ -80,11 +92,12 @@ function Users() {
         password: ''
       });
       handleCloseDialog();
+      handleSnackbarOpen('Kullanıcı başarıyla eklendi.'); // Snackbar mesajı
     } catch (error) {
       console.error('Kullanıcı eklenirken bir hata oluştu:', error);
     }
   };
-
+  
   return (
     <>
       <AdminNavbar />
@@ -144,6 +157,18 @@ function Users() {
         </Grid>
       </Container>
       <AddUserDialog open={openDialog} onClose={handleCloseDialog} handleChange={handleChange} handleSubmit={handleSubmit} newUser={newUser} />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        
+        ContentProps={{
+          sx: {
+            backgroundColor: green[600],
+          }
+        }}
+        message={snackbarMessage}
+      />
     </>
   );
 }
