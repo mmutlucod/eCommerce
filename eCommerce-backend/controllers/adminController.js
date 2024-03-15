@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt'); // Şifreleri güvenli bir şekilde saklamak için bcrypt kütüphanesini kullanıyoruz
 const Admin = require('../models/admin');
-const Authenticate = require('../middlewares/AuthMiddleware');
 const jwt = require('jsonwebtoken');
 const Product = require('../models/product');
 const Category = require('../models/category');
@@ -13,6 +12,7 @@ const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const sellerProduct = require('../models/sellerProduct');
 const Seller = require('../models/seller');
+const saltRounds = 10; // Bcrypt için salt tur sayısı
 
 const login = async (req, res) => {
     const { username, password } = req.body;
@@ -325,11 +325,32 @@ const getUsersById = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+
 const createUser = async (req, res) => {
     try {
-        const user = await User.create(req.body);
+        // Kullanıcı adı veya e-posta adresi ile mevcut kullanıcıyı kontrol et
+        const existingUser = await User.findOne({
+            where: {
+                email: req.body.email
+            }
+        });
 
-        return res.status(201).json({ success: true, message: 'Kullanıcı başarıyla oluşturuldu.' }, user);
+        // Eğer kullanıcı zaten varsa, bir hata mesajı gönder
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: 'E-posta adresi zaten kullanımda.' });
+        }
+
+        // Şifreyi hash'le
+        const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+
+        // Kullanıcıyı şifreyle birlikte oluştur
+        const user = await User.create({
+            ...req.body,
+            password: hashedPassword, // Hash'lenmiş şifreyi kullan
+        });
+
+        // Başarılı bir şekilde oluşturulduğunu bildir
+        return res.status(201).json({ success: true, message: 'Kullanıcı başarıyla oluşturuldu.', user });
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
