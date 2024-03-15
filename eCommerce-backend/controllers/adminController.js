@@ -710,8 +710,28 @@ const deleteBrand = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+//ONAY DURUMU 
+const getApprovalStatuses = async (req, res) => {
+    try {
+        const approvals = await ApprovalStatus.findAll();
 
-
+        return res.status(200).json(approvals);
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+const getApprovalStatusById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const approvalStatus = await ApprovalStatus.findByPk(id);
+        if (!approvalStatus) {
+            return res.status(404).json({ success: false, message: 'Bulunamadı.' });
+        }
+        return res.status(200).json(approvalStatus);
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
 module.exports = {
     login, register, listAdmins,
     getProducts, getProductsById, createProduct, editProduct, deleteProduct,
@@ -720,6 +740,6 @@ module.exports = {
     getModerators, getModeratorsById, createModerator, editModerator, deleteModerator,
     getOrders, getOrderDetailsById, updateOrder,
     getSellers, getSellerById, createSeller, editSeller, deleteSeller,
-    getBrands, getBrandById, createBrand, editBrand, deleteBrand,
+    getBrands, getBrandById, createBrand, editBrand, deleteBrand, getApprovalStatuses, getApprovalStatusById
 
 };
