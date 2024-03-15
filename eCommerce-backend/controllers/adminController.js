@@ -676,7 +676,10 @@ const getBrandById = async (req, res) => {
 }
 const createBrand = async (req, res) => {
     try {
-        const brand = await Brand.create(req.body);
+        const brand = await Brand.create({
+            ...req.body,
+            approval_status_id: 3,
+        });
 
         return res.status(201).json({ success: true, message: 'Marka eklendi.', brand });
     } catch (error) {

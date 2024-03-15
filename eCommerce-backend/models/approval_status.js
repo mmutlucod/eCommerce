@@ -11,20 +11,22 @@ const ApprovalStatus = sequelize.define('ApprovalStatus', {
     status_name: Sequelize.TEXT
 });
 
-// Model senkronizasyonundan sonra çalışacak hook'u tanımla
 ApprovalStatus.afterSync(async () => {
-    // İstenen başlangıç durumlarını tanımla
     const statuses = [
         { status_name: 'Onaylandı' },
         { status_name: 'Reddedildi' },
         { status_name: 'Onay Bekleniyor' }
     ];
 
-    // Bulk create ile durumları veritabanına ekle
-    // Bu işlem, aynı isme sahip durumlar zaten varsa bunları yeniden eklemeyecektir.
-    await ApprovalStatus.bulkCreate(statuses, {
-        updateOnDuplicate: ['status_name'] // Zaten var olan kayıtları güncelleme
-    });
+    for (const status of statuses) {
+        // Öncelikle, status_name değerine göre mevcut kayıt olup olmadığını kontrol et
+        const foundStatus = await ApprovalStatus.findOne({ where: { status_name: status.status_name } });
+
+        // Eğer kayıt yoksa, yeni kaydı ekle
+        if (!foundStatus) {
+            await ApprovalStatus.create(status);
+        }
+    }
 });
 
 module.exports = ApprovalStatus;
