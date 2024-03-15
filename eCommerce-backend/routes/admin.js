@@ -43,9 +43,9 @@ router.post('/create-seller', authMiddleware, adminController.createSeller);
 router.put('/sellers/:id', authMiddleware, adminController.editSeller);
 router.delete('/sellers/:id', authMiddleware, adminController.deleteSeller);
 
-router.get('/protected', authMiddleware, roleCheckMiddleware(['admin']), (req, res) => {
-    // authMiddleware başarılı bir şekilde geçildiyse, kullanıcının rolünü döndür
-    res.status(200).json({ message: 'ADMIN PANEL' });
-});
+router.get('/brands', authMiddleware, adminController.getBrands);
+router.post('/create-brand', authMiddleware, adminController.createBrand);
+router.put('/brands/:id', authMiddleware, adminController.editBrand);
+router.delete('/brands/:id', authMiddleware, adminController.deleteBrand);
 
 module.exports = router;

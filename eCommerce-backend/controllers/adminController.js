@@ -12,6 +12,7 @@ const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const sellerProduct = require('../models/sellerProduct');
 const Seller = require('../models/seller');
+const { errors } = require('ethers');
 const saltRounds = 10; // Bcrypt için salt tur sayısı
 
 const login = async (req, res) => {
@@ -636,6 +637,53 @@ const deleteSeller = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+//MARKA
+
+const getBrands = async (req, res) => {
+    try {
+        const brands = await Brand.findAll();
+
+        return res.status(200).json(brands);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+const createBrand = async (req, res) => {
+    try {
+        const brand = await Brand.create(req.body);
+
+        return res.status(201).json({ success: true, message: 'Marka eklendi.', brand });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+const editBrand = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const brand = await Brand.findByPk(id);
+
+        if (!brand) {
+            return res.status(404).json({ success: false, message: 'Silinecek marka bulunamadı.' })
+        }
+        await brand.update(req.body);
+        return res.status(200).json({ success: true, message: 'Marka başarıyla güncellendi.' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message })
+    }
+}
+const deleteBrand = async (req, res) => {
+    const { id } = req.params.id;
+    try {
+        const deleted = await Brand.destroy({ where: { brand_id: id } });
+
+        if (!deleted) {
+            return res.status(404).json({ success: false, message: 'Marka bulunamadı.' });
+        }
+        return res.status(200).json({ success: true, message: 'Marka başarıyla silindi.' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
 
 
 module.exports = {
@@ -645,6 +693,7 @@ module.exports = {
     getUsers, getUsersById, createUser, editUser, deleteUser,
     getModerators, getModeratorsById, createModerator, editModerator, deleteModerator,
     getOrders, getOrderDetailsById, updateOrder,
-    getSellers, getSellerById, createSeller, editSeller, deleteSeller
+    getSellers, getSellerById, createSeller, editSeller, deleteSeller,
+    getBrands, createBrand, editBrand, deleteBrand,
 
 };
