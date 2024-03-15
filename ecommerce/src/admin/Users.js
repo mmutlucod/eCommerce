@@ -20,9 +20,18 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AdminNavbar from '../components/AdminNavbar';
 import api from '../api/api';
+import { Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
 
 function Users() {
   const [users, setUsers] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    phone: '',
+    password: ''
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -40,10 +49,39 @@ function Users() {
   const deleteUser = async (id) => {
     try {
       await api.delete(`/admin/users/${id}`);
-      // Silme işlemi başarılıysa, kullanıcı listesini yeniden yükle
       fetchUsers();
     } catch (error) {
       console.error('Kullanıcı silinirken bir hata oluştu:', error);
+    }
+  };
+  
+
+  const handleOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleChange = (e) => {
+    setNewUser({ ...newUser, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await api.post('/admin/create-user', newUser);
+      fetchUsers();
+      setNewUser({
+        name: '',
+        surname: '',
+        email: '',
+        phone: '',
+        password: ''
+      });
+      handleCloseDialog();
+    } catch (error) {
+      console.error('Kullanıcı eklenirken bir hata oluştu:', error);
     }
   };
 
@@ -69,7 +107,7 @@ function Users() {
                         <TableCell>Telefon</TableCell>
                         <TableCell align="right">
                           <Tooltip title="Kullanıcı Ekle">
-                            <IconButton color="primary">
+                            <IconButton color="primary" onClick={handleOpenDialog}>
                               <AddCircleIcon />
                             </IconButton>
                           </Tooltip>
@@ -91,7 +129,7 @@ function Users() {
                             <IconButton aria-label="edit">
                               <EditIcon color="primary" />
                             </IconButton>
-                            <IconButton aria-label="delete" onClick={() => deleteUser(user.id)}>
+                            <IconButton aria-label="delete" onClick={() => deleteUser(user.user_id)}>
                               <DeleteIcon color="secondary" />
                             </IconButton>
                           </TableCell>
@@ -105,7 +143,73 @@ function Users() {
           </Grid>
         </Grid>
       </Container>
+      <AddUserDialog open={openDialog} onClose={handleCloseDialog} handleChange={handleChange} handleSubmit={handleSubmit} newUser={newUser} />
     </>
+  );
+}
+
+function AddUserDialog({ open, onClose, handleChange, handleSubmit, newUser }) {
+  return (
+    <Dialog open={open} onClose={onClose}>
+      <DialogTitle>Kullanıcı Ekle</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin="dense"
+          name="name"
+          label="Adı"
+          type="text"
+          fullWidth
+          variant="standard"
+          value={newUser.name}
+          onChange={handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="surname"
+          label="Soyadı"
+          type="text"
+          fullWidth
+          variant="standard"
+          value={newUser.surname}
+          onChange={handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="email"
+          label="E-posta"
+          type="email"
+          fullWidth
+          variant="standard"
+          value={newUser.email}
+          onChange={handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="phone"
+          label="Telefon"
+          type="tel"
+          fullWidth
+          variant="standard"
+          value={newUser.phone}
+          onChange={handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="password"
+          label="Şifre"
+          type="password"
+          fullWidth
+          variant="standard"
+          value={newUser.password}
+          onChange={handleChange}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose}>İptal</Button>
+        <Button onClick={handleSubmit}>Ekle</Button>
+      </DialogActions>
+    </Dialog>
   );
 }
 
