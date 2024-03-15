@@ -200,56 +200,55 @@ function Brands() {
                 </Card>
               </Grid>
             </Grid>
-          </Container>    <Dialog open={openDialog} onClose={handleCloseDialog}>
-      <DialogTitle>{editBrand ? 'Markayı Düzenle' : 'Marka Ekle'}</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          name="brand_name"
-          label="Marka Adı"
-          type="text"
-          fullWidth
-          variant="outlined"
-          // Value and onChange
-        />
-        <TextField
-          margin="dense"
-          name="description"
-          label="Açıklama"
-          type="text"
-          fullWidth
-          variant="outlined"
-          // Value and onChange
-        />
-        <FormControl fullWidth margin="dense">
-          <InputLabel>Onay Durumu</InputLabel>
-          <Select
-            label="Onay Durumu"
-            name="approval_status_id"
-            value={editBrand ? editBrand.approval_status_id : newBrand.approval_status_id}
-            onChange={editBrand ? handleEditChange : handleChange}
-          >
-            
-            {approvalStatuses.map((status) => (
-              <MenuItem key={status.status_name} value={status.approval_status_id}>
-                {status.status_name}
-                {console.log(status)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleCloseDialog}>İptal</Button>
-        <Button onClick={editBrand ? handleEditSubmit : handleSubmit}>
-          {editBrand ? 'Güncelle' : 'Ekle'}
-        </Button>
-      </DialogActions>
-    </Dialog>
-
-    
-          {/* Snackbar for notifications */}
+          </Container>   <Dialog open={openDialog} onClose={handleCloseDialog}>
+  <DialogTitle>{editBrand ? 'Markayı Düzenle' : 'Marka Ekle'}</DialogTitle>
+  <DialogContent>
+    <TextField
+      autoFocus
+      margin="dense"
+      name="brand_name"
+      label="Marka Adı"
+      type="text"
+      fullWidth
+      variant="outlined"
+      value={editBrand ? editBrand.brand_name : newBrand.brand_name}
+      onChange={editBrand ? handleEditChange : handleChange}
+    />
+    <TextField
+      margin="dense"
+      name="description"
+      label="Açıklama"
+      type="text"
+      fullWidth
+      variant="outlined"
+      value={editBrand ? editBrand.description : newBrand.description}
+      onChange={editBrand ? handleEditChange : handleChange}
+    />
+    {editBrand && (
+      <FormControl fullWidth margin="dense">
+        <InputLabel>Onay Durumu</InputLabel>
+        <Select
+          label="Onay Durumu"
+          name="approval_status_id"
+          value={editBrand.approval_status_id}
+          onChange={handleEditChange}
+        >
+          {approvalStatuses.map((status) => (
+            <MenuItem key={status.approval_status_id} value={status.approval_status_id}>
+              {status.status_name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={handleCloseDialog}>İptal</Button>
+    <Button onClick={editBrand ? handleEditSubmit : handleSubmit}>
+      {editBrand ? 'Güncelle' : 'Ekle'}
+    </Button>
+  </DialogActions>
+</Dialog>
           <Snackbar
             open={snackbarOpen}
             autoHideDuration={6000}
