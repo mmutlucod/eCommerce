@@ -34,7 +34,12 @@ function Categories() {
   const [openDialog, setOpenDialog] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [newCategory, setNewCategory] = useState('');
+  const [newCategory, setNewCategory] = useState({
+    name: '',
+    description: '',
+    categoryNumber: '',
+    status: ''
+  });
   const [editCategory, setEditCategory] = useState(null);
 
   useEffect(() => {
@@ -86,18 +91,23 @@ function Categories() {
   };
 
   const handleChange = (e) => {
-    setNewCategory(e.target.value);
+    setNewCategory({ ...newCategory, [e.target.name]: e.target.value });
   };
 
   const handleEditChange = (e) => {
-    setEditCategory(e.target.value);
+    setEditCategory({ ...editCategory, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async () => {
     try {
-      await api.post('/admin/categories', { name: newCategory });
+      await api.post('/admin/create-category', newCategory);
       fetchCategories();
-      setNewCategory('');
+      setNewCategory({
+        name: '',
+        description: '',
+        categoryNumber: '',
+        status: ''
+      });
       handleCloseDialog();
       handleSnackbarOpen('Kategori başarıyla eklendi.'); // Snackbar mesajı
     } catch (error) {
@@ -108,7 +118,7 @@ function Categories() {
 
   const handleEditSubmit = async () => {
     try {
-      await api.put(`/admin/categories/${editCategory.id}`, { name: editCategory.name });
+      await api.put(`/admin/categories/${editCategory.id}`, editCategory);
       fetchCategories();
       handleCloseDialog();
       handleSnackbarOpen('Kategori başarıyla güncellendi.'); // Snackbar mesajı
@@ -132,7 +142,6 @@ function Categories() {
                   <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                       <TableRow>
-                        
                         <TableCell> Kategori Adı</TableCell>
                         <TableCell> Kategori Açıklaması</TableCell>
                         <TableCell> Kategori Numarası</TableCell>
@@ -152,12 +161,10 @@ function Categories() {
                           key={category.id}
                           sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
-                        
                           <TableCell>{category.category_name}</TableCell>
                           <TableCell>{category.description}</TableCell>
-                          <TableCell>{category.id}</TableCell>
+                          <TableCell>{category.category_id}</TableCell>
                           <TableCell>{category.ApprovalStatus.status_name}</TableCell>
-
                           <TableCell align="right">
                             <IconButton aria-label="edit" onClick={() => handleEdit(category)}>
                               <EditIcon color="primary" />
@@ -216,7 +223,37 @@ function AddEditCategoryDialog({ open, onClose, handleChange, handleSubmit, hand
           type="text"
           fullWidth
           variant="standard"
-          value={isEditMode ? editCategory.name : newCategory}
+          value={isEditMode ? editCategory.name : newCategory.name}
+          onChange={isEditMode ? handleEditChange : handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="description"
+          label="Kategori Açıklaması"
+          type="text"
+          fullWidth
+          variant="standard"
+          value={isEditMode ? editCategory.description : newCategory.description}
+          onChange={isEditMode ? handleEditChange : handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="categoryNumber"
+          label="Kategori Numarası"
+          type="text"
+          fullWidth
+          variant="standard"
+          value={isEditMode ? editCategory.categoryNumber : newCategory.categoryNumber}
+          onChange={isEditMode ? handleEditChange : handleChange}
+        />
+        <TextField
+          margin="dense"
+          name="status"
+          label="Kategori Durumu"
+          type="text"
+          fullWidth
+          variant="standard"
+          value={isEditMode ? editCategory.status : newCategory.status}
           onChange={isEditMode ? handleEditChange : handleChange}
         />
       </DialogContent>
