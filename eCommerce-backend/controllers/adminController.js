@@ -3,7 +3,6 @@ const Admin = require('../models/admin');
 const jwt = require('jsonwebtoken');
 const Product = require('../models/product');
 const Category = require('../models/category');
-const { where } = require('sequelize');
 const User = require('../models/user');
 const Moderator = require('../models/moderator');
 const Brand = require('../models/Brand');
@@ -12,7 +11,6 @@ const Order = require('../models/order');
 const OrderItem = require('../models/orderItem');
 const sellerProduct = require('../models/sellerProduct');
 const Seller = require('../models/seller');
-const { errors } = require('ethers');
 const saltRounds = 10; // Bcrypt için salt tur sayısı
 
 const login = async (req, res) => {
