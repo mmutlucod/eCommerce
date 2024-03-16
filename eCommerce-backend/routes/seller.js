@@ -12,6 +12,7 @@ router.post('/register', sellerController.register);
 router.get('/listSellers', sellerController.listSellers);
 
 router.get('/products', authMiddleware, sellerController.getProducts);
-router.get('/products/:id', sellerController.getProductDetailsById);
+router.get('/products/:id', authMiddleware, sellerController.getProductDetailsById);
+router.post('/create-seller-product', authMiddleware, sellerController.createProduct);
 
 module.exports = router;

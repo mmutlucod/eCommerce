@@ -6,6 +6,8 @@ const Product = require('../models/product');
 const ApprovalStatus = require('../models/approval_status');
 const Brand = require('../models/Brand');
 const Category = require('../models/category');
+const { Op } = require('sequelize');
+
 
 //GİRİŞ
 const login = async (req, res) => {
@@ -137,9 +139,59 @@ const getProductDetailsById = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+const createProduct = async (req, res) => {
+    try {
+        const seller = await Seller.findOne({ where: { username: req.user.username } });
+        console.log(seller.seller_id);
+        const existingItem = await sellerProduct.findOne({
+            where: {
+                [Op.and]: [
+                    { seller_id: 12 },
+                    { product_id: req.body.product_id }
+                ]
+            }
+        });
+        console.log(existingItem);
+        if (existingItem) {
+            return res.status(404).json({ success: false, message: 'Bu ürünü zaten eklediniz.' });
+        }
+        await sellerProduct.create({
+            seller_id: seller.seller_id,
+            ...req.body
+        });
+        res.status(200).json({ success: true, message: 'Ürün eklendi.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+const updateProduct = async (req, res) => {
+    const { id } = req.params;
+    const updatedData = req.body;
+    try {
+        const seller = await Seller.findOne({ where: { username: req.user.username } });
+        const product = await sellerProduct.findOne({
+            where: {
+                [Op.or]: [
+                    { seller_product_id: id },
+                    { seller_id: seller.seller_id }
+                ]
+            }
+        });
 
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Ürün bulunamadı.' })
+        }
+        await product.update(updatedData);
 
+        return res.status(200).json({ success: true, message: 'Ürün güncellendi' });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message })
+    }
+}
+const deleteProduct = async (req, res) => {
+
+}
 module.exports = {
     login, register, listSellers,
-    getProducts, getProductDetailsById
+    getProducts, getProductDetailsById, createProduct, updateProduct
 }
