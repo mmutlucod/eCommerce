@@ -171,7 +171,7 @@ const updateProduct = async (req, res) => {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
         const product = await sellerProduct.findOne({
             where: {
-                [Op.or]: [
+                [Op.and]: [
                     { seller_product_id: id },
                     { seller_id: seller.seller_id }
                 ]
@@ -193,21 +193,22 @@ const activateProduct = async (req, res) => {
 
     try {
         // Ürünü bul ve is_active alanını 1 olarak güncelle
-        const updatedProduct = await Product.update(
-            { is_active: 1 }, // Güncellenecek alan ve değer
-            { where: { seller_product_id: id } } // Hangi ürünün güncelleneceği
-        );
+
+        const updateProduct = await sellerProduct.findByPk(id);
 
         // Güncelleme başarılıysa, bir yanıt dön
-        if (updatedProduct[0] > 0) { // Sequelize update, güncellenen satırların sayısını dizi olarak döner
-            return res.status(200).json({ success: true, message: 'Ürün başarıyla aktif hale getirildi.' });
-        } else {
-            // Belirtilen ID'ye sahip bir ürün bulunamazsa
+        if (!updateProduct) { // Sequelize update, güncellenen satırların sayısını dizi olarak döner
             return res.status(404).json({ success: false, message: 'Ürün bulunamadı veya zaten aktif.' });
         }
+        await updateProduct.update(
+            { is_active: 1 }
+        );
+
+        return res.status(200).json({ success: true, message: 'Ürün başarıyla aktif hale getirildi.' });
+
     } catch (error) {
         console.error('Ürün aktifleştirme sırasında bir hata oluştu:', error);
-        return res.status(500).json({ success: false, message: 'Ürünü aktifleştirme işlemi sırasında bir hata oluştu.' });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 const deactivateProduct = async (req, res) => {
@@ -215,21 +216,22 @@ const deactivateProduct = async (req, res) => {
 
     try {
         // Ürünü bul ve is_active alanını 1 olarak güncelle
-        const updatedProduct = await Product.update(
-            { is_active: 0 }, // Güncellenecek alan ve değer
-            { where: { seller_product_id: id } } // Hangi ürünün güncelleneceği
-        );
+
+        const updateProduct = await sellerProduct.findByPk(id);
 
         // Güncelleme başarılıysa, bir yanıt dön
-        if (updatedProduct[0] > 0) { // Sequelize update, güncellenen satırların sayısını dizi olarak döner
-            return res.status(200).json({ success: true, message: 'Ürün başarıyla aktif hale getirildi.' });
-        } else {
-            // Belirtilen ID'ye sahip bir ürün bulunamazsa
-            return res.status(404).json({ success: false, message: 'Ürün bulunamadı veya zaten aktif.' });
+        if (!updateProduct) { // Sequelize update, güncellenen satırların sayısını dizi olarak döner
+            return res.status(404).json({ success: false, message: 'Ürün bulunamadı veya zaten pasif.' });
         }
+        await updateProduct.update(
+            { is_active: 0 }
+        );
+
+        return res.status(200).json({ success: true, message: 'Ürün başarıyla pasif hale getirildi.' });
+
     } catch (error) {
-        console.error('Ürün aktifleştirme sırasında bir hata oluştu:', error);
-        return res.status(500).json({ success: false, message: 'Ürünü aktifleştirme işlemi sırasında bir hata oluştu.' });
+        console.error('Ürün kaldırma sırasında bir hata oluştu:', error);
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 module.exports = {
