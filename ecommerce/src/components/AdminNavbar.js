@@ -1,60 +1,77 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Button, IconButton, InputBase, Grid, Badge } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
-import { styled } from '@mui/material/styles';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import MailIcon from '@mui/icons-material/Mail';
+import { styled, alpha } from '@mui/material/styles';
+import { useAuth } from '../context/AuthContext'; // `useAuth` hook'unu import edin
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+  backgroundColor: alpha(theme.palette.common.white, 0.15),
   '&:hover': {
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    backgroundColor: alpha(theme.palette.common.white, 0.25),
   },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: 'auto',
   display: 'flex',
   alignItems: 'center',
+  width: '100%',
 }));
 
-const StyledInputBase = styled('input')(({ theme }) => ({
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: 'inherit',
-  '&::placeholder': {
-    color: 'inherit',
-    opacity: 0.5,
+  '& .MuiInputBase-input': {
+    padding: theme.spacing(1, 1, 1, 0),
+    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    width: '100%',
   },
-  padding: theme.spacing(1, 1, 1, 0),
-  paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-  width: '100%',
-  border: 'none',
-  outline: 'none',
-  backgroundColor: 'transparent',
 }));
 
 const AdminNavbar = () => {
+  const { token, logout } = useAuth(); // `useAuth` hook'unu kullanarak giriş yapma durumunu ve çıkış fonksiyonunu alın
+
   return (
-    <AppBar position="fixed">
+    <AppBar position="fixed" sx={{ backgroundColor: '#3a3a3a' }}>
       <Toolbar>
-        <IconButton
-          size="large"
-          edge="start"
-          color="inherit"
-          aria-label="open drawer"
-          sx={{ mr: 2 }}
-        >
-          <MenuIcon />
-        </IconButton>
-        <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          Logo
-        </Typography>
-        <Search>
-          <StyledInputBase placeholder="Ara…" />
-          <IconButton type="submit" sx={{ p: '10px' }} aria-label="search">
-            <SearchIcon />
-          </IconButton>
-        </Search>
-        <Button color="inherit">Giriş</Button>
+        <Grid container alignItems="center">
+          <Grid item xs>
+            <IconButton color="inherit">
+              <MenuIcon />
+            </IconButton>
+          </Grid>
+          <Grid item xs={8}>
+            <Search>
+              <IconButton type="submit" sx={{ p: '10px', color: 'inherit' }}>
+                <SearchIcon />
+              </IconButton>
+              <StyledInputBase
+                placeholder="Ara…"
+                inputProps={{ 'aria-label': 'search' }}
+              />
+            </Search>
+          </Grid>
+          <Grid item xs display="flex" justifyContent="flex-end">
+            {token && (
+              <>
+                <IconButton color="inherit">
+                  <Badge badgeContent={4} color="secondary">
+                    <MailIcon />
+                  </Badge>
+                </IconButton>
+                <IconButton color="inherit">
+                  <Badge badgeContent={10} color="secondary">
+                    <NotificationsIcon />
+                  </Badge>
+                </IconButton>
+                <Button color="inherit" onClick={logout}>Çıkış</Button> {/* Giriş yapılmışsa Çıkış butonunu göster */}
+              </>
+            )}
+            {!token && (
+              <Button color="inherit">Giriş</Button> 
+            )}
+          </Grid>
+        </Grid>
       </Toolbar>
     </AppBar>
   );

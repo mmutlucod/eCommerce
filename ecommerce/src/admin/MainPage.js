@@ -1,70 +1,155 @@
-import React from 'react';
-import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Container, Grid, Card, CardContent, Paper, Toolbar } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Drawer, List, ListItem, ListItemIcon, ListItemText, Container, Grid, Card, CardContent, Paper, Toolbar, Typography, Table, TableContainer, TableHead, TableRow, TableCell, TableBody, IconButton } from '@mui/material';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import AdminNavbar from '../components/AdminNavbar';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupIcon from '@mui/icons-material/Group';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { Typography } from '@mui/material';
+import BrandingWatermarkIcon from '@mui/icons-material/BrandingWatermark';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import CategoryIcon from '@mui/icons-material/Category';
+import api from '../api/api'; // Yolu doğru belirleyin
+
 const drawerWidth = 240;
 
 function MainPage() {
-  return (
-    <Box sx={{ display: 'flex', m: 2 }}>
-     
-        <AdminNavbar />
-        <Drawer
-          variant="permanent"
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box', marginTop: '64px', height: 'calc(100% - 64px)', backgroundColor: '#1565c0' },
-          }}
-        >
-          <List>
-              {[{ text: 'Ana Sayfa', icon: <DashboardIcon />, link: '/' }, { text: 'Kullanıcılar', icon: <GroupIcon />, link: '/users' },
-               { text: 'Siparişler', icon: <ShoppingCartIcon />, link: '/orders' },
-               { text: 'Markalar', icon: <ShoppingCartIcon />, link: '/brands' },
-               { text: 'Satıcılar', icon: <ShoppingCartIcon />, link: '/sellers' },
-               { text: 'Kategoriler', icon: <ShoppingCartIcon />, link: '/categories' },
+  const [latestOrders, setLatestOrders] = useState([]);
+  const [latestUsers, setLatestUsers] = useState([]);
 
-              ].map((item, index) => (
-                <ListItem button key={item.text} component={Link} to={item.link}>
-                  <ListItemIcon>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText primary={item.text} />
-                </ListItem>
-              ))}
-            </List>
-        </Drawer>
-        <Box component="main" sx={{ flexGrow: 1, p: 3, mt:-5 }}>
-          <Toolbar />
-          <Container sx={{ py: 2 }}>
-            <Grid container spacing={2}>
-              {['Satışlar', 'Ziyaretçiler', 'Siparişler', 'Gelir'].map((statistic) => (
-                <Grid item xs={12} sm={6} md={3} key={statistic}>
-                  <Card sx={{ minHeight: 120 }}>
-                    <CardContent>
-                      <Typography variant="h5" component="div">
-                        {statistic}
-                      </Typography>
-                      <Typography variant="body2">
-                        Detaylar...
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
+  useEffect(() => {
+    const fetchLatestData = async () => {
+      try {
+        const ordersResponse = await api.get('admin/orders');
+        setLatestOrders(ordersResponse.data.slice(0, 5));
+        const usersResponse = await api.get('admin/users');
+        setLatestUsers(usersResponse.data.slice(0, 5));
+      } catch (error) {
+        console.error("Veri çekme işlemi sırasında bir hata oluştu:", error);
+      }
+    };
+
+    fetchLatestData();
+  }, []);
+
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <AdminNavbar />
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          ml: 20,  
+          [`& .MuiDrawer-paper`]: { 
+            width: drawerWidth, 
+            boxSizing: 'border-box', 
+            marginTop: '75px',
+            height: 'calc(100% - 150px)', 
+            backgroundColor: '#3a3a3a',
+            color: '#fff',
+            borderRadius: '0 30px 30px 0',
+          },
+        }}
+      >
+        <List>
+          {[{ text: 'Ana Sayfa', icon: <DashboardIcon />, link: '/adminpaneli' },
+            { text: 'Kullanıcılar', icon: <GroupIcon />, link: '/users' },
+            { text: 'Siparişler', icon: <ShoppingCartIcon />, link: '/orders' },
+            { text: 'Markalar', icon: <BrandingWatermarkIcon />, link: '/brands' },
+            { text: 'Satıcılar', icon: <AccountCircleIcon />, link: '/sellers' },
+            { text: 'Kategoriler', icon: <CategoryIcon />, link: '/categories' },
+          ].map((item, index) => (
+            <ListItem button key={item.text} component={Link} to={item.link} sx={{ '&:hover': { backgroundColor: '#1565c0' } }}>
+              <ListItemIcon sx={{ color: '#fff' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItem>
+          ))}
+        </List>
+      </Drawer>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        <Toolbar />
+        <Container sx={{ py: 2 }}>
+          <Grid container spacing={2}>
+            {/* İstatistik Kartları */}
+            {['Satışlar', 'Ziyaretçiler', 'Siparişler', 'Gelir'].map((statistic) => (
+              <Grid item xs={12} sm={6} md={3} key={statistic}>
+                <Card>
+                  <CardContent>
+                    <Typography variant="h5" component="div">
+                      {statistic}
+                    </Typography>
+                    <Typography variant="body2">
+                      Detaylar...
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+           
+           <Grid item xs={12} md={6}>
+              <Typography variant="h6" gutterBottom sx={{ bgcolor: '#1565c0', color: '#fff', p: 2 }}>
+                <IconButton component={Link} to="/orders" sx={{ color: '#fff' }}>
+                  <ShoppingCartIcon />
+                </IconButton>
+                Son 5 Sipariş
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Sipariş ID</TableCell>
+                      <TableCell>Tutar</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {latestOrders.map((order, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{order.order_date}</TableCell>
+                        <TableCell>{order.total_price}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </Grid>
-          </Container>
-          <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: 2, textAlign: 'center'}}>
-            <Typography variant="body1">Your Footer Content Here</Typography>
-          </Paper>
-        </Box>
-      
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" gutterBottom sx={{ bgcolor: '#1565c0', color: '#fff', p: 2 }}>
+                <IconButton component={Link} to="/users" sx={{ color: '#fff' }}>
+                  <GroupIcon />
+                </IconButton>
+                Son 5 Kullanıcı
+              </Typography>
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Kullanıcı Adı</TableCell>
+                      <TableCell>E-posta</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {latestUsers.map((user, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Grid>
+          </Grid>
+        </Container>
+        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: 2, textAlign: 'center', color: '##3a3a3a' }}>
+  <Typography variant="body1">© 2024 Admin Panel. Tüm hakları saklıdır.</Typography>
+  <Typography variant="body2">Bize ulaşın: admin@example.com</Typography>
+</Paper>
+      </Box>
     </Box>
   );
 }
+
 
 export default MainPage;
