@@ -19,6 +19,7 @@ const Seller = sequelize.define('seller', {
     city: Sequelize.STRING,
     district: Sequelize.STRING,
     reference_code: Sequelize.STRING,
+    password: Sequelize.STRING,
     approval_status_id: {
         type: Sequelize.INTEGER,
         defaultValue: 0
