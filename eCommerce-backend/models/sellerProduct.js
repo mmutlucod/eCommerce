@@ -13,6 +13,7 @@ const sellerProduct = sequelize.define('sellerProduct', {
     product_id: Sequelize.INTEGER,
     price: Sequelize.DOUBLE,
     stock: Sequelize.INTEGER,
+    is_active: Sequelize.INTEGER,
     approval_status_id: {
         type: Sequelize.INTEGER,
         defaultValue: 0

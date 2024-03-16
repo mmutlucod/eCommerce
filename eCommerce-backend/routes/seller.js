@@ -14,5 +14,8 @@ router.get('/listSellers', sellerController.listSellers);
 router.get('/products', authMiddleware, sellerController.getProducts);
 router.get('/products/:id', authMiddleware, sellerController.getProductDetailsById);
 router.post('/create-seller-product', authMiddleware, sellerController.createProduct);
+router.put('/products/:id', authMiddleware, sellerController.updateProduct);
+router.put('/activateProduct/:id', authMiddleware, sellerController.activateProduct);
+router.put('/deactivateProduct/:id', authMiddleware, sellerController.deactivateProduct);
 
 module.exports = router;
