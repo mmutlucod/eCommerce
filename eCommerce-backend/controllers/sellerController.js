@@ -189,7 +189,7 @@ const updateProduct = async (req, res) => {
     }
 }
 const activateProduct = async (req, res) => {
-    const { id } = req.params.id; // Ürün ID'sini istek gövdesinden al
+    const { id } = req.params; // Ürün ID'sini istek gövdesinden al
 
     try {
         // Ürünü bul ve is_active alanını 1 olarak güncelle
@@ -211,7 +211,7 @@ const activateProduct = async (req, res) => {
     }
 }
 const deactivateProduct = async (req, res) => {
-    const { id } = req.params.id; // Ürün ID'sini istek gövdesinden al
+    const { id } = req.params; // Ürün ID'sini istek gövdesinden al
 
     try {
         // Ürünü bul ve is_active alanını 1 olarak güncelle
