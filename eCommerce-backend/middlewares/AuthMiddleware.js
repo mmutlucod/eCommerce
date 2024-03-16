@@ -23,7 +23,6 @@ const authMiddleware = (req, res, next) => {
         // Token doğrulandıktan sonra, decoded bilgisini request nesnesine ekle
         req.user = decoded;
 
-
         // Eğer kullanıcının rolü token içerisinde saklanıyorsa, bu bilgi artık req.user içerisinde mevcuttur
         // Örneğin: req.user.role
 

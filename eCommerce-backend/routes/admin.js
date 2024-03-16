@@ -6,8 +6,7 @@ const { authMiddleware, roleCheckMiddleware } = require('../middlewares/AuthMidd
 
 router.post('/login', adminController.login);
 router.post('/register', adminController.register);
-router.get('/listAdmins', authMiddleware, adminController.listAdmins);
-
+router.get('/listAdmins', authMiddleware, roleCheckMiddleware('admin'), adminController.listAdmins);
 
 router.get('/products', authMiddleware, adminController.getProducts)
 router.get('/products/:id', authMiddleware, adminController.getProductsById);
