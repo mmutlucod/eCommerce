@@ -147,6 +147,7 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
         </Box>
       </Toolbar>
       {/* Kategori 1 seçildiğinde ve markalar varsa, markaları göster */}
+      {console.log(brands)}
       {selectedSubItem === 'Kategori 1' && brands.length > 0 && (
         <Box sx={{ padding: 2, marginTop: 2 }}>
           <Typography variant="h5">Markalar</Typography>
