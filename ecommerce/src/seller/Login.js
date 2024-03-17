@@ -1,25 +1,31 @@
 import React, { useState } from 'react';
-import { Container, TextField, Button, Typography, Paper, Alert } from '@mui/material';
-import { useAuth } from '../context/AuthContext';
-import api from '../api/api'; // API'nin olduğu dosyanın yolu doğru olmalı
+import { Container, TextField, Button, Typography, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Sayfa yönlendirmek için
+import { useAuth } from '../context/AuthContext'; // AuthContext'i içe aktar
+import api from '../api/api'; // API istekleri için özelleştirilmiş axios örneğini içe aktar
 
 function SellerLogin() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login } = useAuth();
+  const navigate = useNavigate(); // Sayfa yönlendirmesi için kullanılacak
+  const { login } = useAuth(); // login fonksiyonunu AuthContext'ten kullan
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(''); // Önceki hataları temizle
 
     try {
-      const response = await api.post('seller/login', { email, password });
-      if (response.data.token) {
-        login(response.data.token); // Token'ı AuthContext'e ve localStorage'a kaydet
+      // Kullanıcı adı ve şifre ile giriş yapma isteği
+      const response = await api.post('seller/login', { username, password });
+
+      if (response.data && response.data.token) {
+        login(response.data.token); // Token'ı sakla
+        alert("Giriş başarılı");
+        navigate('/seller/dashboard'); // Kullanıcıyı satıcı paneline yönlendir
+      } else {
+        alert("Giriş başarısız. Geçerli kullanıcı verileri alınamadı.");
       }
-    } catch (err) {
-      setError('Giriş başarısız. Lütfen bilgilerinizi kontrol edin ve tekrar deneyin.');
+    } catch (error) {
+      alert(`Giriş hatası: ${error.response ? error.response.data.message : error.message}`);
     }
   };
 
@@ -29,31 +35,26 @@ function SellerLogin() {
         <Typography component="h1" variant="h5" style={{ marginBottom: '20px' }}>
           Satıcı Girişi
         </Typography>
-        {error && <Alert severity="error">{error}</Alert>}
-        <form onSubmit={handleSubmit} noValidate>
+        <form onSubmit={handleSubmit}>
           <TextField
+            label="Kullanıcı Adı"
             variant="outlined"
             margin="normal"
             required
             fullWidth
-            id="email"
-            label="E-posta Adresi"
-            name="email"
-            autoComplete="email"
+            name="username"
             autoFocus
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
+            label="Şifre"
             variant="outlined"
             margin="normal"
             required
             fullWidth
             name="password"
-            label="Şifre"
             type="password"
-            id="password"
-            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
