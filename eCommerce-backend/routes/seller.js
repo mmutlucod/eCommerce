@@ -18,4 +18,16 @@ router.put('/products/:id', authMiddleware, sellerController.updateProduct);
 router.put('/activateProduct/:id', sellerController.activateProduct);
 router.put('/deactivateProduct/:id', sellerController.deactivateProduct);
 
+router.get('/allBrands', authMiddleware, sellerController.getAllBrands);
+router.get('/brands', authMiddleware, sellerController.getSellerBrands);
+router.get('/searchBrands', sellerController.searchBrand);
+router.post('/create-seller-brand', authMiddleware, sellerController.createBrand);
+router.put('/brands/:id', authMiddleware, sellerController.updateBrand);
+
+
+router.get('/categories', authMiddleware, sellerController.getAllCategories);
+router.get('/searchCategories', sellerController.getAllCategoriesWithSearch);
+
+router.get('/orders', authMiddleware, sellerController.getSellerOrders);
+
 module.exports = router;

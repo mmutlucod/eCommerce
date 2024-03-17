@@ -11,6 +11,7 @@ const Brand = sequelize.define('Brand', {
     },
     brand_name: Sequelize.STRING,
     description: Sequelize.TEXT,
+    seller_id: Sequelize.INTEGER,
     approval_status_id: {
         type: Sequelize.INTEGER,
         defaultValue: 0
