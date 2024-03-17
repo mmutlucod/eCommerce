@@ -27,6 +27,8 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SellerNavbar from '../components/SellerNavbar';
 import api from '../api/api'; // Bu yolu projenize göre ayarlayın
 import { green } from '@mui/material/colors';
+import SearchIcon from '@mui/icons-material/Search';
+
 
 function Brands() {
   const [brands, setBrands] = useState([]);
@@ -35,10 +37,16 @@ function Brands() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [brandToEdit, setBrandToEdit] = useState(null);
   const [newBrandName, setNewBrandName] = useState('');
-
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    fetchBrands();
-  }, []);
+    if (searchTerm.trim()) {
+      searchBrands(searchTerm);
+    } else {
+      // Arama terimi boşsa tüm markaları tekrar yükle
+      fetchBrands();
+    }
+  }, [searchTerm]);
 
   const handleSnackbarOpen = (message) => {
     setSnackbarMessage(message);
@@ -48,16 +56,36 @@ function Brands() {
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
-
+  const searchBrands = async (searchTerm) => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/seller/searchsellerbrands?search=${searchTerm}`);
+      setBrands(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Markalar aranırken bir hata oluştu:', error);
+      setLoading(false);
+    }
+  };
   const fetchBrands = async () => {
     try {
       const response = await api.get('/seller/brands');
-      setBrands(response.data);
+      const sortedBrands = response.data.sort((a, b) => {
+        // Onay durumuna göre sıralama kuralını buraya yazın
+        // Örnek olarak, "Onay Bekleyen" durumunu kontrol ediyoruz
+        if (a.ApprovalStatus.status_name === "Onay Bekleniyor" && b.ApprovalStatus.status_name !== "Onay Bekleniyor") {
+          return -1; // a, b'den önce gelmeli
+        } else if (a.ApprovalStatus.status_name !== "Onay Bekleniyor" && b.ApprovalStatus.status_name === "Onay Bekleniyor") {
+          return 1; // b, a'dan önce gelmeli
+        }
+        return 0; // Aynı durumdaysa sıralama değişmez
+      });
+      setBrands(sortedBrands);
     } catch (error) {
       console.error('Markaları çekerken bir hata oluştu:', error);
     }
   };
-
+  
   const handleOpenAddDialog = () => {
     setBrandToEdit(null);
     setNewBrandName('');
@@ -99,10 +127,16 @@ function Brands() {
       <SellerNavbar />
       <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
         <Grid container spacing={3}>
-          <Grid item xs={12} display="flex" justifyContent="flex-end">
+        <Grid item xs={12} display="flex" justifyContent="space-between" alignItems="center">
+            {/* Arama kutusu ve Ekle butonu */}
+            <TextField
+              placeholder="Marka ara..."
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{ marginRight: 20 }}
+            />
             <Tooltip title="Marka Ekle">
               <IconButton color="primary" onClick={handleOpenAddDialog}>
-                <AddCircleIcon sx={{ fontSize: 30 }} />
+                <AddCircleIcon />
               </IconButton>
             </Tooltip>
           </Grid>
@@ -123,21 +157,25 @@ function Brands() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {brands.map((brand) => (
-                        <TableRow key={brand.brand_id}>
-                          <TableCell>{brand.brand_id}</TableCell>
-                          <TableCell>{brand.brand_name}</TableCell>
-                          <TableCell>{brand.ApprovalStatus.status_name}</TableCell>
-                          <TableCell align="right">
-                            <Tooltip title="Düzenle">
-                              <IconButton onClick={() => handleOpenEditDialog(brand)}>
-                                <EditIcon color="primary" />
-                              </IconButton>
-                            </Tooltip>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
+  {brands.map((brand) => (
+    <TableRow key={brand.brand_id}>
+      <TableCell>{brand.brand_id}</TableCell>
+      <TableCell>{brand.brand_name}</TableCell>
+      <TableCell>{brand.ApprovalStatus.status_name}</TableCell>
+      <TableCell align="right">
+        
+        {brand.ApprovalStatus.status_name !== "Onaylandı" &&brand.ApprovalStatus.status_name !== "Reddedildi" && (
+          <Tooltip title="Düzenle">
+            <IconButton onClick={() => handleOpenEditDialog(brand)}>
+              <EditIcon color="primary" />
+            </IconButton>
+          </Tooltip>
+        )}
+      </TableCell>
+    </TableRow>
+  ))}
+</TableBody>
+
                   </Table>
                 </TableContainer>
               </CardContent>
