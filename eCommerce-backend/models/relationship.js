@@ -41,6 +41,9 @@ ApprovalStatus.hasMany(Brand, { foreignKey: 'approval_status_id' }); // Bir onay
 Brand.belongsTo(Moderator, { foreignKey: 'moderator_id' }); // Bir marka bir moderatöre ait olur
 Moderator.hasMany(Brand, { foreignKey: 'moderator_id' }); // Bir moderatör birden fazla markaya sahip olabilir
 
+Brand.belongsTo(Seller, { foreignKey: 'seller_id' });
+Seller.hasMany(Brand, { foreignKey: 'seller_id' });
+
 Cart.belongsTo(User, { foreignKey: 'user_id' }); // Bir sepet bir kullanıcıya ait olur
 User.hasMany(Cart, { foreignKey: 'user_id' }); // Bir kullanıcının birden fazla sepeti olabilir
 
@@ -85,6 +88,9 @@ Order.hasMany(OrderItem, { foreignKey: 'order_id' }); // Bir siparişin birden f
 
 OrderItem.belongsTo(SellerProduct, { foreignKey: 'seller_product_id' }); // Bir sipariş kalemi bir satıcı ürününe ait olur
 SellerProduct.hasMany(OrderItem, { foreignKey: 'seller_product_id' }); // Bir satıcı ürününe birden fazla sipariş kalemi olabilir
+
+OrderItem.belongsTo(OrderStatus, { foreignKey: 'order_status_id' });
+OrderStatus.hasMany(OrderItem, { foreignKey: 'status_id' });
 
 Product.belongsTo(Brand, { foreignKey: 'brand_id' }); // Bir ürün bir markaya ait olur
 Brand.hasMany(Product, { foreignKey: 'brand_id' }); // Bir markaya birden fazla ürün bağlı olabilir

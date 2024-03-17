@@ -12,7 +12,8 @@ const OrderItem = sequelize.define('OrderItem', {
     order_id: Sequelize.INTEGER,
     seller_product_id: Sequelize.INTEGER,
     quantity: Sequelize.INTEGER,
-    price: Sequelize.DOUBLE
+    price: Sequelize.DOUBLE,
+    order_status_id: Sequelize.INTEGER
 })
 
 module.exports = OrderItem;

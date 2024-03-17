@@ -152,7 +152,6 @@ const createProduct = async (req, res) => {
                 ]
             }
         });
-        console.log(existingItem);
         if (existingItem) {
             return res.status(404).json({ success: false, message: 'Bu ürün ekleme talebiniz zaten mevcut.' });
         }
