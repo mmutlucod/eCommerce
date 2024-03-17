@@ -13,6 +13,7 @@ const OrderItem = sequelize.define('OrderItem', {
     seller_product_id: Sequelize.INTEGER,
     quantity: Sequelize.INTEGER,
     price: Sequelize.DOUBLE,
+    shipping_code: Sequelize.STRING,
     order_status_id: Sequelize.INTEGER
 })
 
