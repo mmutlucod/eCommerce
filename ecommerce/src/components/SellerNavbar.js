@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -15,65 +16,33 @@ import {
   AccountCircle,
   Mail as MailIcon,
   ShoppingCart as ShoppingCartIcon,
-  MoreVert as MoreVertIcon
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon
 } from '@mui/icons-material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import api from '../api/api'; // api konfigürasyonunu içe aktarın
-import { useAuth } from '../context/AuthContext';
 
 const StyledMenuButton = styled(Button)(({ theme }) => ({
-    color: theme.palette.common.white,
-    textTransform: 'none',
-    margin: theme.spacing(1),
-    '& .menu-arrow': {
-      transition: theme.transitions.create(['transform'], {
-        duration: theme.transitions.duration.short,
-      }),
-    },
-    '&.open .menu-arrow': {
-        transform: 'rotate(180deg)',
-    },
-  }));
+  color: theme.palette.common.white,
+  textTransform: 'none',
+  margin: theme.spacing(1),
+  '& .menu-arrow': {
+    transition: theme.transitions.create(['transform'], {
+      duration: theme.transitions.duration.short,
+    }),
+  },
+  '&.open .menu-arrow': {
+    transform: 'rotate(180deg)',
+  },
+}));
+
 const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
-    fontSize: theme.typography.pxToRem(13), // Küçük font boyutu
-    padding: theme.spacing(2), // Daha az padding
-  }));
-  export default function SellerNavbar() {
-    const [anchorEl, setAnchorEl] = useState(null);
-    const [openMenuTitle, setOpenMenuTitle] = useState('');
-    const [selectedSubItem, setSelectedSubItem] = useState('');
-    const [brands, setBrands] = useState([]);
-  
-    // Menü açma işleyicisi
-    const handleMenuOpen = (event, title) => {
-      setAnchorEl(event.currentTarget);
-      setOpenMenuTitle(title);
-    };
-  
-    // Menü kapatma işleyicisi
-    const handleMenuClose = () => {
-      setAnchorEl(null);
-      setOpenMenuTitle('');
-    };
-  
-    // Alt menü öğesine tıklama işleyicisi
-    const handleSubItemClick = (subItem) => {
-      setSelectedSubItem(subItem);
-      if (subItem === 'Kategori 1') {
-        fetchBrands(); // Eğer "Kategori 1" seçildiyse, markaları çek
-      }
-      handleMenuClose(); // Menüyü kapat
-    };
-  
-    const fetchBrands = async () => {
-      try {
-        const response = await api.get('seller/brands');
-        setBrands(response.data); // API'den dönen veri yapısına bağlı olarak ayarlayın
-      } catch (error) {
-        console.error('Markaları çekerken hata oluştu:', error);
-      }
-    };
+  fontSize: theme.typography.pxToRem(13),
+  padding: theme.spacing(2),
+}));
+
+export default function SellerNavbar() {
+  const [anchorEls, setAnchorEls] = useState({});
+  const [openMenuTitle, setOpenMenuTitle] = useState('');
+  const navigate = useNavigate();
 
   const menuItems = [
     { title: 'ÜRÜN', subItems: ['Marka Tanımla', 'Kategori 2', 'Kategori 3'] },
@@ -81,8 +50,27 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
     { title: 'FİNANS', subItems: ['Fatura İşlemleri', 'Ödeme Seçenekleri'] },
     { title: 'PROMOSYONLAR', subItems: ['Fatura İşlemleri', 'Ödeme Seçenekleri'] },
     { title: 'RAPORLAR', subItems: ['Fatura İşlemleri', 'Ödeme Seçenekleri'] },
-    // Diğer menü öğeleri...
   ];
+
+  const handleMenuOpen = (event, title) => {
+    setAnchorEls({
+      ...anchorEls,
+      [title]: event.currentTarget
+    });
+    setOpenMenuTitle(title);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEls({});
+    setOpenMenuTitle('');
+  };
+
+  const handleSubItemClick = (subItem) => {
+    if (subItem === 'Marka Tanımla') {
+      navigate('/seller/seller-add');
+    }
+    handleMenuClose();
+  };
 
   return (
     <AppBar position="static" sx={{ bgcolor: '#004d40' }}>
@@ -101,23 +89,16 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
                 className={openMenuTitle === menuItem.title ? 'open' : ''}
               >
                 {menuItem.title}
-                {/* Ok ikonu menü açık ise yukarı, değilse aşağı bakacak şekilde koşullu render */}
                 <span className="menu-arrow">
                   {openMenuTitle === menuItem.title ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                 </span>
               </StyledMenuButton>
               <Menu
-                PaperProps={{
-                  sx: {
-                    bgcolor: 'secondary.main', // Özel arka plan rengi
-                    color: 'common.white', // Yazı rengi
-                    boxShadow: 3, // Gölgelendirme derinliği
-                  }
-                }}
+                PaperProps={{ sx: { bgcolor: 'secondary.main', color: 'common.white', boxShadow: 3 } }}
                 id={`menu-${menuItem.title}`}
-                anchorEl={anchorEl}
+                anchorEl={anchorEls[menuItem.title]}
                 keepMounted
-                open={Boolean(anchorEl) && openMenuTitle === menuItem.title}
+                open={Boolean(anchorEls[menuItem.title])}
                 onClose={handleMenuClose}
                 MenuListProps={{ onMouseLeave: handleMenuClose }}
               >
@@ -131,34 +112,18 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
           ))}
         </Box>
         <Box sx={{ display: 'flex' }}>
+          {/* Simge butonları */}
           <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
-              <MailIcon />
-            </Badge>
+            <Badge badgeContent={4} color="error"><MailIcon /></Badge>
           </IconButton>
           <IconButton color="inherit">
-            <Badge badgeContent={17} color="error">
-              <ShoppingCartIcon />
-            </Badge>
+            <Badge badgeContent={17} color="error"><ShoppingCartIcon /></Badge>
           </IconButton>
           <IconButton edge="end" color="inherit">
             <AccountCircle />
           </IconButton>
         </Box>
       </Toolbar>
-      {/* Kategori 1 seçildiğinde ve markalar varsa, markaları göster */}
-      {console.log(brands)}
-      {selectedSubItem === 'Kategori 1' && brands.length > 0 && (
-        <Box sx={{ padding: 2, marginTop: 2 }}>
-          <Typography variant="h5">Markalar</Typography>
-          <ul>
-            {brands.map((brand) => (
-              <li key={brand.id}>{brand.name}</li>
-            ))}
-          </ul>
-        </Box>
-      )}
     </AppBar>
   );
-
 }
