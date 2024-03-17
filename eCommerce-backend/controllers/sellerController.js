@@ -271,11 +271,12 @@ const createBrand = async (req, res) => {
             )
         });
 
-        if (!brand) {
+        if (brand) {
             return res.status(404).json({ success: false, message: 'Bu marka zaten sistemde mevcut.' });
         }
 
-        await brand.create({
+        await Brand.create({
+            seller_id: seller.seller_id,
             approval_status_id: 3,
             ...req.body
         });
