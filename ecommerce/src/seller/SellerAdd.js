@@ -70,21 +70,17 @@ function Brands() {
   const fetchBrands = async () => {
     try {
       const response = await api.get('/seller/brands');
-      const sortedBrands = response.data.sort((a, b) => {
-        // Onay durumuna göre sıralama kuralını buraya yazın
-        // Örnek olarak, "Onay Bekleyen" durumunu kontrol ediyoruz
-        if (a.ApprovalStatus.status_name === "Onay Bekleniyor" && b.ApprovalStatus.status_name !== "Onay Bekleniyor") {
-          return -1; // a, b'den önce gelmeli
-        } else if (a.ApprovalStatus.status_name !== "Onay Bekleniyor" && b.ApprovalStatus.status_name === "Onay Bekleniyor") {
-          return 1; // b, a'dan önce gelmeli
-        }
-        return 0; // Aynı durumdaysa sıralama değişmez
-      });
-      setBrands(sortedBrands);
+      const brandsWithStatusCheck = response.data.map((brand) => ({
+        ...brand,
+        ApprovalStatus: brand.ApprovalStatus || { status_name: "Bilinmiyor" }, // Eğer ApprovalStatus yoksa varsayılan bir değer ata
+      }));
+  
+      setBrands(brandsWithStatusCheck);
     } catch (error) {
       console.error('Markaları çekerken bir hata oluştu:', error);
     }
   };
+  
   
   const handleOpenAddDialog = () => {
     setBrandToEdit(null);
@@ -164,13 +160,13 @@ function Brands() {
       <TableCell>{brand.ApprovalStatus.status_name}</TableCell>
       <TableCell align="right">
         
-        {brand.ApprovalStatus.status_name !== "Onaylandı" &&brand.ApprovalStatus.status_name !== "Reddedildi" && (
+      
           <Tooltip title="Düzenle">
             <IconButton onClick={() => handleOpenEditDialog(brand)}>
               <EditIcon color="primary" />
             </IconButton>
           </Tooltip>
-        )}
+        
       </TableCell>
     </TableRow>
   ))}
