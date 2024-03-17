@@ -249,8 +249,13 @@ const getAllBrands = async (req, res) => {
 const getSellerBrands = async (req, res) => {
     try {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
-        const brands = await Brand.findAll({ where: { seller_id: seller.seller_id } });
-
+        const brands = await Brand.findAll({
+            where: { seller_id: seller.seller_id },
+            include: [{
+                model: ApprovalStatus,
+                attributes: ['status_name']
+            }]
+        });
         return res.status(200).json(brands);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
