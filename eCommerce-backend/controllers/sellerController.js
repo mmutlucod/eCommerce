@@ -35,7 +35,7 @@ const login = async (req, res) => {
         // Token oluştur (token içinde yalnızca gerekli ve güvenli bilgileri sakla)
         const tokenPayload = { id: seller.id, username: seller.username, role: 'seller', sellerId: seller.id };
         const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-            expiresIn: '1h', // Token süresi (örneğin 1 saat)
+            expiresIn: '100y', // Token süresi (örneğin 1 saat)
         });
 
         // Başarılı giriş yanıtı ve token dön
@@ -249,8 +249,13 @@ const getAllBrands = async (req, res) => {
 const getSellerBrands = async (req, res) => {
     try {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
-        const brands = await Brand.findAll({ where: { seller_id: seller.seller_id } });
-
+        const brands = await Brand.findAll({
+            where: { seller_id: seller.seller_id },
+            include: [{
+                model: ApprovalStatus,
+                attributes: ['status_name']
+            }]
+        });
         return res.status(200).json(brands);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -266,9 +271,15 @@ const createBrand = async (req, res) => {
             )
         });
 
-        if (!brand) {
+        if (brand) {
             return res.status(404).json({ success: false, message: 'Bu marka zaten sistemde mevcut.' });
         }
+
+        await Brand.create({
+            seller_id: seller.seller_id,
+            approval_status_id: 3,
+            ...req.body
+        });
 
         return res.status(200).json({ success: true, message: 'Marka ekleme talebiniz iletildi.' });
     } catch (error) {
@@ -351,12 +362,18 @@ const getSellerOrders = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
         }
         const sellerOrders = await OrderItem.findAll({
-            attributes: ['quantity', 'order_id'],
+            where: { '$SellerProduct.seller_id$': seller.seller_id },
+            attributes: [
+                'quantity',
+                'order_id',
+                'canceled_quantity',
+                [Sequelize.literal('quantity + IFNULL(canceled_quantity, 0)'), 'total_quantity']
+            ],
             include: [
                 {
-                    model: sellerProduct, // Doğru model ismi
-                    where: { seller_id: seller.seller_id }, // seller.seller_id değil, doğru alan adı seller.id olmalı
-                    attributes: ['price'], // Ürün fiyatı
+                    model: sellerProduct, // Model isminin doğru olduğundan emin olun.
+                    attributes: ['price'],
+                    where: { seller_id: seller.seller_id },
                     include: [{
                         model: Product,
                         attributes: ['name'],
@@ -364,24 +381,127 @@ const getSellerOrders = async (req, res) => {
                             model: Brand,
                             attributes: ['brand_name']
                         }]
-                    }]
+                    }],
+                    required: true
                 },
                 {
                     model: OrderStatus,
-                    attributes: ['status_name']
+                    attributes: ['status_name'],
+                    required: false
                 }
             ],
-            // order: [['Order', 'createdAt', 'DESC']] Bu satırı kaldırdım çünkü Order modeli doğrudan include edilmemiş
         });
 
-        return res.status(200).json(sellerOrders);
+        // İptal öncesi ve anlık miktarları ile birlikte sonucu döndür
+        const modifiedSellerOrders = sellerOrders.map(order => ({
+            ...order.get({ plain: true }),
+            total_quantity: order.dataValues.total_quantity, // Toplam miktar (İptal edilmeyen + İptal edilen)
+            remaining_quantity: order.quantity, // Kalan miktar (İptal edilmeyen)
+            canceled_quantity: order.canceled_quantity || 0, // İptal edilen miktar
+            cancellation_info: order.canceled_quantity ? `${order.canceled_quantity} tanesi iptal edildi.` : 'İptal edilen ürün yok.'
+        }));
+
+        return res.status(200).json(modifiedSellerOrders);
     } catch (error) {
         console.error('Error fetching seller orders:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
+const cancelOrderItemQuantity = async (req, res) => {
+    const { orderItemId, quantityToCancel } = req.body;
 
+    try {
+        const orderItem = await OrderItem.findByPk(orderItemId);
 
+        if (!orderItem) {
+            return res.status(404).json({ success: false, message: 'Order item not found.' });
+        }
+
+        // İptal edilecek miktarın geçerli olup olmadığını kontrol et
+        if (quantityToCancel <= 0 || quantityToCancel > orderItem.quantity) {
+            return res.status(400).json({ success: false, message: 'Invalid cancellation quantity.' });
+        }
+
+        // Yeni iptal edilen miktarı hesapla ve mevcut miktarı güncelle
+        const newCanceledQuantity = (orderItem.canceled_quantity || 0) + quantityToCancel;
+        const newQuantity = orderItem.quantity - quantityToCancel;
+
+        // OrderItem güncelleme
+        await OrderItem.update(
+            {
+                quantity: newQuantity,
+                canceled_quantity: newCanceledQuantity,
+                // Tamamen iptal edilmişse, durumu güncelleyin (Örneğin, 'cancelled' durumunun ID'si)
+                // Bu kısmı, durum IDsine göre uyarlayın
+                order_status_id: newQuantity === 0 ? 4 : orderItem.order_status_id
+            },
+            { where: { order_item_id: orderItemId } }
+        );
+
+        return res.json({ success: true, message: 'İptal etme işlemi başarılı.' });
+    } catch (error) {
+        console.error('İptal işlemi başarısız.', error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+const updateShippingCodeOrderItem = async (req, res) => {
+    const { id } = req.params;
+    const { shippingCode } = req.body;
+
+    try {
+        // Öncelikle, güncellenecek OrderItem'ı bul
+        const orderItem = await OrderItem.findByPk(id);
+
+        if (!orderItem) {
+            return res.status(404).json({ success: false, message: 'Order item not found.' });
+        }
+
+        // OrderItem için shipping_code alanını güncelle
+        await OrderItem.update(
+            {
+                shipping_code: shippingCode,
+                order_status_id: 2
+            },
+            { where: { order_item_id: id } }
+        );
+
+        return res.status(200).json({ success: true, message: 'Kargo takip kodu eklendi.' });
+    } catch (error) {
+        console.error('Kargo kodu eklenirken hata!', error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+
+}
+const updateOrderStatus = async (req, res) => {
+    const { id } = req.params;
+    const { newStatusId } = req.body;
+
+    try {
+        // Öncelikle, güncellenecek OrderItem'ı bul
+        const orderItem = await OrderItem.findByPk(id);
+
+        if (!orderItem) {
+            return res.status(404).json({ success: false, message: 'Order item not found.' });
+        }
+
+        // Yeni durumu kontrol et
+        const newStatus = await OrderStatus.findByPk(newStatusId);
+        if (!newStatus) {
+            return res.status(404).json({ success: false, message: 'Order status not found.' });
+        }
+
+        // OrderItem için order_status_id alanını güncelle
+        await OrderItem.update(
+            { order_status_id: newStatusId },
+            { where: { order_item_id: id } }
+        );
+
+        return res.status(200).json({ success: true, message: 'Order status updated successfully.' });
+    } catch (error) {
+        console.error('Error updating order status:', error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
 
 //MARKA ARAMA ASYNC FUNC.
 async function fetchCategoriesWithSubcategories() {
@@ -433,5 +553,6 @@ module.exports = {
     getProducts, getProductDetailsById, createProduct, updateProduct, deactivateProduct, activateProduct,
     getAllBrands, getSellerBrands, createBrand, updateBrand, searchBrand,
     getAllCategories, getAllCategoriesWithSearch,
-    getSellerOrders,
+    getSellerOrders, cancelOrderItemQuantity, updateShippingCodeOrderItem, updateOrderStatus,
+
 }
