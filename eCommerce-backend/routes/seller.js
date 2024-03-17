@@ -29,5 +29,6 @@ router.get('/categories', authMiddleware, sellerController.getAllCategories);
 router.get('/searchCategories', sellerController.getAllCategoriesWithSearch);
 
 router.get('/orders', authMiddleware, sellerController.getSellerOrders);
+router.post('/cancel-order-item', sellerController.cancelOrderItemQuantity);
 
 module.exports = router;

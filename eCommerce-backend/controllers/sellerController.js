@@ -380,7 +380,43 @@ const getSellerOrders = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+const cancelOrderItemQuantity = async (req, res) => {
+    const { orderItemId, quantityToCancel } = req.body;
 
+    try {
+        const orderItem = await OrderItem.findByPk(orderItemId);
+
+        if (!orderItem) {
+            return res.status(404).json({ success: false, message: 'Order item not found.' });
+        }
+
+        // İptal edilecek miktarın geçerli olup olmadığını kontrol et
+        if (quantityToCancel <= 0 || quantityToCancel > orderItem.quantity) {
+            return res.status(400).json({ success: false, message: 'Invalid cancellation quantity.' });
+        }
+
+        // Yeni iptal edilen miktarı hesapla ve mevcut miktarı güncelle
+        const newCanceledQuantity = (orderItem.canceled_quantity || 0) + quantityToCancel;
+        const newQuantity = orderItem.quantity - quantityToCancel;
+
+        // OrderItem güncelleme
+        await OrderItem.update(
+            {
+                quantity: newQuantity,
+                canceled_quantity: newCanceledQuantity,
+                // Tamamen iptal edilmişse, durumu güncelleyin (Örneğin, 'cancelled' durumunun ID'si)
+                // Bu kısmı, durum IDsine göre uyarlayın
+                order_status_id: newQuantity === 0 ? 4 : orderItem.order_status_id
+            },
+            { where: { order_item_id: orderItemId } }
+        );
+
+        return res.json({ success: true, message: 'Order item quantity cancelled successfully.' });
+    } catch (error) {
+        console.error('Error cancelling order item quantity:', error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 
 //MARKA ARAMA ASYNC FUNC.
@@ -433,5 +469,5 @@ module.exports = {
     getProducts, getProductDetailsById, createProduct, updateProduct, deactivateProduct, activateProduct,
     getAllBrands, getSellerBrands, createBrand, updateBrand, searchBrand,
     getAllCategories, getAllCategoriesWithSearch,
-    getSellerOrders,
+    getSellerOrders, cancelOrderItemQuantity
 }
