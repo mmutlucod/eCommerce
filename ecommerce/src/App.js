@@ -1,13 +1,14 @@
 import React from 'react';
 import './App.css';
-import Login from './admin/login';
+import A_Login from './admin/login';
 import MainPage from './admin/MainPage';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
 import Users from './admin/Users'
 import Orders from './admin/Orders'
 import Sellers from './admin/Sellers'
 import Brands from './admin/Brands'
 import Categories from './admin/Categories'
+import S_Login from './seller/Login';
 import { AuthProvider } from './context/AuthContext';
 function App() {
   return (
@@ -15,13 +16,20 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/adminpaneli" element={<MainPage />} />
-          <Route path="/users" element={<Users/>} />
-          <Route path="/orders" element={<Orders/>} />
-          <Route path="/sellers" element={<Sellers/>} />
-          <Route path="/brands" element={<Brands/>} />
-          <Route path="/categories" element={<Categories/>} />
+          {/* ADMİN */}
+          <Route path="/" element={<Navigate to="/admin/" />} />
+          <Route path="/admin" element={<A_Login />} />
+          <Route path="/admin/dashboard" element={<MainPage />} />
+          <Route path="/admin/users" element={<Users/>} />
+          <Route path="/admin/orders" element={<Orders/>} />
+          <Route path="/admin/sellers" element={<Sellers/>} />
+          <Route path="/admin/brands" element={<Brands/>} />
+          <Route path="/admin/categories" element={<Categories/>} />
+
+          {/* SATICI */}
+          <Route path="/seller" element={<S_Login />} />
+
+         
         </Routes>
       </Router>
     </div>
