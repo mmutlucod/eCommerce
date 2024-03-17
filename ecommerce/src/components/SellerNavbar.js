@@ -40,21 +40,30 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
     padding: theme.spacing(2), // Daha az padding
   }));
   export default function SellerNavbar() {
-    const [anchorEl, setAnchorEl] = React.useState(null);
-    const [openMenuTitle, setOpenMenuTitle] = React.useState('');
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [openMenuTitle, setOpenMenuTitle] = useState('');
+    const [selectedSubItem, setSelectedSubItem] = useState('');
     const [brands, setBrands] = useState([]);
   
+    // Menü açma işleyicisi
     const handleMenuOpen = (event, title) => {
       setAnchorEl(event.currentTarget);
       setOpenMenuTitle(title);
-      if (title === 'ÜRÜN') {
-        fetchBrands(); // Kategori 1'e tıkladığında markaları çek
-      }
     };
   
+    // Menü kapatma işleyicisi
     const handleMenuClose = () => {
       setAnchorEl(null);
       setOpenMenuTitle('');
+    };
+  
+    // Alt menü öğesine tıklama işleyicisi
+    const handleSubItemClick = (subItem) => {
+      setSelectedSubItem(subItem);
+      if (subItem === 'Kategori 1') {
+        fetchBrands(); // Eğer "Kategori 1" seçildiyse, markaları çek
+      }
+      handleMenuClose(); // Menüyü kapat
     };
   
     const fetchBrands = async () => {
@@ -85,27 +94,26 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
           {menuItems.map((menuItem) => (
             <React.Fragment key={menuItem.title}>
               <StyledMenuButton
-    aria-controls={`menu-${menuItem.title}`}
-    aria-haspopup="true"
-    onMouseOver={(event) => handleMenuOpen(event, menuItem.title)}
-    onClick={(event) => handleMenuOpen(event, menuItem.title)}
-    className={openMenuTitle === menuItem.title ? 'open' : ''}
-  
-  >
-    {menuItem.title}
-    {/* Ok ikonu menü açık ise yukarı, değilse aşağı bakacak şekilde koşullu render */}
-    <span className="menu-arrow">
-    {openMenuTitle === menuItem.title ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-  </span>
-  </StyledMenuButton>
+                aria-controls={`menu-${menuItem.title}`}
+                aria-haspopup="true"
+                onMouseOver={(event) => handleMenuOpen(event, menuItem.title)}
+                onClick={(event) => handleMenuOpen(event, menuItem.title)}
+                className={openMenuTitle === menuItem.title ? 'open' : ''}
+              >
+                {menuItem.title}
+                {/* Ok ikonu menü açık ise yukarı, değilse aşağı bakacak şekilde koşullu render */}
+                <span className="menu-arrow">
+                  {openMenuTitle === menuItem.title ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                </span>
+              </StyledMenuButton>
               <Menu
-               PaperProps={{
-                sx: {
-                  bgcolor: 'secondary.main', // Özel arka plan rengi
-                  color: 'common.white', // Yazı rengi
-                  boxShadow: 3, // Gölgelendirme derinliği
-                }
-              }}
+                PaperProps={{
+                  sx: {
+                    bgcolor: 'secondary.main', // Özel arka plan rengi
+                    color: 'common.white', // Yazı rengi
+                    boxShadow: 3, // Gölgelendirme derinliği
+                  }
+                }}
                 id={`menu-${menuItem.title}`}
                 anchorEl={anchorEl}
                 keepMounted
@@ -113,8 +121,8 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
                 onClose={handleMenuClose}
                 MenuListProps={{ onMouseLeave: handleMenuClose }}
               >
-                 {menuItem.subItems.map((subItem) => (
-                  <StyledMenuItem key={subItem} onClick={handleMenuClose}>
+                {menuItem.subItems.map((subItem) => (
+                  <StyledMenuItem key={subItem} onClick={() => handleSubItemClick(subItem)}>
                     {subItem}
                   </StyledMenuItem>
                 ))}
@@ -138,6 +146,18 @@ const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
           </IconButton>
         </Box>
       </Toolbar>
+      {/* Kategori 1 seçildiğinde ve markalar varsa, markaları göster */}
+      {selectedSubItem === 'Kategori 1' && brands.length > 0 && (
+        <Box sx={{ padding: 2, marginTop: 2 }}>
+          <Typography variant="h5">Markalar</Typography>
+          <ul>
+            {brands.map((brand) => (
+              <li key={brand.id}>{brand.name}</li>
+            ))}
+          </ul>
+        </Box>
+      )}
     </AppBar>
   );
+
 }
