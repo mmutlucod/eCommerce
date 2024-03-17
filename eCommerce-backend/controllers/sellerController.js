@@ -311,7 +311,7 @@ const updateBrand = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
-const searchBrand = async (req, res) => {
+const searchAllBrands = async (req, res) => {
     const { search } = req.query; // Arama terimi, query string üzerinden alınır
 
     try {
@@ -332,6 +332,35 @@ const searchBrand = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+const searchSellerBrands = async (req, res) => {
+    const { search } = req.query; // Arama terimi, query string üzerinden alınır
+
+    try {
+        const seller = await Seller.findOne({ where: { username: req.user.username } });
+        if (!search) {
+            return res.status(400).json({ success: false, message: 'Arama terimi gereklidir.' });
+        }
+
+        // MySQL için büyük/küçük harfe duyarlı olmayan arama
+        const brands = await Brand.findAll({
+            where: {
+                [Op.and]: [
+                    // brand_name alanında büyük/küçük harf duyarlı olmayan arama
+                    Sequelize.where(
+                        Sequelize.fn('LOWER', Sequelize.col('brand_name')),
+                        'LIKE', `%${search.toLowerCase()}%`
+                    ),
+                    // Sadece belirli bir satıcıya ait markaları getir
+                    { seller_id: seller.seller_id }
+                ]
+            }
+        });
+
+        return res.status(200).json(brands);
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
 //KATEGORİ
 const getAllCategories = async (req, res) => {
     try {
@@ -551,7 +580,7 @@ async function searchCategories(search) {
 module.exports = {
     login, register, listSellers,
     getProducts, getProductDetailsById, createProduct, updateProduct, deactivateProduct, activateProduct,
-    getAllBrands, getSellerBrands, createBrand, updateBrand, searchBrand,
+    getAllBrands, getSellerBrands, createBrand, updateBrand, searchAllBrands, searchSellerBrands,
     getAllCategories, getAllCategoriesWithSearch,
     getSellerOrders, cancelOrderItemQuantity, updateShippingCodeOrderItem, updateOrderStatus,
 

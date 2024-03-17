@@ -20,7 +20,8 @@ router.put('/deactivateProduct/:id', sellerController.deactivateProduct);
 
 router.get('/allBrands', authMiddleware, sellerController.getAllBrands);
 router.get('/brands', authMiddleware, sellerController.getSellerBrands);
-router.get('/searchBrands', sellerController.searchBrand);
+router.get('/searchAllBrands', authMiddleware, sellerController.searchAllBrands);
+router.get('/searchSellerBrands', authMiddleware, sellerController.searchSellerBrands);
 router.post('/create-seller-brand', authMiddleware, sellerController.createBrand);
 router.put('/brands/:id', authMiddleware, sellerController.updateBrand);
 
