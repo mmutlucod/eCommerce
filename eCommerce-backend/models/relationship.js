@@ -86,6 +86,9 @@ Order.hasMany(OrderItem, { foreignKey: 'order_id' }); // Bir siparişin birden f
 OrderItem.belongsTo(SellerProduct, { foreignKey: 'seller_product_id' }); // Bir sipariş kalemi bir satıcı ürününe ait olur
 SellerProduct.hasMany(OrderItem, { foreignKey: 'seller_product_id' }); // Bir satıcı ürününe birden fazla sipariş kalemi olabilir
 
+OrderItem.belongsTo(OrderStatus, { foreignKey: 'order_status_id' });
+OrderStatus.hasMany(OrderItem, { foreignKey: 'status_id' });
+
 Product.belongsTo(Brand, { foreignKey: 'brand_id' }); // Bir ürün bir markaya ait olur
 Brand.hasMany(Product, { foreignKey: 'brand_id' }); // Bir markaya birden fazla ürün bağlı olabilir
 
