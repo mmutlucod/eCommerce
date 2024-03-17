@@ -299,7 +299,7 @@ const updateBrand = async (req, res) => {
             }
         });
 
-        await Brand.update({
+        await brand.update({
             approval_status_id: 3,
             seller_id: seller.seller_id,
             ...req.body
