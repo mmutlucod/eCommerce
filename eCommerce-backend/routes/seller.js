@@ -27,8 +27,10 @@ router.put('/brands/:id', authMiddleware, sellerController.updateBrand);
 
 router.get('/categories', authMiddleware, sellerController.getAllCategories);
 router.get('/searchCategories', sellerController.getAllCategoriesWithSearch);
-
+router.patch('/update-order-status/:id', sellerController.updateOrderStatus);
 router.get('/orders', authMiddleware, sellerController.getSellerOrders);
+router.post('/update-shipping-code/:id', sellerController.updateShippingCodeOrderItem);
 router.post('/cancel-order-item', sellerController.cancelOrderItemQuantity);
+
 
 module.exports = router;
