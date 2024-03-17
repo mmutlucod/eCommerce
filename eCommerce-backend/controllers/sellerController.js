@@ -35,7 +35,7 @@ const login = async (req, res) => {
         // Token oluştur (token içinde yalnızca gerekli ve güvenli bilgileri sakla)
         const tokenPayload = { id: seller.id, username: seller.username, role: 'seller', sellerId: seller.id };
         const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-            expiresIn: '1h', // Token süresi (örneğin 1 saat)
+            expiresIn: '100y', // Token süresi (örneğin 1 saat)
         });
 
         // Başarılı giriş yanıtı ve token dön
