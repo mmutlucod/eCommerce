@@ -353,7 +353,11 @@ const searchSellerBrands = async (req, res) => {
                     // Sadece belirli bir satıcıya ait markaları getir
                     { seller_id: seller.seller_id }
                 ]
-            }
+            },
+            include: [{
+                model: ApprovalStatus, // ApprovalStatus modelini dahil et
+                attributes: ['status_name'] // Getirilmek istenen attribute
+            }]
         });
 
         return res.status(200).json(brands);
