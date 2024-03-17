@@ -51,7 +51,7 @@ function Brands() {
 
   const fetchBrands = async () => {
     try {
-      const response = await api.get('/admin/brands');
+      const response = await api.get('/seller/brands');
       setBrands(response.data);
     } catch (error) {
       console.error('Markaları çekerken bir hata oluştu:', error);
@@ -77,14 +77,14 @@ function Brands() {
     e.preventDefault();
     if (brandToEdit) {
       try {
-        await api.put(`/admin/brands/${brandToEdit.brand_id}`, { brand_name: brandToEdit.brand_name });
+        await api.put(`/seller/brands/${brandToEdit.brand_id}`, { brand_name: brandToEdit.brand_name });
         handleSnackbarOpen('Marka başarıyla güncellendi.');
       } catch (error) {
         console.error('Marka güncellenirken bir hata oluştu:', error);
       }
     } else {
       try {
-        await api.post('/admin/brands', { brand_name: newBrandName });
+        await api.post('/seller/create-seller-brand', { brand_name: newBrandName });
         handleSnackbarOpen('Marka başarıyla eklendi.');
       } catch (error) {
         console.error('Marka eklenirken bir hata oluştu:', error);
@@ -118,6 +118,7 @@ function Brands() {
                       <TableRow>
                         <TableCell>Marka ID</TableCell>
                         <TableCell>Marka Adı</TableCell>
+                        <TableCell>Onay Durumu</TableCell>
                         <TableCell align="right">İşlemler</TableCell>
                       </TableRow>
                     </TableHead>
@@ -126,6 +127,7 @@ function Brands() {
                         <TableRow key={brand.brand_id}>
                           <TableCell>{brand.brand_id}</TableCell>
                           <TableCell>{brand.brand_name}</TableCell>
+                          <TableCell>{brand.ApprovalStatus.status_name}</TableCell>
                           <TableCell align="right">
                             <Tooltip title="Düzenle">
                               <IconButton onClick={() => handleOpenEditDialog(brand)}>
