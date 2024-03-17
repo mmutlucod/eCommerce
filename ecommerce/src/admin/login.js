@@ -26,7 +26,7 @@ const Login = () => {
       if (response.data && response.data.token) { // Token varsa
         login(response.data.token); // Token'ı AuthContext aracılığıyla yönet
         alert("Giriş başarılı");
-        navigate('/adminpaneli'); // Kullanıcıyı admin paneline yönlendir
+        navigate('/admin/dashboard'); // Kullanıcıyı admin paneline yönlendir
       } else {
         alert("Giriş başarısız. Geçerli kullanıcı verileri alınamadı.");
       }

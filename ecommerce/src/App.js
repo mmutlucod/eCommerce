@@ -11,6 +11,7 @@ import Categories from './admin/Categories'
 
 import S_Login from './seller/Login';
 import S_MainPage from './seller/MainPage';
+import S_SellerAdd from './seller/SellerAdd';
 import { AuthProvider } from './context/AuthContext';
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           {/* SATICI */}
           <Route path="/seller" element={<S_Login />} />
           <Route path="/seller/dashboard" element={<S_MainPage />} />
+          <Route path="/seller/seller-add" element={<S_SellerAdd/>} />
 
          
         </Routes>
