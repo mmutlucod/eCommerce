@@ -411,9 +411,9 @@ const cancelOrderItemQuantity = async (req, res) => {
             { where: { order_item_id: orderItemId } }
         );
 
-        return res.json({ success: true, message: 'Order item quantity cancelled successfully.' });
+        return res.json({ success: true, message: 'İptal etme işlemi başarılı.' });
     } catch (error) {
-        console.error('Error cancelling order item quantity:', error);
+        console.error('İptal işlemi başarısız.', error);
         return res.status(500).json({ success: false, message: error.message });
     }
 };
