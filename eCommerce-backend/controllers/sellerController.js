@@ -236,10 +236,67 @@ const deactivateSellerProduct = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+const searchSellerProducts = async (req, res) => {
+    const { search } = req.query;
+
+    try {
+        const seller = await Seller.findOne({ where: { username: req.user.username } });
+
+        if (!search) {
+            return res.status(400).json({ success: false, message: 'Arama terimi gereklidir.' });
+        }
+
+        // sellerproducts ve products tablolarını join ederek arama yapma
+        const products = await SellerProduct.findAll({
+            where: { seller_id: seller.seller_id },
+            include: [{
+                model: Product, // Product modeli include edilir
+                where: Sequelize.where(
+                    Sequelize.fn('LOWER', Sequelize.col('product.product_name')),
+                    'LIKE', `%${search.toLowerCase()}%`
+                )
+            }]
+        });
+
+        return res.status(200).json(products);
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 //ÜRÜN
 const getAllProducts = async (req, res) => {
+    try {
+        const products = await Product.findAll();
 
+        res.status(200).json(products);
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
 }
+const searchAllProducts = async (req, res) => {
+    const { search } = req.query; // Arama terimi, query string üzerinden alınır
+
+    try {
+        if (!search) {
+            return res.status(400).json({ success: false, message: 'Arama terimi gereklidir.' });
+        }
+
+        // MySQL için büyük/küçük harfe duyarlı olmayan arama
+        const products = await Product.findAll({
+            where: Sequelize.where(
+                Sequelize.fn('LOWER', Sequelize.col('product_name')),
+                'LIKE', `%${search.toLowerCase()}%`
+            )
+        });
+
+        return res.status(200).json(products);
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 // MARKA
 const getAllBrands = async (req, res) => {
     try {
@@ -587,9 +644,9 @@ async function searchCategories(search) {
 }
 module.exports = {
     login, register, listSellers,
-    getSellerProducts, getSellerProductDetailsById, createSellerProduct, updateSellerProduct, deactivateSellerProduct, activateSellerProduct,
+    getSellerProducts, getSellerProductDetailsById, createSellerProduct, updateSellerProduct, deactivateSellerProduct, activateSellerProduct, searchSellerProducts,
     getAllBrands, getSellerBrands, createBrand, updateBrand, searchAllBrands, searchSellerBrands,
     getAllCategories, getAllCategoriesWithSearch,
     getSellerOrders, cancelOrderItemQuantity, updateShippingCodeOrderItem, updateOrderStatus,
-
+    searchAllProducts
 }

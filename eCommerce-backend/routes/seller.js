@@ -13,6 +13,8 @@ router.get('/listSellers', authMiddleware, sellerController.listSellers);
 
 router.get('/products', authMiddleware, sellerController.getSellerProducts);
 router.get('/products/:id', authMiddleware, sellerController.getSellerProductDetailsById);
+router.get('/searchSellerProducts', authMiddleware, sellerController.searchSellerProducts);
+router.get('/searchAllProducts', authMiddleware, sellerController.searchallpr);
 router.post('/create-seller-product', authMiddleware, sellerController.createSellerProduct);
 router.put('/products/:id', authMiddleware, sellerController.updateSellerProduct);
 router.put('/activateProduct/:id', authMiddleware, sellerController.activateSellerProduct);
