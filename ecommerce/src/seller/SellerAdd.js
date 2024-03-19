@@ -74,14 +74,14 @@ function Brands() {
         ...brand,
         ApprovalStatus: brand.ApprovalStatus || { status_name: "Bilinmiyor" }, // Eğer ApprovalStatus yoksa varsayılan bir değer ata
       }));
-  
+
       setBrands(brandsWithStatusCheck);
     } catch (error) {
       console.error('Markaları çekerken bir hata oluştu:', error);
     }
   };
-  
-  
+
+
   const handleOpenAddDialog = () => {
     setBrandToEdit(null);
     setNewBrandName('');
@@ -123,12 +123,12 @@ function Brands() {
       <SellerNavbar />
       <Container maxWidth="lg" sx={{ mt: 3, mb: 3 }}>
         <Grid container spacing={3}>
-        <Grid item xs={12}>
+          <Grid item xs={12}>
             {/* Uyarı mesajını burada göster */}
-            <Alert 
+            <Alert
               severity="warning"
               sx={{
-                fontWeight:'bold',
+                fontWeight: 'bold',
                 display: 'flex', // Flex container olarak ayarla
                 justifyContent: 'center', // İçeriği yatay olarak ortala
                 alignItems: 'center', // İçeriği dikey olarak ortala
@@ -138,7 +138,7 @@ function Brands() {
               Onaylanan ya da Reddedilen işlemler üzerinde işlemler yapamazsınız.
             </Alert>
           </Grid>
-         
+
           <Grid item xs={12}>
             <Card>
               <CardContent>
@@ -146,57 +146,57 @@ function Brands() {
                   Marka Listesi
                 </Typography>
                 <TableContainer component={Paper}>
-  <Table sx={{ minWidth: 650 }} aria-label="simple table">
-    <TableHead>
-      <TableRow>
-        <TableCell colSpan={4}>
-          {/* Arama kutusu ve Ekle butonunu bu hücreye yerleştir */}
-          <Grid container justifyContent="space-between" alignItems="center">
-            <Grid item>
-              <TextField
-                placeholder="Marka ara..."
-                variant="outlined"
-                size="small"
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </Grid>
-            <Grid item>
-              <Tooltip title="Marka Ekle">
-                <IconButton color="primary" onClick={handleOpenAddDialog}>
-                  <AddCircleIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-          </Grid>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell>Marka ID</TableCell>
-        <TableCell>Marka Adı</TableCell>
-        <TableCell>Onay Durumu</TableCell>
-        <TableCell align="right">İşlemler</TableCell>
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {brands.map((brand) => (
-        <TableRow key={brand.brand_id}>
-          <TableCell>{brand.brand_id}</TableCell>
-          <TableCell>{brand.brand_name}</TableCell>
-          <TableCell>{brand.ApprovalStatus.status_name}</TableCell>
-          <TableCell align="right">
-            {brand.ApprovalStatus.status_name !== "Reddedildi" && brand.ApprovalStatus.status_name !== "Onaylandı" ? (
-              <Tooltip title="Düzenle">
-                <IconButton onClick={() => handleOpenEditDialog(brand)}>
-                  <EditIcon color="primary" />
-                </IconButton>
-              </Tooltip>
-            ) : null}
-          </TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
-  </Table>
-</TableContainer>
+                  <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell colSpan={4}>
+                          {/* Arama kutusu ve Ekle butonunu bu hücreye yerleştir */}
+                          <Grid container justifyContent="space-between" alignItems="center">
+                            <Grid item>
+                              <TextField
+                                placeholder="Marka ara..."
+                                variant="outlined"
+                                size="small"
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                              />
+                            </Grid>
+                            <Grid item>
+                              <Tooltip title="Marka Ekle">
+                                <IconButton color="primary" onClick={handleOpenAddDialog}>
+                                  <AddCircleIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                          </Grid>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>Marka ID</TableCell>
+                        <TableCell>Marka Adı</TableCell>
+                        <TableCell>Onay Durumu</TableCell>
+                        <TableCell align="right">İşlemler</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {brands.map((brand) => (
+                        <TableRow key={brand.brand_id}>
+                          <TableCell>{brand.brand_id}</TableCell>
+                          <TableCell>{brand.brand_name}</TableCell>
+                          <TableCell>{brand.ApprovalStatus.status_name}</TableCell>
+                          <TableCell align="right">
+                            {brand.ApprovalStatus.status_name !== "Reddedildi" && brand.ApprovalStatus.status_name !== "Onaylandı" ? (
+                              <Tooltip title="Düzenle">
+                                <IconButton onClick={() => handleOpenEditDialog(brand)}>
+                                  <EditIcon color="primary" />
+                                </IconButton>
+                              </Tooltip>
+                            ) : null}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
 
               </CardContent>
             </Card>

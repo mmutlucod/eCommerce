@@ -45,7 +45,7 @@ export default function SellerNavbar() {
   const navigate = useNavigate();
 
   const menuItems = [
-    { title: 'ÜRÜN', subItems: ['Marka Tanımla', 'Kategori 2', 'Kategori 3'] },
+    { title: 'ÜRÜN', subItems: ['Marka Tanımla', 'Urunlerim', 'Kategori 3'] },
     { title: 'SİPARİŞ & KARGO', subItems: ['Sipariş Takibi', 'Kargo Seçenekleri'] },
     { title: 'FİNANS', subItems: ['Fatura İşlemleri', 'Ödeme Seçenekleri'] },
     { title: 'PROMOSYONLAR', subItems: ['Fatura İşlemleri', 'Ödeme Seçenekleri'] },
@@ -64,8 +64,14 @@ export default function SellerNavbar() {
     setAnchorEls({});
     setOpenMenuTitle('');
   };
+  const handleSubItemClickProducts = (subItem) => {
+    if (subItem === 'Urunlerim') {
+      navigate('/seller/product');
+    }
+    handleMenuClose();
+  };
 
-  const handleSubItemClick = (subItem) => {
+  const handleSubItemClickBrands = (subItem) => {
     if (subItem === 'Marka Tanımla') {
       navigate('/seller/seller-add');
     }
@@ -103,7 +109,7 @@ export default function SellerNavbar() {
                 MenuListProps={{ onMouseLeave: handleMenuClose }}
               >
                 {menuItem.subItems.map((subItem) => (
-                  <StyledMenuItem key={subItem} onClick={() => handleSubItemClick(subItem)}>
+                  <StyledMenuItem key={subItem} onClick={() => handleSubItemClickBrands(subItem)}>
                     {subItem}
                   </StyledMenuItem>
                 ))}

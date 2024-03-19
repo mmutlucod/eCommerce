@@ -37,7 +37,7 @@ function Sellers() {
         <Table>
           <TableHead>
             <TableRow>
-             
+
               <TableCell>Unvan</TableCell>
               <TableCell>Kullanıcı Adı</TableCell>
               <TableCell>Kep Adresi</TableCell>
@@ -50,14 +50,14 @@ function Sellers() {
           <TableBody>
             {sellers.map((seller) => (
               <TableRow key={seller.id}>
-               
+
                 <TableCell>{seller.name}</TableCell>
                 <TableCell>{seller.username}</TableCell>
                 <TableCell>{seller.email}</TableCell>
                 <TableCell>{seller.phone}</TableCell>
                 <TableCell>{seller.corporate_type_id}</TableCell>
                 <TableCell>{seller.tax_identity_number}</TableCell>
-                <TableCell>{seller.district +'/'+ seller.city}</TableCell>
+                <TableCell>{seller.district + '/' + seller.city}</TableCell>
                 {/* Diğer satıcı bilgilerini burada listele */}
               </TableRow>
             ))}

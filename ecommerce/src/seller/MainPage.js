@@ -1,10 +1,11 @@
 import React from "react";
 import SellerNavbar from "../components/SellerNavbar"
 
-const MainPage = ()=>{
-    return(
+const MainPage = () => {
+    return (
         <div>
-            <SellerNavbar/>
+            <SellerNavbar />
+
         </div>
     )
 }
