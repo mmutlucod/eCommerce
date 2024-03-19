@@ -25,10 +25,10 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SellerNavbar from '../components/SellerNavbar';
-import api from '../api/api'; // Bu yolu projenize göre ayarlayın
+import api from '../api/api';
 import { green } from '@mui/material/colors';
-import SearchIcon from '@mui/icons-material/Search';
 
+import { Alert } from '@mui/material';
 
 function Brands() {
   const [brands, setBrands] = useState([]);
@@ -43,7 +43,6 @@ function Brands() {
     if (searchTerm.trim()) {
       searchBrands(searchTerm);
     } else {
-      // Arama terimi boşsa tüm markaları tekrar yükle
       fetchBrands();
     }
   }, [searchTerm]);
@@ -67,6 +66,7 @@ function Brands() {
       setLoading(false);
     }
   };
+
   const fetchBrands = async () => {
     try {
       const response = await api.get('/seller/brands');
@@ -74,14 +74,14 @@ function Brands() {
         ...brand,
         ApprovalStatus: brand.ApprovalStatus || { status_name: "Bilinmiyor" }, // Eğer ApprovalStatus yoksa varsayılan bir değer ata
       }));
-  
+
       setBrands(brandsWithStatusCheck);
     } catch (error) {
       console.error('Markaları çekerken bir hata oluştu:', error);
     }
   };
-  
-  
+
+
   const handleOpenAddDialog = () => {
     setBrandToEdit(null);
     setNewBrandName('');
@@ -121,21 +121,24 @@ function Brands() {
   return (
     <>
       <SellerNavbar />
-      <Container maxWidth="lg" sx={{ mt: 8, mb: 4 }}>
+      <Container maxWidth="lg" sx={{ mt: 3, mb: 3 }}>
         <Grid container spacing={3}>
-        <Grid item xs={12} display="flex" justifyContent="space-between" alignItems="center">
-            {/* Arama kutusu ve Ekle butonu */}
-            <TextField
-              placeholder="Marka ara..."
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ marginRight: 20 }}
-            />
-            <Tooltip title="Marka Ekle">
-              <IconButton color="primary" onClick={handleOpenAddDialog}>
-                <AddCircleIcon />
-              </IconButton>
-            </Tooltip>
+          <Grid item xs={12}>
+            {/* Uyarı mesajını burada göster */}
+            <Alert
+              severity="warning"
+              sx={{
+                fontWeight: 'bold',
+                display: 'flex', // Flex container olarak ayarla
+                justifyContent: 'center', // İçeriği yatay olarak ortala
+                alignItems: 'center', // İçeriği dikey olarak ortala
+                textAlign: 'center' // Metni ortala (eğer metin birden fazla satırsa)
+              }}
+            >
+              Onaylanan ya da Reddedilen işlemler üzerinde işlemler yapamazsınız.
+            </Alert>
           </Grid>
+
           <Grid item xs={12}>
             <Card>
               <CardContent>
@@ -146,6 +149,28 @@ function Brands() {
                   <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                       <TableRow>
+                        <TableCell colSpan={4}>
+                          {/* Arama kutusu ve Ekle butonunu bu hücreye yerleştir */}
+                          <Grid container justifyContent="space-between" alignItems="center">
+                            <Grid item>
+                              <TextField
+                                placeholder="Marka ara..."
+                                variant="outlined"
+                                size="small"
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                              />
+                            </Grid>
+                            <Grid item>
+                              <Tooltip title="Marka Ekle">
+                                <IconButton color="primary" onClick={handleOpenAddDialog}>
+                                  <AddCircleIcon />
+                                </IconButton>
+                              </Tooltip>
+                            </Grid>
+                          </Grid>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
                         <TableCell>Marka ID</TableCell>
                         <TableCell>Marka Adı</TableCell>
                         <TableCell>Onay Durumu</TableCell>
@@ -153,27 +178,26 @@ function Brands() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-  {brands.map((brand) => (
-    <TableRow key={brand.brand_id}>
-      <TableCell>{brand.brand_id}</TableCell>
-      <TableCell>{brand.brand_name}</TableCell>
-      <TableCell>{brand.ApprovalStatus.status_name}</TableCell>
-      <TableCell align="right">
-        
-      
-          <Tooltip title="Düzenle">
-            <IconButton onClick={() => handleOpenEditDialog(brand)}>
-              <EditIcon color="primary" />
-            </IconButton>
-          </Tooltip>
-        
-      </TableCell>
-    </TableRow>
-  ))}
-</TableBody>
-
+                      {brands.map((brand) => (
+                        <TableRow key={brand.brand_id}>
+                          <TableCell>{brand.brand_id}</TableCell>
+                          <TableCell>{brand.brand_name}</TableCell>
+                          <TableCell>{brand.ApprovalStatus.status_name}</TableCell>
+                          <TableCell align="right">
+                            {brand.ApprovalStatus.status_name !== "Reddedildi" && brand.ApprovalStatus.status_name !== "Onaylandı" ? (
+                              <Tooltip title="Düzenle">
+                                <IconButton onClick={() => handleOpenEditDialog(brand)}>
+                                  <EditIcon color="primary" />
+                                </IconButton>
+                              </Tooltip>
+                            ) : null}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
                   </Table>
                 </TableContainer>
+
               </CardContent>
             </Card>
           </Grid>
