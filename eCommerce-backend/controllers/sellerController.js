@@ -536,7 +536,7 @@ const updateOrderStatus = async (req, res) => {
     }
 }
 
-//MARKA ARAMA ASYNC FUNC.
+//ALT KATEGORİLERİ ÇEKME ASYNC FUNC.
 async function fetchCategoriesWithSubcategories() {
     // Tüm kategorileri çek
     const categories = await Category.findAll({
