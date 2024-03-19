@@ -11,12 +11,12 @@ router.post('/login', sellerController.login);
 router.post('/register', sellerController.register);
 router.get('/listSellers', authMiddleware, sellerController.listSellers);
 
-router.get('/products', authMiddleware, sellerController.getProducts);
-router.get('/products/:id', authMiddleware, sellerController.getProductDetailsById);
-router.post('/create-seller-product', authMiddleware, sellerController.createProduct);
-router.put('/products/:id', authMiddleware, sellerController.updateProduct);
-router.put('/activateProduct/:id', authMiddleware, sellerController.activateProduct);
-router.put('/deactivateProduct/:id', authMiddleware, sellerController.deactivateProduct);
+router.get('/products', authMiddleware, sellerController.getSellerProducts);
+router.get('/products/:id', authMiddleware, sellerController.getSellerProductDetailsById);
+router.post('/create-seller-product', authMiddleware, sellerController.createSellerProduct);
+router.put('/products/:id', authMiddleware, sellerController.updateSellerProduct);
+router.put('/activateProduct/:id', authMiddleware, sellerController.activateSellerProduct);
+router.put('/deactivateProduct/:id', authMiddleware, sellerController.deactivateSellerProduct);
 
 router.get('/allBrands', authMiddleware, sellerController.getAllBrands);
 router.get('/brands', authMiddleware, sellerController.getSellerBrands);

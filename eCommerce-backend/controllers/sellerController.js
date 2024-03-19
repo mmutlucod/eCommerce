@@ -81,8 +81,8 @@ const listSellers = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-//ÜRÜN 
-const getProducts = async (req, res) => {
+//SATICI-ÜRÜN 
+const getSellerProducts = async (req, res) => {
     try {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
         const products = await sellerProduct.findAll({
@@ -111,7 +111,7 @@ const getProducts = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-const getProductDetailsById = async (req, res) => {
+const getSellerProductDetailsById = async (req, res) => {
     const { id } = req.params;
     try {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
@@ -141,7 +141,7 @@ const getProductDetailsById = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-const createProduct = async (req, res) => {
+const createSellerProduct = async (req, res) => {
     try {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
         const existingItem = await sellerProduct.findOne({
@@ -166,7 +166,7 @@ const createProduct = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
-const updateProduct = async (req, res) => {
+const updateSellerProduct = async (req, res) => {
     const { id } = req.params;
     const updatedData = req.body;
     try {
@@ -190,7 +190,7 @@ const updateProduct = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message })
     }
 }
-const activateProduct = async (req, res) => {
+const activateSellerProduct = async (req, res) => {
     const { id } = req.params; // Ürün ID'sini istek gövdesinden al
 
     try {
@@ -213,7 +213,7 @@ const activateProduct = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-const deactivateProduct = async (req, res) => {
+const deactivateSellerProduct = async (req, res) => {
     const { id } = req.params; // Ürün ID'sini istek gövdesinden al
 
     try {
@@ -235,6 +235,10 @@ const deactivateProduct = async (req, res) => {
         console.error('Ürün kaldırma sırasında bir hata oluştu:', error);
         return res.status(500).json({ success: false, message: error.message });
     }
+}
+//ÜRÜN
+const getAllProducts = async (req, res) => {
+
 }
 // MARKA
 const getAllBrands = async (req, res) => {
@@ -583,7 +587,7 @@ async function searchCategories(search) {
 }
 module.exports = {
     login, register, listSellers,
-    getProducts, getProductDetailsById, createProduct, updateProduct, deactivateProduct, activateProduct,
+    getSellerProducts, getSellerProductDetailsById, createSellerProduct, updateSellerProduct, deactivateSellerProduct, activateSellerProduct,
     getAllBrands, getSellerBrands, createBrand, updateBrand, searchAllBrands, searchSellerBrands,
     getAllCategories, getAllCategoriesWithSearch,
     getSellerOrders, cancelOrderItemQuantity, updateShippingCodeOrderItem, updateOrderStatus,
