@@ -5,7 +5,7 @@ const MainPage = () => {
     return (
         <div>
             <SellerNavbar />
-
+            <div></div>
         </div>
     )
 }
