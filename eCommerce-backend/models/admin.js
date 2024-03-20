@@ -12,7 +12,8 @@ const Admin = sequelize.define('Admin', {
     username: Sequelize.STRING,
     password: Sequelize.STRING,
     email: Sequelize.STRING,
-    full_name: Sequelize.STRING
+    full_name: Sequelize.STRING,
+    is_mod: Sequelize.BOOLEAN
 });
 
 
