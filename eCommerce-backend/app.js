@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const connection = require('./utility/db.js');
 const adminRoutes = require('./routes/admin.js')
 const sellerRoutes = require('./routes/seller.js');
+const userRoutes = require('./routes/user.js');
 const port = 5000;
 const relationships = require('./models/relationship.js');
 const sequelize = require('./utility/db');
@@ -23,6 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/admin', adminRoutes);
 app.use('/seller', sellerRoutes);
+app.use('/user', userRoutes);
 
 
 app.listen(port, () => {
