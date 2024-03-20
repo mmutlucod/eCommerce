@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 const Product = require('../models/product');
 const Category = require('../models/category');
 const User = require('../models/user');
-// const Moderator = require('../models/moderator');
 const Brand = require('../models/Brand');
 const ApprovalStatus = require('../models/approval_status');
 const Order = require('../models/order');
