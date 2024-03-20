@@ -76,17 +76,16 @@ function Products() {
                     <Table sx={{ minWidth: 650 }} aria-label="simple table">
                       <TableHead>
                         <TableRow>
-                          <TableCell>Ürün ID</TableCell>
-                          <TableCell>Ürün Adı</TableCell>
-                          <TableCell>Kategori</TableCell>
-                          <TableCell>Onay Durumu</TableCell>
-                          <TableCell>Aktıflik Durumu</TableCell>
-                          <TableCell>Marka Adi</TableCell>
-                          <TableCell>Fiyat</TableCell>
-                          <TableCell>Guncelleme tarihi</TableCell>
-                          <TableCell>Stok adedi</TableCell>
-                          
-                          <TableCell align="right">İşlemler</TableCell>
+                          <TableCell><b>Ürün ID</b></TableCell>
+                          <TableCell><b>Ürün Adı</b></TableCell>
+                          <TableCell><b>Kategori</b></TableCell>
+                          <TableCell><b>Onay Durumu</b></TableCell>
+                          <TableCell><b>Aktiflik Durumu</b></TableCell>
+                          <TableCell><b>Marka Adı</b></TableCell>
+                          <TableCell><b>Fiyat</b></TableCell>
+                          <TableCell><b>Güncelleme Tarihi</b></TableCell>
+                          <TableCell><b>Stok Adedi</b></TableCell>
+                          <TableCell align="right"><b>İşlemler</b></TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -94,9 +93,14 @@ function Products() {
                         {products.map((product) => (
                           <TableRow key={product.product_id}>
                             <TableCell>{product.product_id}</TableCell>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>{product.category}</TableCell>
+                            <TableCell>{product.product.name}</TableCell>
+                            <TableCell>{product.product.category}</TableCell>
+                            <TableCell>{product.ApprovalStatus.status_name}</TableCell>
+                            <TableCell>{product.is_active}</TableCell>
+                            <TableCell>{product.product.Brand.brand_name}</TableCell>
                             <TableCell>{`$${product.price}`}</TableCell>
+                            <TableCell>{product.updateAt}</TableCell>
+                            <TableCell>{product.stock}</TableCell>
                             <TableCell align="right">
                               <Tooltip title="Düzenle">
                                 <IconButton>

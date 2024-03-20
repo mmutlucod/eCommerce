@@ -171,10 +171,10 @@ function Brands() {
                         </TableCell>
                       </TableRow>
                       <TableRow>
-                        <TableCell>Marka ID</TableCell>
-                        <TableCell>Marka Adı</TableCell>
-                        <TableCell>Onay Durumu</TableCell>
-                        <TableCell align="right">İşlemler</TableCell>
+                      <TableCell><b>Marka ID</b></TableCell>
+    <TableCell><b>Marka Adı</b></TableCell>
+    <TableCell><b>Onay Durumu</b></TableCell>
+    <TableCell align="right"><b>İşlemler</b></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
