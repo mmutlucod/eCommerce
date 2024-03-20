@@ -13,6 +13,7 @@ import S_Login from './seller/Login';
 import S_MainPage from './seller/MainPage';
 import S_SellerAdd from './seller/SellerAdd';
 import { AuthProvider } from './context/AuthContext';
+import S_Product from './seller/Product';
 function App() {
   return (
     <AuthProvider>
@@ -33,7 +34,7 @@ function App() {
             <Route path="/seller" element={<S_Login />} />
             <Route path="/seller/dashboard" element={<S_MainPage />} />
             <Route path="/seller/seller-add" element={<S_SellerAdd />} />
-
+            <Route path="/seller/product" element={<S_Product />} />
 
           </Routes>
         </Router>
