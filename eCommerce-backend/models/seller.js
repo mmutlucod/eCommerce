@@ -33,12 +33,12 @@ Seller.afterSync(async () => {
         {
             username: 'umutkarakas',
             password: '$2b$10$NHlsLPkdBkp/V/gZGt3WKuVIBO4NBdLdZXbfj7x9RD.uob9chwCBC',
-            is_mod: false
+            approval_status_id: 1
         },
         {
             username: 'mustafamutlu',
             password: '$2b$10$izywZ7O/s/9A7ObokD1pfOqqqaXYcPMuxUnOM/MDV.a0Joj1ZJGae',
-            is_mod: false
+            approval_status_id: 1
         }
     ];
 

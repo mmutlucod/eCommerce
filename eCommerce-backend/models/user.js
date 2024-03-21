@@ -20,21 +20,19 @@ User.afterSync(async () => {
     // İstenen başlangıç durumlarını tanımla
     const statuses = [
         {
-            username: 'umutkarakas',
-            password: '$2b$10$NHlsLPkdBkp/V/gZGt3WKuVIBO4NBdLdZXbfj7x9RD.uob9chwCBC',
-            is_mod: false
+            email: 'umutkarakas',
+            password: '$2b$10$NHlsLPkdBkp/V/gZGt3WKuVIBO4NBdLdZXbfj7x9RD.uob9chwCBC'
         },
         {
-            username: 'mustafamutlu',
-            password: '$2b$10$izywZ7O/s/9A7ObokD1pfOqqqaXYcPMuxUnOM/MDV.a0Joj1ZJGae',
-            is_mod: false
+            email: 'mustafamutlu',
+            password: '$2b$10$izywZ7O/s/9A7ObokD1pfOqqqaXYcPMuxUnOM/MDV.a0Joj1ZJGae'
         }
     ];
 
     // Bulk create ile durumları veritabanına ekle
     // Bu işlem, aynı isme sahip durumlar zaten varsa bunları yeniden eklemeyecektir.
     await User.bulkCreate(statuses, {
-        updateOnDuplicate: ['username'] // Zaten var olan kayıtları güncelleme
+        updateOnDuplicate: ['email'] // Zaten var olan kayıtları güncelleme
     });
 });
 
