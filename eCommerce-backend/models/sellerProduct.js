@@ -18,7 +18,7 @@ const sellerProduct = sequelize.define('sellerProduct', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
-    moderator_id: Sequelize.INTEGER
+    admin_id: Sequelize.INTEGER
 })
 
 module.exports = sellerProduct;

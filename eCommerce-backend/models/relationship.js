@@ -9,7 +9,6 @@ const CorporateTypes = require('./corporateTypes');
 const Discount = require('./discount');
 const Follow = require('./follow');
 const FollowReward = require('./followReward');
-const Moderator = require('./moderator');
 const Order = require('./order');
 const OrderItem = require('./orderItem');
 const OrderStatus = require('./orderStatus');
@@ -32,16 +31,16 @@ const CampaignProducts = require('./campaignProducts');
 const ReturnItem = require('./returnItem.js');
 const Return = require('./return.js');
 
-Address.belongsTo(User, { foreignKey: 'user_id' }); // Bir adres bir kullanıcıya ait olur
+Address.belongsTo(User, { foreignKey: 'user_id', onDelete: 'SET NULL' }); // Bir adres bir kullanıcıya ait olur
 User.hasMany(Address, { foreignKey: 'user_id' }); // Bir kullanıcının birden fazla adresi olabilir
 
 Brand.belongsTo(ApprovalStatus, { foreignKey: 'approval_status_id' }); // Bir marka onay durumuna ait olur
 ApprovalStatus.hasMany(Brand, { foreignKey: 'approval_status_id' }); // Bir onay durumu birden fazla markaya sahip olabilir
 
-Brand.belongsTo(Moderator, { foreignKey: 'moderator_id' }); // Bir marka bir moderatöre ait olur
-Moderator.hasMany(Brand, { foreignKey: 'moderator_id' }); // Bir moderatör birden fazla markaya sahip olabilir
+Brand.belongsTo(Admin, { foreignKey: 'admin_id' }); // Bir marka bir moderatöre ait olur
+Admin.hasMany(Brand, { foreignKey: 'admin_id' }); // Bir moderatör birden fazla markaya sahip olabilir
 
-Brand.belongsTo(Seller, { foreignKey: 'seller_id' });
+Brand.belongsTo(Seller, { foreignKey: 'seller_id', onDelete: 'SET NULL' });
 Seller.hasMany(Brand, { foreignKey: 'seller_id' });
 
 Cart.belongsTo(User, { foreignKey: 'user_id' }); // Bir sepet bir kullanıcıya ait olur
@@ -56,8 +55,8 @@ Cart.hasMany(CartItem, { foreignKey: 'cart_id' });
 Category.belongsTo(ApprovalStatus, { foreignKey: 'approval_status_id' }); // Bir kategori onay durumuna ait olur
 ApprovalStatus.hasMany(Category, { foreignKey: 'approval_status_id' }); // Bir onay durumu birden fazla kategoriye sahip olabilir
 
-Category.belongsTo(Moderator, { foreignKey: 'moderator_id' }); // Bir kategori bir moderatöre ait olur
-Moderator.hasMany(Category, { foreignKey: 'moderator_id' }); // Bir moderatör birden fazla kategoriye sahip olabilir
+Category.belongsTo(Admin, { foreignKey: 'admin_id' }); // Bir kategori bir moderatöre ait olur
+Admin.hasMany(Category, { foreignKey: 'admin_id' }); // Bir moderatör birden fazla kategoriye sahip olabilir
 
 // Category modeli için self-referencing ilişki kurulumu ve cascade kurallarının eklenmesi
 Category.belongsTo(Category, { as: 'SubCategories', foreignKey: 'category_id', onDelete: 'CASCADE', onUpdate: 'CASCADE' });
@@ -101,8 +100,8 @@ Category.hasMany(Product, { foreignKey: 'category_id' }); // Bir kategoriye bird
 Product.belongsTo(ApprovalStatus, { foreignKey: 'approval_status_id' }); // Bir ürün bir onay durumuna ait olur
 ApprovalStatus.hasMany(Product, { foreignKey: 'approval_status_id' }); // Bir onay durumuna birden fazla ürün bağlı olabilir
 
-Product.belongsTo(Moderator, { foreignKey: 'moderator_id' }); // Bir ürün bir moderatöre ait olur
-Moderator.hasMany(Product, { foreignKey: 'moderator_id' }); // Bir moderatöre birden fazla ürün bağlı olabilir
+Product.belongsTo(Admin, { foreignKey: 'admin_id' }); // Bir ürün bir moderatöre ait olur
+Admin.hasMany(Product, { foreignKey: 'admin_id' }); // Bir moderatöre birden fazla ürün bağlı olabilir
 
 ProductComment.belongsTo(SellerProduct, { foreignKey: 'seller_product_id' }); // Bir yorum bir ürüne ait olur
 SellerProduct.hasMany(ProductComment, { foreignKey: 'seller_product_id' }); // Bir ürüne birden fazla yorum yapılabilir
@@ -132,8 +131,8 @@ Seller.hasMany(ProductQuestion, { foreignKey: 'seller_id' }); // Bir satıcını
 ProductQuestion.belongsTo(ApprovalStatus, { foreignKey: 'approval_status_id' }); // Bir ürün sorusu bir onay durumuna ait olur
 ApprovalStatus.hasMany(ProductQuestion, { foreignKey: 'approval_status_id' }); // Bir onay durumuna birden fazla ürün sorusu olabilir
 
-ProductQuestion.belongsTo(Moderator, { foreignKey: 'moderator_id' }); // Bir ürün sorusu bir moderatöre ait olur
-Moderator.hasMany(ProductQuestion, { foreignKey: 'moderator_id' }); // Bir moderatörün birden fazla ürün sorusu olabilir
+ProductQuestion.belongsTo(Admin, { foreignKey: 'admin_id' }); // Bir ürün sorusu bir moderatöre ait olur
+Admin.hasMany(ProductQuestion, { foreignKey: 'admin_id' }); // Bir moderatörün birden fazla ürün sorusu olabilir
 
 Property.belongsTo(Category, { foreignKey: 'category_id' }); // Bir özellik bir kategoriye ait olur
 Category.hasMany(Property, { foreignKey: 'category_id' }); // Bir kategorinin birden fazla özelliği olabilir
@@ -141,8 +140,8 @@ Category.hasMany(Property, { foreignKey: 'category_id' }); // Bir kategorinin bi
 Property.belongsTo(Product, { foreignKey: 'product_id' }); // Bir özellik bir ürüne ait olur
 Product.hasMany(Property, { foreignKey: 'product_id' }); // Bir ürünün birden fazla özelliği olabilir
 
-Seller.belongsTo(Moderator, { foreignKey: 'moderator_id' }); // Bir satıcı bir moderatöre ait olur
-Moderator.hasMany(Seller, { foreignKey: 'moderator_id' }); // Bir moderatör birden fazla satıcıya sahip olabilir
+Seller.belongsTo(Admin, { foreignKey: 'admin_id' }); // Bir satıcı bir moderatöre ait olur
+Admin.hasMany(Seller, { foreignKey: 'admin_id' }); // Bir moderatör birden fazla satıcıya sahip olabilir
 
 Seller.belongsTo(Category, { foreignKey: 'category_id' }); // Bir satıcı bir ürün kategorisine ait olur
 Category.hasMany(Seller, { foreignKey: 'category_id' }); // Bir ürün kategorisine birden fazla satıcı bağlı olabilir
@@ -162,8 +161,8 @@ Product.hasMany(SellerProduct, { foreignKey: 'product_id' }); // Bir ürüne bir
 SellerProduct.belongsTo(ApprovalStatus, { foreignKey: 'approval_status_id' }); // Bir satıcı ürünü bir onay durumuna ait olur
 ApprovalStatus.hasMany(SellerProduct, { foreignKey: 'approval_status_id' }); // Bir onay durumuna birden fazla satıcı ürünü olabilir
 
-SellerProduct.belongsTo(Moderator, { foreignKey: 'moderator_id' }); // Bir satıcı ürünü bir moderatöre ait olur
-Moderator.hasMany(SellerProduct, { foreignKey: 'moderator_id' }); // Bir moderatörün birden fazla satıcı ürünü olabilir
+SellerProduct.belongsTo(Admin, { foreignKey: 'admin_id' }); // Bir satıcı ürünü bir moderatöre ait olur
+Admin.hasMany(SellerProduct, { foreignKey: 'admin_id' }); // Bir moderatörün birden fazla satıcı ürünü olabilir
 
 SellerShippingAgreements.belongsTo(Seller, { foreignKey: 'seller_id' }); // Bir satıcı nakliye anlaşması bir satıcıya ait olur
 Seller.hasMany(SellerShippingAgreements, { foreignKey: 'seller_id' }); // Bir satıcının birden fazla nakliye anlaşması olabilir

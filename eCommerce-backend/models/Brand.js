@@ -16,7 +16,7 @@ const Brand = sequelize.define('Brand', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
-    moderator_id: Sequelize.INTEGER
+    admin_id: Sequelize.INTEGER
 })
 
 module.exports = Brand;
