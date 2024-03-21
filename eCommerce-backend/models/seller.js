@@ -27,4 +27,26 @@ const Seller = sequelize.define('seller', {
     admin_id: Sequelize.INTEGER
 })
 
+Seller.afterSync(async () => {
+    // İstenen başlangıç durumlarını tanımla
+    const statuses = [
+        {
+            username: 'umutkarakas',
+            password: '$2b$10$NHlsLPkdBkp/V/gZGt3WKuVIBO4NBdLdZXbfj7x9RD.uob9chwCBC',
+            approval_status_id: 1
+        },
+        {
+            username: 'mustafamutlu',
+            password: '$2b$10$izywZ7O/s/9A7ObokD1pfOqqqaXYcPMuxUnOM/MDV.a0Joj1ZJGae',
+            approval_status_id: 1
+        }
+    ];
+
+    // Bulk create ile durumları veritabanına ekle
+    // Bu işlem, aynı isme sahip durumlar zaten varsa bunları yeniden eklemeyecektir.
+    await Seller.bulkCreate(statuses, {
+        updateOnDuplicate: ['username'] // Zaten var olan kayıtları güncelleme
+    });
+});
+
 module.exports = Seller;
