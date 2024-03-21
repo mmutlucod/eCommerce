@@ -31,7 +31,7 @@ const CampaignProducts = require('./campaignProducts');
 const ReturnItem = require('./returnItem.js');
 const Return = require('./return.js');
 
-Address.belongsTo(User, { foreignKey: 'user_id' }); // Bir adres bir kullanıcıya ait olur
+Address.belongsTo(User, { foreignKey: 'user_id', onDelete: 'SET NULL' }); // Bir adres bir kullanıcıya ait olur
 User.hasMany(Address, { foreignKey: 'user_id' }); // Bir kullanıcının birden fazla adresi olabilir
 
 Brand.belongsTo(ApprovalStatus, { foreignKey: 'approval_status_id' }); // Bir marka onay durumuna ait olur
@@ -40,7 +40,7 @@ ApprovalStatus.hasMany(Brand, { foreignKey: 'approval_status_id' }); // Bir onay
 Brand.belongsTo(Admin, { foreignKey: 'admin_id' }); // Bir marka bir moderatöre ait olur
 Admin.hasMany(Brand, { foreignKey: 'admin_id' }); // Bir moderatör birden fazla markaya sahip olabilir
 
-Brand.belongsTo(Seller, { foreignKey: 'seller_id' });
+Brand.belongsTo(Seller, { foreignKey: 'seller_id', onDelete: 'SET NULL' });
 Seller.hasMany(Brand, { foreignKey: 'seller_id' });
 
 Cart.belongsTo(User, { foreignKey: 'user_id' }); // Bir sepet bir kullanıcıya ait olur
