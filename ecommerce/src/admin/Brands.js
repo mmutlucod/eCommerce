@@ -31,7 +31,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AdminNavbar from '../components/AdminNavbar';
 import api from '../api/api';
-import { green } from '@mui/material/colors';
+import { blue, green } from '@mui/material/colors';
 
 function Brands() {
   const [brands, setBrands] = useState([]);
@@ -256,7 +256,7 @@ function Brands() {
             message={snackbarMessage}
             ContentProps={{
               sx: {
-                backgroundColor: green[600], // Customize your snackbar color
+                backgroundColor: blue[600], // Customize your snackbar color
               },
             }}
           />
