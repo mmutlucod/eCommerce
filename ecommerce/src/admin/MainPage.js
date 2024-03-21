@@ -58,6 +58,7 @@ function MainPage() {
             { text: 'Markalar', icon: <BrandingWatermarkIcon />, link: '/admin/brands' },
             { text: 'Satıcılar', icon: <AccountCircleIcon />, link: '/admin/sellers' },
             { text: 'Kategoriler', icon: <CategoryIcon />, link: '/admin/categories' },
+            { text: 'Ürünler', icon: <CategoryIcon />, link: '/admin/products' },
           ].map((item, index) => (
             <ListItem button key={item.text} component={Link} to={item.link} sx={{ '&:hover': { backgroundColor: '#1565c0' } }}>
               <ListItemIcon sx={{ color: '#fff' }}>
