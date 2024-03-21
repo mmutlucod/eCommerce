@@ -91,25 +91,32 @@ function ProductsAdmin() {
                 <Typography variant="h5" gutterBottom>
                   Ürün Listesi
                 </Typography>
-                <TableContainer component={Paper}>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Ürün Adı</TableCell>
-                        <TableCell align="right">Fiyat</TableCell>
-                        <TableCell align="right">Stok</TableCell>
-                        <TableCell align="right">İşlemler</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {console.log(products)}
-                      {products.map((product) => (
-                        <TableRow key={product.id}>
+                <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+  <Table>
+    <TableHead sx={{ backgroundColor: '#f5f5f5' }}> {/* Başlık arka planı */}
+      <TableRow>
+        <TableCell>Ürün Adı</TableCell>
+        <TableCell align="right">Stok Kodu</TableCell>
+        <TableCell align="right">Kategori</TableCell>
+        <TableCell align="right">Marka</TableCell>
+        <TableCell align="right">Katalog Fiyatı</TableCell>
+        <TableCell align="right">Onay Durumu</TableCell>
+        <TableCell align="right">Onaylayan Kişi</TableCell>
+        <TableCell align="right">İşlemler</TableCell>
+      </TableRow>
+    </TableHead>
+    <TableBody>
+      {products.map((product, index) => (
+        <TableRow key={product.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: '#fafafa' } }}> 
                           <TableCell component="th" scope="row">
                             {product.name}
                           </TableCell>
+                          <TableCell align="right">{product.stock_code}</TableCell>
+                          <TableCell align="right">{product.category}</TableCell>
+                          <TableCell align="right">{product.Brand?.brand_name}</TableCell>
                           <TableCell align="right">{product.price}</TableCell>
-                          <TableCell align="right">{product.stock}</TableCell>
+                          <TableCell align="right">{product.Approvalstatus?.status_name}</TableCell>
+                          <TableCell align="right">{product.Admin.full_name}</TableCell>
                           <TableCell align="right">
                             <Tooltip title="Düzenle">
                               <IconButton onClick={() => handleEditDialogOpen(product)}>

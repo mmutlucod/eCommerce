@@ -8,18 +8,39 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token'));
 
-  const login = (newToken) => {
-    localStorage.setItem('token', newToken);
-    setToken(newToken);
-  };
+  const login = (data) => {
+    console.log(data)
 
-  const logout = () => {
-    localStorage.removeItem('token');
+   
+    if(data.role=='admin'){
+      localStorage.setItem('adminToken',data.token);
+    }
+    else if (data.role == "user"){
+      localStorage.setItem('userToken',data.token);
+    }
+    else {
+      localStorage.setItem('sellerToken',data.token);
+    
+    }
+    // setToken(newToken);
+  };
+  
+
+  const logoutAdmin = () => {
+    localStorage.removeItem('adminToken');
+
     setToken(null);
+    window.location.href= '/admin'
+  };
+  const logoutSeller = () => {
+    localStorage.removeItem('sellerToken');
+
+    setToken(null);
+    window.location.href= '/seller'
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token, login,  logoutAdmin, logoutSeller }}>
       {children}
     </AuthContext.Provider>
   );

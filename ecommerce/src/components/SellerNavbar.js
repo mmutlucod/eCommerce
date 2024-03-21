@@ -19,7 +19,7 @@ import {
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon
 } from '@mui/icons-material';
-
+import { useAuth } from '../context/AuthContext'; 
 const StyledMenuButton = styled(Button)(({ theme }) => ({
   color: theme.palette.common.white,
   textTransform: 'none',
@@ -73,6 +73,7 @@ export default function SellerNavbar() {
     navigate(path);
     handleMenuClose();
   };
+  const { logoutSeller } = useAuth();
   return (
     <AppBar position="static" sx={{ bgcolor: '#004d40' }}>
       <Toolbar sx={{ justifyContent: 'center' }}>
@@ -127,9 +128,7 @@ export default function SellerNavbar() {
           <IconButton color="inherit">
             <Badge badgeContent={17} color="error"><ShoppingCartIcon /></Badge>
           </IconButton>
-          <IconButton edge="end" color="inherit">
-            <AccountCircle />
-          </IconButton>
+          <Button color="inherit" onClick={logoutSeller}>Çıkış</Button>
         </Box>
       </Toolbar>
     </AppBar>

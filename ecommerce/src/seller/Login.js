@@ -18,7 +18,7 @@ function SellerLogin() {
       const response = await api.post('seller/login', { username, password });
 
       if (response.data && response.data.token) {
-        login(response.data.token); // Token'ı sakla
+        login(response.data); // Token'ı sakla
         alert("Giriş başarılı");
         navigate('/seller/dashboard'); // Kullanıcıyı satıcı paneline yönlendir
       } else {

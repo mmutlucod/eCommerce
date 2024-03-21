@@ -29,7 +29,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 const AdminNavbar = () => {
-  const { token, logout } = useAuth(); // `useAuth` hook'unu kullanarak giriş yapma durumunu ve çıkış fonksiyonunu alın
+  const { token, logoutAdmin } = useAuth(); // `useAuth` hook'unu kullanarak giriş yapma durumunu ve çıkış fonksiyonunu alın
 
   return (
     <AppBar position="fixed" sx={{ backgroundColor: '#3a3a3a' }}>
@@ -52,24 +52,7 @@ const AdminNavbar = () => {
             </Search>
           </Grid>
           <Grid item xs display="flex" justifyContent="flex-end">
-            {token && (
-              <>
-                <IconButton color="inherit">
-                  <Badge badgeContent={4} color="secondary">
-                    <MailIcon />
-                  </Badge>
-                </IconButton>
-                <IconButton color="inherit">
-                  <Badge badgeContent={10} color="secondary">
-                    <NotificationsIcon />
-                  </Badge>
-                </IconButton>
-                <Button color="inherit" onClick={logout}>Çıkış</Button> {/* Giriş yapılmışsa Çıkış butonunu göster */}
-              </>
-            )}
-            {!token && (
-              <Button color="inherit">Giriş</Button> 
-            )}
+          <Button color="inherit" onClick={logoutAdmin}>Çıkış</Button>
           </Grid>
         </Grid>
       </Toolbar>

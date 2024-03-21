@@ -24,7 +24,7 @@ const Login = () => {
       const response = await api.post('/admin/login', userData);
 
       if (response.data && response.data.token) { // Token varsa
-        login(response.data.token); // Token'ı AuthContext aracılığıyla yönet
+        login(response.data); // Token'ı AuthContext aracılığıyla yönet
         alert("Giriş başarılı");
         navigate('/admin/dashboard'); // Kullanıcıyı admin paneline yönlendir
       } else {

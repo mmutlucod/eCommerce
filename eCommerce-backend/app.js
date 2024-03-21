@@ -22,6 +22,7 @@ app.use(express.urlencoded({ limit: "30mb", extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+
 app.use('/admin', adminRoutes);
 app.use('/seller', sellerRoutes);
 app.use('/user', userRoutes);
