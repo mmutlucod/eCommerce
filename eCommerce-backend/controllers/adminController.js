@@ -235,7 +235,14 @@ const searchProduct = async (req, res) => {
                     where: search ? { category_name: { [Op.like]: `%${search}%` } } : undefined,
                     required: false
                 },
-                // Admin modeli için 'include' veya 'where' koşulu eklenmedi.
+                {
+                    model: Admin,
+                    attributes: ['username', 'full_name']
+                },
+                {
+                    model: ApprovalStatus,
+                    attributes: ['status_name']
+                }
             ]
         });
 
