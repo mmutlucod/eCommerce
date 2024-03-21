@@ -11,6 +11,7 @@ const OrderItem = require('../models/orderItem');
 const sellerProduct = require('../models/sellerProduct');
 const Seller = require('../models/seller');
 const saltRounds = 10; // Bcrypt için salt tur sayısı
+const { Sequelize, Op } = require('sequelize')
 
 const login = async (req, res) => {
     const { username, password } = req.body;
@@ -99,8 +100,8 @@ const getProducts = async (req, res) => {
                     attributes: ['category_name'], // Kategorinin sadece adını dahil et
                 },
                 {
-                    model: Moderator,
-                    attributes: ['name']
+                    model: Admin,
+                    attributes: ['username', 'full_name']
                 }
             ]
         });
@@ -129,8 +130,8 @@ const getProductsById = async (req, res) => {
                     attributes: ['category_name'], // Kategorinin sadece adını dahil et
                 },
                 {
-                    model: Moderator,
-                    attributes: ['name']
+                    model: Admin,
+                    attributes: ['username', 'full_name']
                 }
                 // Diğer ilişkili modelleri de benzer şekilde ekleyebilirsiniz
             ]
@@ -201,6 +202,52 @@ const deleteProduct = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+const searchProduct = async (req, res) => {
+    const { search } = req.query;
+
+    try {
+        const products = await Product.findAll({
+            where: search ? {
+                [Op.or]: [
+                    {
+                        product_name: {
+                            [Op.like]: `%${search}%`
+                        }
+                    }
+                    // Not: Admin modelinde arama yapmak istenmiyor gibi görünüyor.
+                ]
+            } : {},
+            include: [
+                {
+                    model: Brand,
+                    attributes: ['brand_name'],
+                    where: search ? {
+                        brand_name: {
+                            [Op.like]: `%${search}%`
+                        }
+                    } : undefined,
+                    required: false
+                },
+                {
+                    model: Category,
+                    attributes: ['category_name'],
+                    where: search ? {
+                        category_name: {
+                            [Op.like]: `%${search}%`
+                        }
+                    } : undefined,
+                    required: false
+                }
+                // Admin modeli için herhangi bir 'include' veya 'where' koşulu eklenmedi.
+            ]
+        });
+
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
 //KATEGORİ
 const getCategories = async (req, res) => {
     try {
@@ -212,8 +259,8 @@ const getCategories = async (req, res) => {
                     attributes: ['category_name'], // Markanın sadece adını dahil et
                 },
                 {
-                    model: Moderator,
-                    attributes: ['name'], // Kategorinin sadece adını dahil et
+                    model: Admin,
+                    attributes: ['username', 'full_name'], // Kategorinin sadece adını dahil et
                 },
                 {
                     model: ApprovalStatus,
@@ -238,8 +285,8 @@ const getCategoriesById = async (req, res) => {
                     attributes: ['category_name'], // Markanın sadece adını dahil et
                 },
                 {
-                    model: Moderator,
-                    attributes: ['name'], // Kategorinin sadece adını dahil et
+                    model: Admin,
+                    attributes: ['username', 'full_name'], // Kategorinin sadece adını dahil et
                 },
                 {
                     model: ApprovalStatus,
@@ -382,72 +429,6 @@ const deleteUser = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
-//MODERATOR
-const getModerators = async (req, res) => {
-    try {
-        const moderators = await Moderator.findAll();
-
-        return res.status(200).json(moderators);
-    }
-    catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
-    }
-}
-const getModeratorsById = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const moderator = await Moderator.findByPk(id);
-
-        if (!moderator) {
-            return res.status(404).json({ success: false, message: 'Moderatör bulunamadı.' });
-        }
-
-        return res.status(200).json(moderator);
-
-    } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
-    }
-}
-const createModerator = async (req, res) => {
-    try {
-        const moderator = await Moderator.create(req.body);
-
-        return res.status(201).json({ success: true, message: 'Moderatör oluşturuldu.', moderator });
-    }
-    catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
-    }
-}
-const editModerator = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const moderator = await Moderator.findByPk(id);
-
-        if (!moderator) {
-            return res.status(404).json({ success: false, message: 'Moderatör bulunamadı.' });
-        }
-        await moderator.update(req.body);
-
-        return res.status(200).json({ success: true, message: 'Moderatör başarıyla güncellendi.' });
-    }
-    catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
-    }
-}
-const deleteModerator = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const deleted = Moderator.destroy({ where: { modertor_id: id } });
-
-        if (!deleted) {
-            return res.status(404).json({ success: false, message: 'Böyle bir moderatör bulunamadı.' });
-        }
-        return res.status(200).json({ success: true, message: 'Moderatör silindi.' });
-    } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
-    }
-}
 //SİPARİŞLER
 const getOrders = async (req, res) => {
     try {
@@ -549,8 +530,8 @@ const getSellers = async (req, res) => {
                     attributes: ['id', 'category_name']
                 },
                 {
-                    model: Moderator,
-                    attributes: ['moderator_id', 'name', 'surname']
+                    model: Admin,
+                    attributes: ['admin_id', 'username', 'full_name']
                 }
 
             ]
@@ -576,8 +557,8 @@ const getSellerById = async (req, res) => {
                     attributes: ['id', 'category_name']
                 },
                 {
-                    model: Moderator,
-                    attributes: ['moderator_id', 'name', 'surname']
+                    model: Admin,
+                    attributes: ['admin_id', 'username', 'full_name']
                 }
 
             ]
@@ -734,10 +715,9 @@ const getApprovalStatusById = async (req, res) => {
 }
 module.exports = {
     login, register, listAdmins,
-    getProducts, getProductsById, createProduct, editProduct, deleteProduct,
+    getProducts, getProductsById, createProduct, editProduct, deleteProduct, searchProduct,
     getCategories, getCategoriesById, createCategory, editCategory, deleteCategory,
     getUsers, getUsersById, createUser, editUser, deleteUser,
-    getModerators, getModeratorsById, createModerator, editModerator, deleteModerator,
     getOrders, getOrderDetailsById, updateOrder,
     getSellers, getSellerById, createSeller, editSeller, deleteSeller,
     getBrands, getBrandById, createBrand, editBrand, deleteBrand, getApprovalStatuses, getApprovalStatusById

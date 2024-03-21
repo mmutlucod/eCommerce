@@ -13,6 +13,7 @@ router.get('/products/:id', authMiddleware, adminController.getProductsById);
 router.post('/create-product', authMiddleware, adminController.createProduct);
 router.put('/products/:id', authMiddleware, adminController.editProduct);
 router.delete('/products/:id', authMiddleware, adminController.deleteProduct);
+router.get('/searchProduct', authMiddleware, adminController.searchProduct);
 
 router.get('/categories', adminController.getCategories)
 router.get('/categories/:id', authMiddleware, adminController.getCategoriesById);
@@ -26,11 +27,11 @@ router.post('/create-user', authMiddleware, adminController.createUser);
 router.put('/users/:id', authMiddleware, adminController.editUser);
 router.delete('/users/:id', authMiddleware, adminController.deleteUser);
 
-router.get('/moderators', authMiddleware, adminController.getModerators)
-router.get('/moderators/:id', authMiddleware, adminController.getModeratorsById);
-router.post('/create-moderator', authMiddleware, adminController.createModerator);
-router.put('/moderators/:id', authMiddleware, adminController.editModerator);
-router.delete('/moderators/:id', authMiddleware, adminController.deleteModerator);
+// router.get('/moderators', authMiddleware, adminController.getModerators)
+// router.get('/moderators/:id', authMiddleware, adminController.getModeratorsById);
+// router.post('/create-moderator', authMiddleware, adminController.createModerator);
+// router.put('/moderators/:id', authMiddleware, adminController.editModerator);
+// router.delete('/moderators/:id', authMiddleware, adminController.deleteModerator);
 
 router.get('/orders', authMiddleware, adminController.getOrders);
 router.get('/orders/:id', authMiddleware, adminController.getOrderDetailsById);
