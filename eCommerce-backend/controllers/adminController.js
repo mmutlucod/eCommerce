@@ -102,6 +102,10 @@ const getProducts = async (req, res) => {
                 {
                     model: Admin,
                     attributes: ['username', 'full_name']
+                },
+                {
+                    model: ApprovalStatus,
+                    attributes: ['status_name']
                 }
             ]
         });
