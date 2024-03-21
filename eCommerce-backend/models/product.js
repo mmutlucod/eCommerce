@@ -15,6 +15,7 @@ const Product = sequelize.define('product', {
         type: Sequelize.STRING,
         allowNull: true
     },
+    stock_code: Sequelize.STRING,
     category_id: Sequelize.INTEGER,
     approval_status_id: {
         type: Sequelize.INTEGER,

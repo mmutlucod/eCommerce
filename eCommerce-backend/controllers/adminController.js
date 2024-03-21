@@ -203,40 +203,37 @@ const deleteProduct = async (req, res) => {
     }
 };
 const searchProduct = async (req, res) => {
-    const { search } = req.query; // Arama sorgusunu query parametresinden al
+    const { search } = req.query;
 
     try {
-        // Büyük/küçük harf duyarlılığına göre arama yapılacaksa, arama terimi önceden işlenmelidir.
-        const searchCondition = search ? `%${search}%` : null;
-
+        // Ürünleri arama koşuluyla bul
         const products = await Product.findAll({
-            where: searchCondition ? {
+            where: search ? {
                 [Op.or]: [
-                    { product_name: { [Op.like]: searchCondition } },
-                    // Sequelize, direkt olarak Product modelinde arama yapacak.
-                    // İlişkili modellerdeki arama için, include kısmında where koşulu kullanılmalıdır.
+                    { name: { [Op.like]: `%${search}%` } },
+                    // Daha fazla arama koşulu ekleyebilirsiniz
                 ]
             } : {},
             include: [
                 {
                     model: Brand,
                     attributes: ['brand_name'],
-                    where: searchCondition ? { brand_name: { [Op.like]: searchCondition } } : undefined,
-                    required: false, // Bu, LEFT OUTER JOIN olarak çalışır.
+                    where: search ? { brand_name: { [Op.like]: `%${search}%` } } : undefined,
+                    required: false
                 },
                 {
                     model: Category,
                     attributes: ['category_name'],
-                    where: searchCondition ? { category_name: { [Op.like]: searchCondition } } : undefined,
-                    required: false, // Bu, LEFT OUTER JOIN olarak çalışır.
-                }
-                // Admin modeli ile ilgili bir arama isteği belirtilmedi.
+                    where: search ? { category_name: { [Op.like]: `%${search}%` } } : undefined,
+                    required: false
+                },
+                // Admin modeli için 'include' veya 'where' koşulu eklenmedi.
             ]
         });
 
-        res.status(200).json(products);
+        return res.status(200).json(products);
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 
