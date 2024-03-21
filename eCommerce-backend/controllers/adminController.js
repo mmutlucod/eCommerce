@@ -136,6 +136,10 @@ const getProductsById = async (req, res) => {
                 {
                     model: Admin,
                     attributes: ['username', 'full_name']
+                },
+                {
+                    model: ApprovalStatus,
+                    attributes: ['status_name']
                 }
                 // Diğer ilişkili modelleri de benzer şekilde ekleyebilirsiniz
             ]
