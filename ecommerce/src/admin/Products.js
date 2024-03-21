@@ -102,6 +102,7 @@ function ProductsAdmin() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
+                        {console.log(products)}
                       {products.map((product) => (
                         <TableRow key={product.id}>
                           <TableCell component="th" scope="row">
