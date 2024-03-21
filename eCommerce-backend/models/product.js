@@ -20,6 +20,7 @@ const Product = sequelize.define('product', {
         type: Sequelize.INTEGER,
         defaultValue: 0
     },
+    price: Sequelize.INTEGER,
     admin_id: Sequelize.INTEGER
 });
 

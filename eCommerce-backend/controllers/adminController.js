@@ -203,42 +203,34 @@ const deleteProduct = async (req, res) => {
     }
 };
 const searchProduct = async (req, res) => {
-    const { search } = req.query;
+    const { search } = req.query; // Arama sorgusunu query parametresinden al
 
     try {
+        // Büyük/küçük harf duyarlılığına göre arama yapılacaksa, arama terimi önceden işlenmelidir.
+        const searchCondition = search ? `%${search}%` : null;
+
         const products = await Product.findAll({
-            where: search ? {
+            where: searchCondition ? {
                 [Op.or]: [
-                    {
-                        product_name: {
-                            [Op.like]: `%${search}%`
-                        }
-                    }
-                    // Not: Admin modelinde arama yapmak istenmiyor gibi görünüyor.
+                    { product_name: { [Op.like]: searchCondition } },
+                    // Sequelize, direkt olarak Product modelinde arama yapacak.
+                    // İlişkili modellerdeki arama için, include kısmında where koşulu kullanılmalıdır.
                 ]
             } : {},
             include: [
                 {
                     model: Brand,
                     attributes: ['brand_name'],
-                    where: search ? {
-                        brand_name: {
-                            [Op.like]: `%${search}%`
-                        }
-                    } : undefined,
-                    required: false
+                    where: searchCondition ? { brand_name: { [Op.like]: searchCondition } } : undefined,
+                    required: false, // Bu, LEFT OUTER JOIN olarak çalışır.
                 },
                 {
                     model: Category,
                     attributes: ['category_name'],
-                    where: search ? {
-                        category_name: {
-                            [Op.like]: `%${search}%`
-                        }
-                    } : undefined,
-                    required: false
+                    where: searchCondition ? { category_name: { [Op.like]: searchCondition } } : undefined,
+                    required: false, // Bu, LEFT OUTER JOIN olarak çalışır.
                 }
-                // Admin modeli için herhangi bir 'include' veya 'where' koşulu eklenmedi.
+                // Admin modeli ile ilgili bir arama isteği belirtilmedi.
             ]
         });
 
@@ -246,7 +238,8 @@ const searchProduct = async (req, res) => {
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
-}
+};
+
 
 //KATEGORİ
 const getCategories = async (req, res) => {
