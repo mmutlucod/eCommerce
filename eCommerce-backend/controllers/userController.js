@@ -29,7 +29,7 @@ const login = async (req, res) => {
         });
 
         // Başarılı giriş yanıtı ve token dön
-        return res.status(200).json({ message: 'Giriş başarılı.', token });
+        return res.status(200).json({ message: 'Giriş başarılı.', token, role: 'user' });
     } catch (error) {
         // Hata yakalama ve loglama
         console.error('Giriş sırasında bir hata oluştu:', error);

@@ -40,7 +40,7 @@ const login = async (req, res) => {
         });
 
         // Başarılı giriş yanıtı ve token dön
-        return res.status(200).json({ message: 'Giriş başarılı.', token });
+        return res.status(200).json({ message: 'Giriş başarılı.', token, role: 'admin' });
     } catch (error) {
         // Hata yakalama ve loglama
         console.error('Giriş sırasında bir hata oluştu:', error);
@@ -171,7 +171,6 @@ const createProduct = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Ürün oluşturulurken bir hata oluştu.', error: error.message });
     }
 };
-
 const editProduct = async (req, res) => {
     const { id } = req.params; // URL'den ürün ID'si alınır
     const updatedData = req.body; // İstek gövdesinden güncellenecek veriler alınır
