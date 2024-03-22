@@ -93,7 +93,7 @@ function ProductsAdmin() {
                 </Typography>
                 <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
   <Table>
-    <TableHead sx={{ backgroundColor: '#f5f5f5' }}> {/* Başlık arka planı */}
+    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
       <TableRow>
         <TableCell>Ürün Adı</TableCell>
         <TableCell align="right">Stok Kodu</TableCell>
