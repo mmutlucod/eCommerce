@@ -32,9 +32,16 @@ function ProductsAdmin() {
   const [products, setProducts] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [productToEdit, setProductToEdit] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [productToEdit, setProductToEdit] = useState({
+    id: null,
+    name: '',
+    brand: '',
+    price: '',
+    approvalStatus: ''
+  });
+  
 
   // Ürünleri çekmek için API çağrısı
   const fetchProducts = async () => {
@@ -56,19 +63,21 @@ function ProductsAdmin() {
   }, []);
 
   const handleEditDialogOpen = (product) => {
-    setProductToEdit(product);
+    setProductToEdit({
+      id: product.id,
+      name: product.name,
+      brand: product.Brand?.brand_name || '',
+      price: product.price,
+      approvalStatus: product.Approvalstatus?.status_name || ''
+    });
     setOpenDialog(true);
-  };
-
-  const handleDialogClose = () => {
-    setOpenDialog(false);
   };
 
   const handleProductUpdate = async () => {
     // Ürünü güncellemek için API çağrısı
-    if (productToEdit) {
+    if (productToEdit && productToEdit.id) {
       try {
-        await api.put(`/admin/products/${productToEdit.id}`, { name: productToEdit.name });
+        await api.put(`/admin/edit-product/${productToEdit.id}`, productToEdit);
         setSnackbarMessage('Ürün başarıyla güncellendi.');
         setSnackbarOpen(true);
         fetchProducts(); // Ürün listesini güncellemek için ürünleri yeniden çek
@@ -80,6 +89,10 @@ function ProductsAdmin() {
     }
     handleDialogClose();
   };
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+  };
+
   return (
     <>
       <AdminNavbar />
@@ -141,28 +154,57 @@ function ProductsAdmin() {
       </Container>
   
       {/* Ürün Düzenleme Diyalogu */}
-      <Dialog open={openDialog} onClose={handleDialogClose}>
-        <DialogTitle>{productToEdit ? "Ürün Düzenle" : "Yeni Ürün Ekle"}</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Ürün Adı"
-            type="text"
-            fullWidth
-            variant="outlined"
-            value={productToEdit ? productToEdit.name : ''}
-            onChange={(e) => setProductToEdit({ ...productToEdit, name: e.target.value })}
-          />
-          {/* Daha fazla TextField bileşeni ekleyerek diğer ürün özelliklerini düzenleyebilirsiniz */}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose}>İptal</Button>
-          <Button onClick={handleProductUpdate}>Güncelle</Button>
-        </DialogActions>
-      </Dialog>
-  
+     <Dialog open={openDialog} onClose={handleDialogClose}>
+      <DialogTitle>{productToEdit.id ? "Ürün Düzenle" : "Yeni Ürün Ekle"}</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin="dense"
+          id="name"
+          label="Ürün Adı"
+          type="text"
+          fullWidth
+          variant="outlined"
+          value={productToEdit.name}
+          onChange={(e) => setProductToEdit({ ...productToEdit, name: e.target.value })}
+        />
+        <TextField
+          margin="dense"
+          id="brand"
+          label="Marka Adı"
+          type="text"
+          fullWidth
+          variant="outlined"
+          value={productToEdit.brand}
+          onChange={(e) => setProductToEdit({ ...productToEdit, brand: e.target.value })}
+        />
+        <TextField
+          margin="dense"
+          id="price"
+          label="Katalog Fiyatı"
+          type="number"
+          fullWidth
+          variant="outlined"
+          value={productToEdit.price}
+          onChange={(e) => setProductToEdit({ ...productToEdit, price: e.target.value })}
+        />
+        <TextField
+          margin="dense"
+          id="approvalStatus"
+          label="Onay Durumu"
+          type="text"
+          fullWidth
+          variant="outlined"
+          value={productToEdit.approvalStatus}
+          onChange={(e) => setProductToEdit({ ...productToEdit, approvalStatus: e.target.value })}
+        />
+        {/* Diğer alanlarınızı buraya ekleyin */}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleDialogClose}>İptal</Button>
+        <Button onClick={handleProductUpdate}>Güncelle</Button>
+      </DialogActions>
+    </Dialog>
       {/* Snackbar Bildirimi */}
       <Snackbar
         open={snackbarOpen}
