@@ -74,7 +74,16 @@ const listUsers = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+const getUserDetails = async (req, res) => {
+    try {
 
+    }
+    catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const umut=3
 module.exports = {
     login, register, listUsers,
 
