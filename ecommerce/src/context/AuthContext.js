@@ -10,30 +10,26 @@ export const AuthProvider = ({ children }) => {
 
   const login = (data) => {
     console.log(data)
-
+    localStorage.setItem('token',data.token);
    
-    if(data.role=='admin'){
-      localStorage.setItem('adminToken',data.token);
+    if(data){
+      
+      localStorage.setItem('token',data.token);
+      setToken(data.token);
     }
-    else if (data.role == "user"){
-      localStorage.setItem('userToken',data.token);
-    }
-    else {
-      localStorage.setItem('sellerToken',data.token);
-    
-    }
+   
     // setToken(newToken);
   };
   
 
   const logoutAdmin = () => {
-    localStorage.removeItem('adminToken');
+    localStorage.clear();
 
     setToken(null);
     window.location.href= '/admin'
   };
   const logoutSeller = () => {
-    localStorage.removeItem('sellerToken');
+    localStorage.clear()
 
     setToken(null);
     window.location.href= '/seller'
