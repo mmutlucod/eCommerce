@@ -644,7 +644,7 @@ async function searchCategories(search) {
 }
 module.exports = {
     login, register, listSellers,
-    getSellerProducts, getSellerProductDetailsById, createSellerProduct, updateSellerProduct, deactivateSellerProduct, activateSellerProduct, searchSellerProducts,
+    getSellerProducts, getSellerProductDetailsById, createSellerProduct, updateSellerProduct, deactivateSellerProduct, activateSellerProduct, searchSellerProducts, getAllProducts,
     getAllBrands, getSellerBrands, createBrand, updateBrand, searchAllBrands, searchSellerBrands,
     getAllCategories, getAllCategoriesWithSearch,
     getSellerOrders, cancelOrderItemQuantity, updateShippingCodeOrderItem, updateOrderStatus,
