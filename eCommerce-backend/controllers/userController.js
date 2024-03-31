@@ -2,6 +2,11 @@ const bcrypt = require("bcrypt"); // Şifreleri güvenli bir şekilde saklamak i
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const { errors } = require("ethers");
+const Cart = require("../models/cart");
+const CartItem = require("../models/cartItem");
+const sellerProduct = require("../models/sellerProduct");
+const Seller = require("../models/seller");
+const Product = require("../models/product");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -119,7 +124,130 @@ const updateUserDetail = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+//SEPET İŞLEMLERİ
+const addItem = async (req, res) => {
+  try {
+    const { productId, quantity } = req.body;
+
+    const user = await User.findOne({ where: { email: req.user.email } });
+    const cart = await Cart.findOne({ where: { user_id: user.user_id } });
+
+    if (!cart) {
+      await Cart.create({
+        user_id: user.user_id
+      })
+    }
+    const item = await CartItem.findOne({ where: { cart_id: cart.cart_id, seller_product_id: productId } });
+    if (item) {
+      item.quantity += quantity;
+      await item.save();
+    } else {
+      await CartItem.create({
+        cart_id: cart.cart_id,
+        seller_product_id: productId,
+        quantity: quantity
+      })
+    }
+
+    return res.status(200).json({ success: false, message: 'Ürün sepete eklendi.' })
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const deleteItem = async (req, res) => {
+  try {
+    const { productId } = req.body;
+
+    const user = await User.findOne({ where: { email: req.user.email } });
+    const cart = await Cart.findOne({ where: { user_id: user.user_id } });
+
+    if (!cart) {
+      return res.status(404).json({ success: false, message: 'Sepet bulunamadı.' });
+    }
+
+    const item = await CartItem.findOne({ where: { cart_id: cart.cart_id, seller_product_id: productId } });
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Ürün sepetinizde bulunamadı.' });
+    }
+
+    await item.destroy();
+
+    return res.status(200).json({ success: true, message: 'Ürün sepetten silindi.' });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const increaseItem = async (req, res) => {
+  try {
+    const { productId } = req.body;
+
+    const user = await User.findOne({ where: { email: req.user.email } });
+    const cart = await Cart.findOne({ where: { user_id: user.user_id } });
+
+    if (!cart) {
+      return res.status(404).json({ success: false, message: 'Sepet bulunamadı.' });
+    }
+
+    const item = await CartItem.findOne({ where: { cart_id: cart.cart_id, seller_product_id: productId } });
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Ürün sepetinizde bulunamadı.' });
+    }
+
+    // Eğer miktar 1'den büyükse, miktarı bir azalt
+    if (item.quantity > 1) {
+      item.quantity -= 1;
+      await item.save();
+      return res.status(200).json({ success: true, message: 'Ürün miktarı azaltıldı.' });
+    } else {
+      // Miktar 1 ise, ürünü sepetten tamamen çıkar
+      await item.destroy();
+      return res.status(200).json({ success: true, message: 'Ürün sepetten silindi.' });
+    }
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const getCartItems = async (req, res) => {
+  try {
+    // Öncelikle kullanıcının email adresini kullanarak kullanıcıyı bulun
+    const user = await User.findOne({ where: { email: req.user.email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' });
+    }
+
+    // Kullanıcıya ait sepeti bulun
+    const cart = await Cart.findOne({ where: { user_id: user.user_id } });
+    if (!cart) {
+      return res.status(404).json({ success: false, message: 'Sepet bulunamadı.' });
+    }
+
+    // Sepete ait ürünleri çeken bir sorgu yapın
+    const items = await CartItem.findAll({
+      where: { cart_id: cart.cart_id },
+      include: [{
+        model: sellerProduct, // Bu, ürün bilgilerini de çekmek istiyorsanız kullanılabilir 
+        include: [{
+          model: Seller,
+        },
+        {
+          model: Product
+        }]
+      }]
+    });
+
+    // Sepetteki ürünleri döndür
+    return res.status(200).json(items);
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
 
 module.exports = {
-  login, register, listUsers, getUserDetails, updateUserDetail
+  login, register, listUsers, getUserDetails, updateUserDetail,
+  addItem, deleteItem, increaseItem, getCartItems
 };
