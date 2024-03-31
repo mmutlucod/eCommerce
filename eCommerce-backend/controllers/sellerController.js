@@ -451,6 +451,7 @@ const getAllCategoriesWithSearch = async (req, res) => {
 //SİPARİŞLER
 const getSellerOrders = async (req, res) => {
     try {
+
         const seller = await Seller.findOne({ where: { username: req.user.username } });
         if (!seller) {
             return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });

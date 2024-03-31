@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt"); // Şifreleri güvenli bir şekilde saklamak için bcrypt kütüphanesini kullanıyoruz
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const { errors } = require("ethers");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -27,7 +28,7 @@ const login = async (req, res) => {
     }
 
     // Token oluştur (token içinde yalnızca gerekli ve güvenli bilgileri sakla)
-    const tokenPayload = { id: user.id, username: user.username, role: "user" };
+    const tokenPayload = { id: user.user_id, email: user.email, role: "user" };
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
       expiresIn: "100y", // Token süresi (örneğin 1 saat)
     });
@@ -95,13 +96,30 @@ const listUsers = async (req, res) => {
 };
 const getUserDetails = async (req, res) => {
   try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+const updateUserDetail = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Kullanıcı Bulunamadı' });
+    }
+
+    await user.update();
+
+    return res.status(200).json({ success: true, message: 'Bilgileriniz güncellendi' });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
 
 module.exports = {
-  login,
-  register,
-  listUsers,
+  login, register, listUsers, getUserDetails, updateUserDetail
 };
