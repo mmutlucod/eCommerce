@@ -7,6 +7,11 @@ const CartItem = require("../models/cartItem");
 const sellerProduct = require("../models/sellerProduct");
 const Seller = require("../models/seller");
 const Product = require("../models/product");
+const Brand = require("../models/Brand");
+const Category = require("../models/category");
+const ProductList = require("../models/productList");
+const ProductListItems = require("../models/productListItems");
+const Address = require("../models/address");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -233,7 +238,10 @@ const getCartItems = async (req, res) => {
           model: Seller,
         },
         {
-          model: Product
+          model: Product,
+          include: [{
+            model: Brand
+          }]
         }]
       }]
     });
@@ -245,9 +253,386 @@ const getCartItems = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+const getProducts = async (req, res) => {
+  try {
+    const products = await sellerProduct.findAll(
+      {
+        where: { is_active: 1 },
+        include: [{
+          model: Seller
+        },
+        {
+          model: Product,
+          include: [{
+            model: Brand
+          },
+          {
+            model: Category
+          }]
+        },
+        ]
+      }
+    );
+
+    return res.status(200).json(products);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+//LİSTE İŞLEMLERİ
+const getLists = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    const lists = await ProductList.findAll({ where: { user_id: user.user_id } });
+
+    return res.status(200).json(lists);
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const createList = async (req, res) => {
+  try {
+    const { listName } = req.body;
+    // isPublic değerini boolean olarak al, undefined ise varsayılan olarak 0 kullan
+    const isPublic = req.body.isPublic !== undefined ? req.body.isPublic : 0;
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Slug oluştur. Eğer liste herkese açıksa, benzersiz bir slug oluşturur.
+    let slug = null;
+    if (isPublic) {
+      // Slug oluşturma. Gerçek uygulamalarda daha karmaşık ve benzersiz bir slug oluşturmayı düşünebilirsiniz.
+      slug = listName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
+    }
+
+    // Aynı isimde bir liste olup olmadığını kontrol et
+    const existingList = await ProductList.findOne({
+      where: {
+        user_id: user.user_id,
+        list_name: listName,
+        // is_public ve slug kontrolünü burada yapmayabilirsiniz çünkü isim benzersizliği yeterli olacaktır.
+      },
+    });
+
+    if (existingList) {
+      // Liste zaten varsa, hata mesajı gönder
+      return res.status(409).json({ success: false, message: 'Bu isimde bir liste zaten var.' });
+    }
+
+    // Yeni listeyi oluştur
+    const newList = await ProductList.create({
+      user_id: user.user_id,
+      list_name: listName,
+      is_public: isPublic,
+      slug: slug, // Slug'ı veritabanına kaydet
+    });
+
+    return res.status(200).json({ success: true, message: 'Liste başarıyla oluşturuldu.', list: newList });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const deleteList = async (req, res) => {
+  try {
+    const { listId } = req.params;
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Listeyi bul
+    const list = await ProductList.findOne({
+      where: {
+        user_id: user.user_id,
+        list_id: listId,
+      },
+    });
+
+    if (!list) {
+      return res.status(404).json({ success: false, message: 'Liste bulunamadı.' });
+    }
+
+    // Listeyi silmeden önce, ilişkili tüm ürünleri sil
+    await ProductListItems.destroy({ where: { list_id: listId } });
+
+    // Liste silme işlemi
+    await list.destroy();
+
+    return res.status(200).json({ success: true, message: 'Liste başarıyla silindi.' });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const updateList = async (req, res) => {
+  try {
+    const { listId } = req.params; // URL'den listId'yi al
+    const { isPublic } = req.body; // istek gövdesinden isPublic değerini al
+
+    // İlgili kullanıcıyı bul
+    const user = await User.findOne({ where: { email: req.user.email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' });
+    }
+
+    // Güncellenecek listeyi bul
+    const list = await ProductList.findOne({
+      where: {
+        user_id: user.user_id,
+        list_id: listId,
+      },
+    });
+
+    if (!list) {
+      // Liste bulunamazsa, hata mesajı gönder
+      return res.status(404).json({ success: false, message: 'Güncellenecek liste bulunamadı.' });
+    }
+
+    // isPublic durumuna göre slug güncelleme
+    let updateFields = {
+      is_public: isPublic,
+    };
+
+    if (isPublic) {
+      // Eğer liste herkese açık yapılıyorsa, yeni bir slug oluştur
+      const slug = list.list_name.toLowerCase().replace(/ /g, '-') + '-' + Date.now();
+      updateFields.slug = slug;
+    } else {
+      // Eğer liste herkese kapalı yapılıyorsa, slug'ı sil
+      updateFields.slug = null;
+    }
+
+    // Listeyi güncelle
+    await list.update(updateFields);
+
+    return res.status(200).json({ success: true, message: 'Liste başarıyla güncellendi.' });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const getPublicListItemsBySlug = async (req, res) => {
+  const { slug } = req.params;
+
+  const list = await ProductList.findOne({
+    where: {
+      slug: slug,
+      is_public: true
+    },
+    include: [{
+      model: ProductListItems,
+      include: [Product]
+    }]
+  });
+
+  if (!list) {
+    return res.status(404).json({ success: false, message: 'Liste bulunamadı.' });
+  }
+
+  // Liste ve ürünlerini döndür
+  return res.json({ success: true, items: list.ProductListItems });
+};
+//LİSTE İTEM İŞLEMLERİ
+const addItemToList = async (req, res) => {
+  try {
+    const { listId, productId } = req.body;
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    let targetListId = listId;
+
+    if (!listId) {
+      // "Beğendiklerim" listesini bul veya oluştur
+      const favoritesList = await ProductList.findOrCreate({
+        where: {
+          user_id: user.user_id,
+          list_name: 'Beğendiklerim',
+        },
+        defaults: { // findOrCreate metodunun "create" kısmı için varsayılan değerler
+          user_id: user.user_id,
+          list_name: 'Beğendiklerim',
+        }
+      });
+
+      targetListId = favoritesList[0].dataValues.list_id; // findOrCreate döndürdüğü array'in ilk elemanındaki list_id'yi kullan
+    }
+
+    // Aynı ürünün aynı listeye eklenip eklenmediğini kontrol et
+    const existingItem = await ProductListItems.findOne({
+      where: {
+        list_id: targetListId,
+        product_id: productId,
+      },
+    });
+
+    if (!existingItem) {
+      // Ürün zaten listede yoksa, ekleyebiliriz
+      await ProductListItems.create({
+        list_id: targetListId,
+        product_id: productId,
+      });
+    }
+
+    return res.status(200).json({ success: true, message: 'Ürün listeye başarıyla eklendi.' });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const getItemsByListId = async (req, res) => {
+  try {
+    const { listId } = req.params;
+    const items = await ProductListItems.findAll({
+      where: { list_id: listId },
+      include: [{
+        model: Product
+      }]
+    });
+
+    const itemsWithBestPrice = await Promise.all(items.map(async (item) => {
+      // Her bir ürün için en uygun fiyatlı SellerProduct'ı bul
+      const bestPriceSellerProduct = await sellerProduct.findOne({
+        where: {
+          product_id: item.product.product_id,
+          is_active: 1
+        },
+        order: [['price', 'ASC']],
+        limit: 1
+      });
+
+      // Ürün bilgisi ile en uygun fiyatlı satıcı ürününü birleştir
+      return {
+        ...item.toJSON(),
+        BestPriceSellerProduct: bestPriceSellerProduct
+      };
+    }));
+
+    return res.json({ success: true, items: itemsWithBestPrice });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const removeItemFromList = async (req, res) => {
+  try {
+    const { listId, productId } = req.body; // listId ve productId, istekten alınır
+
+    // Ürünün varlığını kontrol et
+    const item = await ProductListItems.findOne({
+      where: {
+        list_id: listId,
+        product_id: productId,
+      },
+    });
+
+    if (item) {
+      // Ürün bulunursa, listeden sil
+      await item.destroy();
+      return res.status(200).json({ success: true, message: 'Ürün listeden başarıyla silindi.' });
+    } else {
+      // Ürün listeye eklenmemişse, bir hata mesajı gönder
+      return res.status(404).json({ success: false, message: 'Listede bu ürün bulunamadı.' });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+//ADRES İŞLEMLERİ
+const getAddresses = async (req, res) => {
+  try {
+
+    // Veritabanında bu email adresine sahip kullanıcıyı buluyoruz
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı." });
+    }
+
+    // Kullanıcıya ait adresleri buluyoruz
+    const addresses = await Address.findAll({
+      where: { user_id: user.user_id } // user.id, bulunan kullanıcının ID'sidir
+    });
+
+    // Adresler varsa, dönüyoruz
+    if (addresses.length > 0) {
+      return res.status(200).json({ success: true, addresses });
+    } else {
+      return res.status(404).json({ success: false, message: "Adres bulunamadı." });
+    }
+  } catch (error) {
+    // Bir hata oluşursa, hatayı döndürüyoruz
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const createAddress = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı." });
+    }
+    // Yeni adresi oluştur
+    const newAddress = await Address.create({
+      ...req.body,
+      user_id: user.user_id
+    });
+
+    return res.status(201).json({ success: true, message: "Adres başarıyla eklendi.", address: newAddress });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+const updateAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params; // URL'den adres ID'si alınır
+    const user = await User.findOne({ where: { email: req.user.email } });
+    const updatedData = req.body; // Güncellenecek adres bilgileri
+
+    // Adresi ve adresin kullanıcıya ait olup olmadığını kontrol et
+    const address = await Address.findOne({
+      where: { address_id: addressId, user_id: user.user_id }
+    });
+
+    if (!address) {
+      return res.status(404).json({ success: false, message: "Adres bulunamadı veya erişim yetkiniz yok." });
+    }
+
+    // Adresi güncelle
+    await address.update(updatedData);
+    return res.status(200).json({ success: true, message: "Adres başarıyla güncellendi.", address: address });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const deleteAddress = async (req, res) => {
+  try {
+    const { addressId } = req.params; // URL'den adres ID'si alınır
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Adresi ve adresin kullanıcıya ait olup olmadığını kontrol et
+    const address = await Address.findOne({
+      where: { address_id: addressId, user_id: user.user_id }
+    });
+
+    if (!address) {
+      return res.status(404).json({ success: false, message: "Adres bulunamadı veya erişim yetkiniz yok." });
+    }
+
+    // Adresi sil
+    await address.destroy();
+    return res.status(200).json({ success: true, message: "Adres başarıyla silindi." });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
 
 
 module.exports = {
   login, register, listUsers, getUserDetails, updateUserDetail,
-  addItem, deleteItem, increaseItem, getCartItems
+  addItem, deleteItem, increaseItem, getCartItems, getProducts,
+  getLists, createList, deleteList, updateList,
+  addItemToList, getItemsByListId, removeItemFromList, getPublicListItemsBySlug,
+  getAddresses, createAddress, updateAddress, deleteAddress
+
 };

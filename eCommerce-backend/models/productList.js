@@ -10,9 +10,15 @@ const ProductList = sequelize.define('ProductList', {
         primaryKey: true
     },
     user_id: Sequelize.INTEGER,
-    list_name: Sequelize.INTEGER,
-    is_public: Sequelize.INTEGER,
-    created_at: Sequelize.DATE
+    list_name: Sequelize.STRING,
+    is_public: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    slug: {
+        type: Sequelize.STRING,
+        unique: true,
+    }
 })
 
 module.exports = ProductList;

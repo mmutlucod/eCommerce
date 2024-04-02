@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 
 const sequelize = require('../utility/db');
 
-const ProductComment = sequelize.define('ProductComment', {
+const SellerComment = sequelize.define('SellerComment', {
     comment_id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -10,9 +10,9 @@ const ProductComment = sequelize.define('ProductComment', {
         primaryKey: true
     },
     user_id: Sequelize.INTEGER,
-    seller_product_id: Sequelize.INTEGER,
+    seller_id: Sequelize.INTEGER,
     comment: Sequelize.TEXT,
     rating: Sequelize.INTEGER
 })
 
-module.exports = ProductComment;
+module.exports = SellerComment;
