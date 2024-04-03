@@ -12,7 +12,9 @@ const SellerComment = sequelize.define('SellerComment', {
     user_id: Sequelize.INTEGER,
     seller_id: Sequelize.INTEGER,
     comment: Sequelize.TEXT,
-    rating: Sequelize.INTEGER
+    rating: Sequelize.INTEGER,
+    is_public: Sequelize.INTEGER,
+    is_deleted: Sequelize.INTEGER
 })
 
 module.exports = SellerComment;

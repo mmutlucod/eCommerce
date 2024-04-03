@@ -12,7 +12,14 @@ const ProductComment = sequelize.define('ProductComment', {
     user_id: Sequelize.INTEGER,
     seller_product_id: Sequelize.INTEGER,
     comment: Sequelize.TEXT,
-    rating: Sequelize.INTEGER
+    rating: Sequelize.INTEGER,
+    is_public: Sequelize.INTEGER, //isim gizliliği
+    is_deleted: Sequelize.INTEGER, //silinen yorum
+    approval_status_id: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+    },
+    admin_id: Sequelize.INTEGER
 })
 
 module.exports = ProductComment;

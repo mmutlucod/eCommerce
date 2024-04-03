@@ -12,6 +12,12 @@ const Category = require("../models/category");
 const ProductList = require("../models/productList");
 const ProductListItems = require("../models/productListItems");
 const Address = require("../models/address");
+const Order = require("../models/order");
+const orderStatus = require("../models/orderStatus");
+const OrderItem = require("../models/orderItem");
+const UserFavoriteProduct = require("../models/userFavoriteProduct");
+const ProductComment = require("../models/productComment");
+const ApprovalStatus = require("../models/approval_status");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -255,26 +261,49 @@ const getCartItems = async (req, res) => {
 }
 const getProducts = async (req, res) => {
   try {
-    const products = await sellerProduct.findAll(
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    const favoriteProductsIds = await UserFavoriteProduct.findAll({
+      where: { user_id: user.user_id },
+      attributes: ['product_id']
+    }).then(favs => favs.map(fav => fav.product_id));
+
+    let products = await sellerProduct.findAll({
+      where: { is_active: 1 },
+      include: [{
+        model: Seller
+      },
       {
-        where: { is_active: 1 },
+        model: Product,
         include: [{
-          model: Seller
+          model: Brand
         },
         {
-          model: Product,
-          include: [{
-            model: Brand
-          },
-          {
-            model: Category
-          }]
-        },
-        ]
-      }
-    );
+          model: Category
+        }]
+      }],
+      order: [['price', 'ASC']], // Fiyata göre sırala
+    });
 
-    return res.status(200).json(products);
+    // Ürünleri benzersiz hale getir ve en düşük fiyatlı olanı seç
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.product.produc_id;
+      if (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = favoriteProductsIds.includes(product.product.product_id);
+      return {
+        ...product.toJSON(),
+        isFavorite: isFavorite
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -624,8 +653,232 @@ const deleteAddress = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+//SİPARİŞ İŞLEMLERİ
+const getorders = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+    const orders = await Order.findAll(
+      {
+        where: { user_id: user.user_id },
+        include: [{ model: orderStatus }]
+      });
 
+    return res.status(200).json(orders);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const getOrderItems = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    const orderItems = await OrderItem.findAll(
+      {
+        where: { order_id: orderId },
+        include: [
+          {
+            model: sellerProduct,
+            include: [
+              {
+                model: Seller
+              },
+              {
+                model: Product
+              }
+            ]
+          },
+          {
+            model: orderStatus
+          }]
+      });
 
+    return res.status(200).json(orderItems);
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+//FAVORİ İŞLEMLERİ
+const getFavorites = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+    const favorites = await Product.findAll({ where: { user_id: user.user_id } });
+    return res.status(200).json(favorites);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const addFavoriteItem = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    await UserFavoriteProduct.create({
+      user_id: user.user_id,
+      product_id: productId
+    })
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const deleteFavoriteItem = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    await UserFavoriteProduct.destroy({
+      user_id: user.user_id,
+      product_id: productId
+    })
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+// ÜRÜN DEĞERLENDİRME İŞLEMLERİ
+
+const getProductComments = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    const productComments = await ProductComment.findAll({
+      where: {
+        user_id: user.user_id,
+        is_deleted: 0 // Silinmemiş yorumları filtrele
+      },
+      include: [
+        {
+          model: ApprovalStatus
+        },
+        {
+          model: User
+        },
+        {
+          model: sellerProduct,
+          include: [
+            {
+              model: Product,
+              include: [
+                {
+                  model: Brand
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    });
+
+    // Kullanıcı adlarını formatlayarak güncelle
+    const formattedComments = productComments.map(comment => {
+      if (comment.is_public === 0) {
+        comment.user.name = formatUserName(comment.user.name, comment.is_public);
+        comment.user.surname = formatUserName(comment.user.surname, comment.is_public);
+        // Soyadını da formatlamak için benzer bir işlem yapabilirsiniz.
+      }
+      return comment;
+    });
+
+    return res.status(200).json(formattedComments);
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+const createProductComments = async (req, res) => {
+  try {
+    const { sellerProductId, comment, rating } = req.body;
+    const isPublic = req.body.isPublic !== undefined ? req.body.isPublic : 1;
+
+    // Oturumdan kullanıcı ID'sini al
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // İlgili sellerProduct'ı bul
+    const sellerProductInstance = await sellerProduct.findOne({ where: { seller_product_id: sellerProductId } });
+    if (!sellerProductInstance) {
+      return res.status(404).json({ success: false, message: "Satıcı ürünü bulunamadı." });
+    }
+
+    // Bu product_id için kullanıcının daha önce yorum yapıp yapmadığını kontrol et
+    const existingComment = await ProductComment.findOne({
+      include: [{
+        model: sellerProduct,
+        where: { product_id: sellerProductInstance.product_id },
+        attributes: []
+      }],
+      where: { user_id: user.user_id },
+    });
+
+    if (existingComment) {
+      return res.status(409).json({ success: false, message: "Bu ürün için zaten bir yorumunuz var." });
+    }
+
+    // Yeni yorum oluştur
+    const newComment = await ProductComment.create({
+      user_id: user.user_id,
+      seller_product_id: sellerProductId,
+      comment: comment,
+      rating: rating,
+      is_public: isPublic,
+      is_deleted: 0
+    });
+
+    return res.status(201).json(newComment);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const updateProductComments = async (req, res) => {
+  try {
+    const { commentId, isPublic } = req.body; // isPublic
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Yalnızca yorumun sahibi is_public değerini güncelleyebilir
+    const updated = await ProductComment.update(
+      { is_public: isPublic },
+      { where: { comment_id: commentId, user_id: user.user_id } }
+    );
+
+    if (updated[0] > 0) {
+      return res.status(200).json({ success: true, message: "Yorum durumu güncellendi." });
+    } else {
+      return res.status(404).json({ success: false, message: "Yorum bulunamadı veya güncellenemedi." });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const deleteProductComments = async (req, res) => {
+  try {
+    const { commentId } = req.body; // Silinmek istenen yorumun ID'si
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Yalnızca yorumun sahibi yorumu silmek için işaretleyebilir
+    const updated = await ProductComment.update(
+      { is_deleted: 1 }, // is_deleted alanını 1 olarak güncelle
+      { where: { comment_id: commentId, user_id: user.user_id } }
+    );
+
+    if (updated[0] > 0) {
+      return res.status(200).json({ success: true, message: "Yorum başarıyla silindi." });
+    } else {
+      return res.status(404).json({ success: false, message: "Yorum bulunamadı veya zaten silinmiş." });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+// Kullanıcı adı ve soyadını formatlayan yardımcı fonksiyon
+function formatUserName(name, isPublic) {
+  if (isPublic === 1) {
+    const formattedFirstName = name.charAt(0) + '*'.repeat(name.length - 1);
+    return `${formattedFirstName}`;
+  } else {
+    return `${name}`;
+  }
+}
 
 
 module.exports = {
@@ -633,6 +886,9 @@ module.exports = {
   addItem, deleteItem, increaseItem, getCartItems, getProducts,
   getLists, createList, deleteList, updateList,
   addItemToList, getItemsByListId, removeItemFromList, getPublicListItemsBySlug,
-  getAddresses, createAddress, updateAddress, deleteAddress
+  getAddresses, createAddress, updateAddress, deleteAddress,
+  getorders, getOrderItems,
+  getFavorites, addFavoriteItem, deleteFavoriteItem,
+  getProductComments, createProductComments, updateProductComments, deleteProductComments
 
 };

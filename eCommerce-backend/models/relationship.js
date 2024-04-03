@@ -106,6 +106,17 @@ Admin.hasMany(Product, { foreignKey: 'admin_id' }); // Bir moderatöre birden fa
 ProductComment.belongsTo(SellerProduct, { foreignKey: 'seller_product_id' }); // Bir yorum bir ürüne ait olur
 SellerProduct.hasMany(ProductComment, { foreignKey: 'seller_product_id' }); // Bir ürüne birden fazla yorum yapılabilir
 
+ProductComment.belongsTo(ApprovalStatus, { foreignKey: 'approval_status_id' }); // Bir kategori onay durumuna ait olur
+ApprovalStatus.hasMany(ProductComment, { foreignKey: 'approval_status_id' }); // Bir onay durumu birden fazla kategoriye sahip olabilir
+
+ProductComment.belongsTo(Admin, { foreignKey: 'admin_id' }); // Bir kategori bir moderatöre ait olur
+Admin.hasMany(ProductComment, { foreignKey: 'admin_id' }); // Bir moderatör birden fazla kategoriye sahip olabilir
+
+ProductComment.belongsTo(User, { foreignKey: 'user_id' }); // Bir yorum bir ürüne ait olur
+User.hasMany(ProductComment, { foreignKey: 'user_id' }); // Bir ürüne birden fazla yorum yapılabilir
+
+
+
 
 ProductImage.belongsTo(Product, { foreignKey: 'product_id' }); // Bir ürün resmi bir ürüne ait olur
 Product.hasMany(ProductImage, { foreignKey: 'product_id' }); // Bir ürüne birden fazla ürün resmi olabilir

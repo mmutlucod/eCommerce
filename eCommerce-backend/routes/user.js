@@ -42,7 +42,22 @@ router.post('/create-address', authMiddleware, userController.createAddress);
 router.put('/addresses/:addressId', authMiddleware, userController.updateAddress);
 router.delete('/addresses/:addressId', authMiddleware, userController.deleteAddress);
 
+//SİPARİŞ İŞLEMLERİ
 
+router.get('/orders', authMiddleware, userController.getorders);
+router.get('/orderItems', authMiddleware, userController.getOrderItems);
 
+//FAVORİ İŞLEMLERİ
+
+router.get('/favorites', authMiddleware, userController.getFavorites);
+router.post('/addFavoriteItem', authMiddleware, userController.addFavoriteItem);
+router.post('/deleteFavoriteItem', authMiddleware, userController.deleteFavoriteItem);
+
+// DEĞERLENDİRME İŞLEMLERİ
+
+router.get('/product-comments', authMiddleware, userController.getProductComments);
+router.post('/create-product-comment', authMiddleware, userController.createProductComments);
+router.post('/update-product-comment', authMiddleware, userController.updateProductComments);
+router.post('/delete-product-comment', authMiddleware, userController.deleteProductComments);
 
 module.exports = router;
