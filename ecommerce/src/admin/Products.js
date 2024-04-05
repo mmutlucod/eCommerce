@@ -8,29 +8,42 @@ import {
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AdminNavbar from '../components/AdminNavbar';
 import api from '../api/api';
+import { useNavigate } from 'react-router-dom';
 
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'; 
 function ProductsAdmin() {
   const [products, setProducts] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [brands, setBrands] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [productToEdit, setProductToEdit] = useState({
     id: null,
     name: '',
-    brand: '',
+    brand_id: '',
     price: '',
     ApprovalStatus: '', // approvalStatus için varsayılan bir değer olarak boş string
   });
   const [productToDelete, setProductToDelete] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null); // Bu eksikti.
   const [approvalStatuses, setApprovalStatuses] = useState([]);
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchProducts();
     fetchApprovalStatuses();
+    fetchBrands();
+    fetchCategories()
   }, []);
-
+  const fetchBrands = async () => {
+    try {
+      const response = await api.get('/admin/brands');
+      setBrands(response.data);
+    } catch (error) {
+      console.error('Fetching brands failed:', error);
+    }
+  };
   const fetchProducts = async () => {
     try {
       const response = await api.get('/admin/products');
@@ -41,7 +54,14 @@ function ProductsAdmin() {
       setSnackbarOpen(true);
     }
   };
-
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/admin/categories'); // API yolunuzu kontrol edin
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Fetching categories failed:', error);
+    }
+  };
   const fetchApprovalStatuses = async () => {
     try {
       const response = await api.get('/admin/approvalstatuses');
@@ -63,31 +83,31 @@ function ProductsAdmin() {
   const handleProductUpdate = async () => {
     // API URL'si
     const baseUrl = "/admin/products";
-    
+
     // Eğer ürün ID'si varsa, bu bir güncelleme işlemidir.
     const isUpdateOperation = productToEdit.product_id != null;
-  
+
     try {
       const response = isUpdateOperation
         ? await api.put(`${baseUrl}/${productToEdit.product_id}`, productToEdit) // Güncelleme işlemi
         : await api.post(baseUrl, productToEdit); // Ekleme işlemi
-  
+
       // Başarılı işlem sonrası bildirim mesajı
       const successMessage = isUpdateOperation
         ? 'Ürün başarıyla güncellendi.'
         : 'Ürün başarıyla eklendi.';
-  
+
       setSnackbarMessage(successMessage);
       setSnackbarOpen(true);
-  
+
       // Ürün listesini yeniden fetch et
       fetchProducts();
-  
+
       // Diyalog penceresini kapat
       setOpenDialog(false);
     } catch (error) {
       console.error('Ürün güncelleme/ekleme işlemi sırasında bir hata meydana geldi:', error);
-  
+
       // Hata durumu için bildirim mesajı
       setSnackbarMessage('Ürün güncelleme/ekleme işlemi başarısız oldu.');
       setSnackbarOpen(true);
@@ -117,10 +137,17 @@ function ProductsAdmin() {
   };
 
   const handleApprovalStatusChange = (event) => {
-    // ApprovalStatus yerine approval_status_id kullanılıyor
+   
     setProductToEdit({ ...productToEdit, approval_status_id: event.target.value });
   };
-  
+  const handleBrandChange = (event) => {
+    setProductToEdit({ ...productToEdit, brand_id: event.target.value });
+  };
+
+  const handleAddMenuClick = () => {
+    navigate('/admin/productadd');
+  };
+
   return (
     <>
       <AdminNavbar />
@@ -129,7 +156,20 @@ function ProductsAdmin() {
           <Grid item xs={12}>
             <Card>
               <CardContent>
-                <Typography variant="h5" gutterBottom>Ürün Listesi</Typography>
+              <Grid container justifyContent="space-between" alignItems="center">
+    <Grid item>
+      <Typography variant="h5" gutterBottom>Ürün Listesi</Typography>
+    </Grid>
+    <Grid item>
+      <IconButton
+        color="primary"
+        aria-label="Menü Ekle"
+        onClick={handleAddMenuClick}
+      >
+        <AddCircleOutlineIcon />
+      </IconButton>
+    </Grid>
+  </Grid>
                 <TableContainer component={Paper}>
                   <Table>
                     <TableHead>
@@ -142,6 +182,7 @@ function ProductsAdmin() {
                         <TableCell align="right">Onay Durumu</TableCell>
                         <TableCell align="right">Onaylayan Kişi</TableCell>
                         <TableCell align="right" style={{ textAlign: "right", paddingRight: 0 }}>İşlemler</TableCell>
+                       
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -170,7 +211,7 @@ function ProductsAdmin() {
           </Grid>
         </Grid>
       </Container>
-  
+
       <Menu
         id="simple-menu"
         anchorEl={anchorEl}
@@ -181,7 +222,7 @@ function ProductsAdmin() {
         <MenuItem onClick={() => { handleDialogOpen(productToDelete); handleMenuClose(); }}>Düzenle</MenuItem>
         <MenuItem onClick={() => { handleDeleteDialogOpen(productToDelete); handleMenuClose(); }}>Sil</MenuItem>
       </Menu>
-  
+
       {/* Diyaloglar, Snackbar ve diğer UI bileşenleri... */}
       <Dialog open={openDialog} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
         <DialogTitle id="form-dialog-title">{productToEdit.id ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}</DialogTitle>
@@ -196,15 +237,37 @@ function ProductsAdmin() {
             value={productToEdit.name}
             onChange={(e) => setProductToEdit({ ...productToEdit, name: e.target.value })}
           />
-          <TextField
-            margin="dense"
-            id="brand"
-            label="Marka"
-            type="text"
-            fullWidth
-            value={productToEdit.brand}
-            onChange={(e) => setProductToEdit({ ...productToEdit, brand: e.target.value })}
-          />
+         {console.log(categories)}
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Kategori</InputLabel>
+            <Select
+              label="Kategori"
+              value={productToEdit.category_id || ''} // Kategorinin ID'sini tutacak bir alanınız varsa
+              onChange={(e) => setProductToEdit({ ...productToEdit, category_id: e.target.value })}
+            >
+              {categories.map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.category_name} 
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Marka</InputLabel>
+            <Select
+              label="Marka"
+              value={productToEdit.brand_id || ''}
+              onChange={handleBrandChange}
+            >
+              {brands.map((brand) => (
+                <MenuItem key={brand.brand_id} value={brand.brand_id}>
+                  {brand.brand_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <TextField
             margin="dense"
             id="price"
@@ -214,24 +277,24 @@ function ProductsAdmin() {
             value={productToEdit.price}
             onChange={(e) => setProductToEdit({ ...productToEdit, price: e.target.value })}
           />
-         {/* Select Component for Approval Status */}
-         {productToEdit && (
-      <FormControl fullWidth margin="dense">
-        <InputLabel>Onay Durumu</InputLabel>
-        <Select
-          label="Onay Durumu"
-          name="approval_status_id"
-          value={productToEdit.approval_status_id}
-          onChange={handleApprovalStatusChange}
-        >
-          {approvalStatuses.map((status) => (
-            <MenuItem key={status.approval_status_id} value={status.approval_status_id}>
-              {status.status_name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-    )}
+          {/* Select Component for Approval Status */}
+          {productToEdit && (
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Onay Durumu</InputLabel>
+              <Select
+                label="Onay Durumu"
+                name="approval_status_id"
+                value={productToEdit.approval_status_id}
+                onChange={handleApprovalStatusChange}
+              >
+                {approvalStatuses.map((status) => (
+                  <MenuItem key={status.approval_status_id} value={status.approval_status_id}>
+                    {status.status_name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">İptal</Button>
@@ -265,7 +328,7 @@ function ProductsAdmin() {
       </Snackbar>
     </>
   );
- }  
-                      
+}
+
 
 export default ProductsAdmin;
