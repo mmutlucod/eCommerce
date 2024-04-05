@@ -700,6 +700,8 @@ const getOrderItems = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+//create-order eklenecek
+
 //FAVORİ İŞLEMLERİ
 const getFavorites = async (req, res) => {
   try {
@@ -788,7 +790,6 @@ const getProductComments = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-
 const createProductComments = async (req, res) => {
   try {
     const { sellerProductId, comment, rating } = req.body;
