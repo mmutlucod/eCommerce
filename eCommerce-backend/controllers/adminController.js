@@ -312,7 +312,10 @@ const getCategoriesById = async (req, res) => {
 const createCategory = async (req, res) => {
     try {
         // Kategoriyi veritabanına ekle
-        const category = await Category.create(req.body);
+        const category = await Category.create({
+            ...req.body,
+            approval_status_id: 1
+        });
 
         // Kategori başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön
         return res.status(201).json({ success: true, message: 'Kategori başarıyla oluşturuldu.', category });

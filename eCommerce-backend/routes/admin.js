@@ -21,7 +21,7 @@ router.post('/create-category', adminController.createCategory);
 router.put('/categories/:id', adminController.editCategory);
 router.delete('/categories/:id', adminController.deleteCategory);
 
-router.get('/users', authMiddleware, adminController.getUsers); //
+router.get('/users', authMiddleware, adminController.getUsers);
 router.get('/users/:id', authMiddleware, adminController.getUsersById);
 router.post('/create-user', authMiddleware, adminController.createUser);
 router.put('/users/:id', authMiddleware, adminController.editUser);
