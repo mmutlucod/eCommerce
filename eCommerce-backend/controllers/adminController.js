@@ -159,10 +159,12 @@ const getProductsById = async (req, res) => {
 }
 const createProduct = async (req, res) => {
     // İstek gövdesinden ürün bilgilerini al
-
     try {
         // Yeni ürünü veritabanına ekle
-        const product = await Product.create(req.body);
+        const product = await Product.create({
+            ...req.body,
+            approval_status_id: 1
+        });
 
         // Ürün başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön
         return res.status(201).json({ success: true, message: 'Ürün başarıyla oluşturuldu.', product });

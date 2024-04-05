@@ -19,6 +19,9 @@ const UserFavoriteProduct = require("../models/userFavoriteProduct");
 const ProductComment = require("../models/productComment");
 const ApprovalStatus = require("../models/approval_status");
 
+
+//KULLANICI İŞLEMLERİ 
+
 const login = async (req, res) => {
   const { email, password } = req.body;
 
