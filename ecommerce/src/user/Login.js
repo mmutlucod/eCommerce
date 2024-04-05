@@ -2,19 +2,28 @@ import React, { useState } from 'react';
 import { Button, TextField, Typography, Card, CardContent, CardActions, Container } from '@mui/material';
 import { useAuth } from '../context/AuthContext'; // AuthContext'i içe aktar
 import api from '../api/api'; // API yapılandırmanızı içe aktar
+import { useNavigate } from 'react-router-dom'; // useNavigate hook'unu içe aktar
 
 function LoginForm() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth(); // useAuth hook'unu kullan
+  const navigate = useNavigate(); // useNavigate hook'undan bir örnek al
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const { data } = await api.post('/user/login', { username, password });
-      login(data);
+      const { data } = await api.post('/user/login', { email, password });
+      login(data); // Kullanıcıyı giriş yapmış olarak işaretle
+
+      // Burada kullanıcı rolüne göre yönlendirme yap
+      if (data.role === 'user') {
+        navigate('/user/mainpage'); // Eğer rol user ise, kullanıcıyı /user/mainpage'e yönlendir
+      } else {
+        // Diğer roller için farklı yönlendirmeler burada yapılabilir
+      }
     } catch (err) {
       setError(err.response.data.message || 'Giriş yapılırken bir hata oluştu.');
     }
@@ -33,10 +42,10 @@ function LoginForm() {
               margin="normal"
               required
               fullWidth
-              label="Kullanıcı Adı"
-              name="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              label="E-posta"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               autoFocus
             />
             <TextField
@@ -55,7 +64,7 @@ function LoginForm() {
         </CardContent>
         <CardActions>
           <Button
-            type="submit"
+            type="button" // Burada onClick ile tetikleneceği için type'ı submit olmamalı
             fullWidth
             variant="contained"
             color="primary"

@@ -19,6 +19,8 @@ import SellerAdd from './seller/SellerAdd';
 import SellerProduct from './seller/Product';
 
 import UserLogin from './user/Login';
+import UserMainPage from './user/MainPage';
+
 
 function App() {
   return (
@@ -27,7 +29,7 @@ function App() {
         <Router>
           <Routes>
             {/* ADMIN */}
-            <Route path="/" element={<Navigate to="/admin/" />} />
+            <Route path="/" element={<Navigate to="/Mainpage/" />} />
             <Route path="/admin" element={<Login />} />
             <Route path="/admin/dashboard" element={<MainPage />} />
             <Route path="/admin/users" element={<Users />} />
@@ -45,7 +47,7 @@ function App() {
             <Route path="/seller/product" element={<SellerProduct />} />
 
             <Route path="/user" element={<UserLogin />} />
-
+            <Route path="/user/mainpage" element={<UserMainPage />} />
           </Routes>
         </Router>
       </div>
