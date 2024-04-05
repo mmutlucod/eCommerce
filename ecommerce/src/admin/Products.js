@@ -1,98 +1,126 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  Tooltip,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-  Button,
-  Snackbar,
-  Alert
+  Container, Grid, Card, CardContent, Typography, Table, TableBody,
+  TableCell, TableContainer, TableHead, TableRow, Paper, IconButton,
+  Dialog, DialogTitle, DialogContent, TextField, DialogActions,
+  Button, Snackbar, Alert, Menu, MenuItem, Select, FormControl, InputLabel
 } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import AddCircleIcon from '@mui/icons-material/AddCircle';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import AdminNavbar from '../components/AdminNavbar';
-import api from '../api/api'; // API iletişim için kullanılacak
+import api from '../api/api';
 
 function ProductsAdmin() {
   const [products, setProducts] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [productToEdit, setProductToEdit] = useState({
     id: null,
     name: '',
     brand: '',
     price: '',
-    approvalStatus: ''
+    ApprovalStatus: '', // approvalStatus için varsayılan bir değer olarak boş string
   });
-  
+  const [productToDelete, setProductToDelete] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null); // Bu eksikti.
+  const [approvalStatuses, setApprovalStatuses] = useState([]);
 
-  // Ürünleri çekmek için API çağrısı
+  useEffect(() => {
+    fetchProducts();
+    fetchApprovalStatuses();
+  }, []);
+
   const fetchProducts = async () => {
-    setLoading(true);
     try {
       const response = await api.get('/admin/products');
       setProducts(response.data);
     } catch (error) {
-      console.error('Ürünler çekilirken hata oluştu:', error);
-      setSnackbarMessage('Ürünler çekilemedi.');
+      console.error('Fetching products failed:', error);
+      setSnackbarMessage('Failed to fetch products.');
       setSnackbarOpen(true);
-    } finally {
-      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  const fetchApprovalStatuses = async () => {
+    try {
+      const response = await api.get('/admin/approvalstatuses');
+      setApprovalStatuses(response.data);
+    } catch (error) {
+      console.error('Fetching approval statuses failed:', error);
+    }
+  };
 
-  const handleEditDialogOpen = (product) => {
-    setProductToEdit({
-      id: product.id,
-      name: product.name,
-      brand: product.Brand?.brand_name || '',
-      price: product.price,
-      approvalStatus: product.Approvalstatus?.status_name || ''
-    });
+  const handleDialogOpen = (product = null) => {
+    setProductToEdit(product ? { ...product } : { id: null, name: '', brand: '', price: '', ApprovalStatus: '' });
     setOpenDialog(true);
   };
 
-  const handleProductUpdate = async () => {
-    // Ürünü güncellemek için API çağrısı
-    if (productToEdit && productToEdit.id) {
-      try {
-        await api.put(`/admin/edit-product/${productToEdit.id}`, productToEdit);
-        setSnackbarMessage('Ürün başarıyla güncellendi.');
-        setSnackbarOpen(true);
-        fetchProducts(); // Ürün listesini güncellemek için ürünleri yeniden çek
-      } catch (error) {
-        console.error('Ürün güncellenirken hata oluştu:', error);
-        setSnackbarMessage('Ürün güncellenemedi.');
-        setSnackbarOpen(true);
-      }
-    }
-    handleDialogClose();
-  };
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
 
+  const handleProductUpdate = async () => {
+    // API URL'si
+    const baseUrl = "/admin/products";
+    
+    // Eğer ürün ID'si varsa, bu bir güncelleme işlemidir.
+    const isUpdateOperation = productToEdit.product_id != null;
+  
+    try {
+      const response = isUpdateOperation
+        ? await api.put(`${baseUrl}/${productToEdit.product_id}`, productToEdit) // Güncelleme işlemi
+        : await api.post(baseUrl, productToEdit); // Ekleme işlemi
+  
+      // Başarılı işlem sonrası bildirim mesajı
+      const successMessage = isUpdateOperation
+        ? 'Ürün başarıyla güncellendi.'
+        : 'Ürün başarıyla eklendi.';
+  
+      setSnackbarMessage(successMessage);
+      setSnackbarOpen(true);
+  
+      // Ürün listesini yeniden fetch et
+      fetchProducts();
+  
+      // Diyalog penceresini kapat
+      setOpenDialog(false);
+    } catch (error) {
+      console.error('Ürün güncelleme/ekleme işlemi sırasında bir hata meydana geldi:', error);
+  
+      // Hata durumu için bildirim mesajı
+      setSnackbarMessage('Ürün güncelleme/ekleme işlemi başarısız oldu.');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleDeleteDialogOpen = (product) => {
+    setProductToDelete(product);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleDeleteDialogClose = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  const handleProductDelete = async () => {
+    // Ürün silme işlemleri
+  };
+
+  const handleMenuClick = (event, product) => {
+    setAnchorEl(event.currentTarget);
+    setProductToDelete(product); // Menüyü açmak için gerekli olan ürünü ayarlayın.
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleApprovalStatusChange = (event) => {
+    // ApprovalStatus yerine approval_status_id kullanılıyor
+    setProductToEdit({ ...productToEdit, approval_status_id: event.target.value });
+  };
+  
   return (
     <>
       <AdminNavbar />
@@ -101,119 +129,143 @@ function ProductsAdmin() {
           <Grid item xs={12}>
             <Card>
               <CardContent>
-                <Typography variant="h5" gutterBottom>
-                  Ürün Listesi
-                </Typography>
-                <TableContainer component={Paper} elevation={3} sx={{ borderRadius: 2, overflow: 'hidden' }}>
-  <Table>
-    <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-      <TableRow>
-        <TableCell>Ürün Adı</TableCell>
-        <TableCell align="right">Stok Kodu</TableCell>
-        <TableCell align="right">Kategori</TableCell>
-        <TableCell align="right">Marka</TableCell>
-        <TableCell align="right">Katalog Fiyatı</TableCell>
-        <TableCell align="right">Onay Durumu</TableCell>
-        <TableCell align="right">Onaylayan Kişi</TableCell>
-        <TableCell align="right">İşlemler</TableCell>
-      </TableRow>
-    </TableHead>
-    <TableBody>
-      {products.map((product, index) => (
-        <TableRow key={product.id} sx={{ '&:nth-of-type(odd)': { backgroundColor: '#fafafa' } }}> 
-                          <TableCell component="th" scope="row">
-                            {product.name}
-                          </TableCell>
+                <Typography variant="h5" gutterBottom>Ürün Listesi</Typography>
+                <TableContainer component={Paper}>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Ürün Adı</TableCell>
+                        <TableCell align="right">Stok Kodu</TableCell>
+                        <TableCell align="right">Kategori</TableCell>
+                        <TableCell align="right">Marka</TableCell>
+                        <TableCell align="right">Fiyat</TableCell>
+                        <TableCell align="right">Onay Durumu</TableCell>
+                        <TableCell align="right">Onaylayan Kişi</TableCell>
+                        <TableCell align="right" style={{ textAlign: "right", paddingRight: 0 }}>İşlemler</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {products.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell component="th" scope="row">{product.name}</TableCell>
                           <TableCell align="right">{product.stock_code}</TableCell>
-                          <TableCell align="right">{product.category}</TableCell>
-                          <TableCell align="right">{product.Brand?.brand_name}</TableCell>
+                          <TableCell align="right">{product.category.category_name}</TableCell>
+                          <TableCell align="right">{product.Brand.brand_name}</TableCell>
                           <TableCell align="right">{product.price}</TableCell>
-                          <TableCell align="right">{product.Approvalstatus?.status_name}</TableCell>
+                          <TableCell align="right">{product.ApprovalStatus.status_name}</TableCell>
                           <TableCell align="right">{product.Admin.full_name}</TableCell>
-                          <TableCell align="right">
-                            <Tooltip title="Düzenle">
-                              <IconButton onClick={() => handleEditDialogOpen(product)}>
-                                <EditIcon />
-                              </IconButton>
-                            </Tooltip>
+                          <TableCell align="right">{product.approver}</TableCell>
+                          <TableCell>
+                            <IconButton aria-label="settings" onClick={(event) => handleMenuClick(event, product)}>
+                              <MoreVertIcon />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </TableContainer>
-                <Tooltip title="Yeni Ürün Ekle">
-                  <IconButton color="primary" onClick={() => handleEditDialogOpen(null)}>
-                    <AddCircleIcon />
-                  </IconButton>
-                </Tooltip>
               </CardContent>
             </Card>
           </Grid>
         </Grid>
       </Container>
   
-      {/* Ürün Düzenleme Diyalogu */}
-     <Dialog open={openDialog} onClose={handleDialogClose}>
-      <DialogTitle>{productToEdit.id ? "Ürün Düzenle" : "Yeni Ürün Ekle"}</DialogTitle>
-      <DialogContent>
-        <TextField
-          autoFocus
-          margin="dense"
-          id="name"
-          label="Ürün Adı"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={productToEdit.name}
-          onChange={(e) => setProductToEdit({ ...productToEdit, name: e.target.value })}
-        />
-        <TextField
-          margin="dense"
-          id="brand"
-          label="Marka Adı"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={productToEdit.brand}
-          onChange={(e) => setProductToEdit({ ...productToEdit, brand: e.target.value })}
-        />
-        <TextField
-          margin="dense"
-          id="price"
-          label="Katalog Fiyatı"
-          type="number"
-          fullWidth
-          variant="outlined"
-          value={productToEdit.price}
-          onChange={(e) => setProductToEdit({ ...productToEdit, price: e.target.value })}
-        />
-        <TextField
-          margin="dense"
-          id="approvalStatus"
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        keepMounted
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
+        <MenuItem onClick={() => { handleDialogOpen(productToDelete); handleMenuClose(); }}>Düzenle</MenuItem>
+        <MenuItem onClick={() => { handleDeleteDialogOpen(productToDelete); handleMenuClose(); }}>Sil</MenuItem>
+      </Menu>
+  
+      {/* Diyaloglar, Snackbar ve diğer UI bileşenleri... */}
+      <Dialog open={openDialog} onClose={handleDialogClose} aria-labelledby="form-dialog-title">
+        <DialogTitle id="form-dialog-title">{productToEdit.id ? 'Ürünü Düzenle' : 'Yeni Ürün Ekle'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Ürün Adı"
+            type="text"
+            fullWidth
+            value={productToEdit.name}
+            onChange={(e) => setProductToEdit({ ...productToEdit, name: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            id="brand"
+            label="Marka"
+            type="text"
+            fullWidth
+            value={productToEdit.brand}
+            onChange={(e) => setProductToEdit({ ...productToEdit, brand: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            id="price"
+            label="Fiyat"
+            type="number"
+            fullWidth
+            value={productToEdit.price}
+            onChange={(e) => setProductToEdit({ ...productToEdit, price: e.target.value })}
+          />
+         {/* Select Component for Approval Status */}
+         {productToEdit && (
+      <FormControl fullWidth margin="dense">
+        <InputLabel>Onay Durumu</InputLabel>
+        <Select
           label="Onay Durumu"
-          type="text"
-          fullWidth
-          variant="outlined"
-          value={productToEdit.approvalStatus}
-          onChange={(e) => setProductToEdit({ ...productToEdit, approvalStatus: e.target.value })}
-        />
-        {/* Diğer alanlarınızı buraya ekleyin */}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={handleDialogClose}>İptal</Button>
-        <Button onClick={handleProductUpdate}>Güncelle</Button>
-      </DialogActions>
-    </Dialog>
+          name="approval_status_id"
+          value={productToEdit.approval_status_id}
+          onChange={handleApprovalStatusChange}
+        >
+          {approvalStatuses.map((status) => (
+            <MenuItem key={status.approval_status_id} value={status.approval_status_id}>
+              {status.status_name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">İptal</Button>
+          <Button onClick={handleProductUpdate} color="primary">Kaydet</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleDeleteDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Ürünü silmek istediğinize emin misiniz?"}</DialogTitle>
+        <DialogActions>
+          <Button onClick={handleDeleteDialogClose} color="primary">
+            İptal
+          </Button>
+          <Button onClick={handleProductDelete} color="primary" autoFocus>
+            Sil
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Snackbar Bildirimi */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-        message={snackbarMessage}
-      />
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={() => setSnackbarOpen(false)}>
+        <Alert onClose={() => setSnackbarOpen(false)} severity="success">
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
-                      }  
+ }  
+                      
 
 export default ProductsAdmin;
