@@ -1,60 +1,70 @@
 import React from 'react';
-import { AppBar, Toolbar, IconButton, Typography, InputBase, Button, Box ,Badge} from '@mui/material';
+import { AppBar, Toolbar, IconButton, InputBase, Box, Badge, Typography, Divider } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PersonIcon from '@mui/icons-material/Person';
-
+import PersonIcon from '@mui/icons-material/Person'; // Profil ikonu için
+import LocationOnIcon from '@mui/icons-material/LocationOn'
 export default function Navbar() {
-  // İkon stilleri ve renkleri burada özelleştirilebilir
-  const iconStyle = {
-    color: '#fff',
-    marginRight: '10px'
-  };
-
   return (
-    <AppBar position="static" style={{ backgroundColor: '#4B0082' }}>
-      <Toolbar>
-        {/* Logo ve slogan */}
-        <Box display="flex" alignItems="center" mr={2}>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+    <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
+      <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
+        {/* Logo */}
+        <Box sx={{ backgroundColor: 'yellow', borderRadius: '10px 0 0 10px', display: 'flex', alignItems: 'center', py: '6px', px: '16px' }}>
+          <Typography variant="h6" noWrap sx={{ fontWeight: 'bold', color: '#4B0082' }}>
             noVa
           </Typography>
-          <Typography variant="subtitle1" noWrap component="div" sx={{ marginLeft: '10px', color: 'yellow' }}>
-            Eğlenceli LEGO Setlerini Keşfet
+        </Box>
+        {/* Arama Çubuğu */}
+        <Box sx={{ flexGrow: 1, backgroundColor: 'white', borderRadius: '0 4px 4px 0', display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
+          <InputBase
+            placeholder="Ürün, kategori, marka ara"
+            inputProps={{ 'aria-label': 'search' }}
+            sx={{
+              ml: 1,
+              flex: 1,
+              height: '100%',
+              '& .MuiInputBase-input': {
+                textAlign: 'left',
+                width: '100%',
+                height: '100%',
+              },
+            }}
+          />
+          <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: 'gray' }}>
+            <SearchIcon />
+          </IconButton>
+        </Box>
+        {/* Dikey Ayırıcı */}
+        <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
+        {/* Diğer Navbar Öğeleri */}
+        <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
+          {/* Profil ve Ayarlar */}
+          <IconButton color="inherit">
+            <LocationOnIcon />
+          </IconButton>
+          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+            Teslimat Adresi Ekle
           </Typography>
+          <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
+          <IconButton color="inherit">
+            <PersonIcon />
+          </IconButton>
+          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+            Üye Ol
+          </Typography>
+          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+            Giriş Yap
+          </Typography>
+          {/* Dikey Ayırıcı */}
+          
+          <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
+          {/* Sepet */}
+          <IconButton aria-label="show cart items" color="inherit">
+            <Badge badgeContent={4} color="secondary">
+              <ShoppingCartIcon />
+            </Badge>
+          </IconButton>
         </Box>
-
-        {/* Arama çubuğu */}
-        <Box sx={{ flexGrow: 1 }}>
-          <div style={{ position: 'relative', backgroundColor: 'white', borderRadius: '4px', width: '100%' }}>
-            <InputBase
-              placeholder="Ara..."
-              inputProps={{ 'aria-label': 'search' }}
-              style={{ paddingLeft: '10px', width: '100%' }}
-            />
-            <IconButton type="submit" aria-label="search" style={{ position: 'absolute', right: '0', top: '0', padding: '10px', color: 'gray' }}>
-              <SearchIcon />
-            </IconButton>
-          </div>
-        </Box>
-
-        {/* Adres ekle butonu */}
-        <Button color="inherit" startIcon={<PersonIcon />} style={{ ...iconStyle, backgroundColor: 'orange', marginLeft: '20px' }}>
-          Adres Ekle
-        </Button>
-
-        {/* Sepet ve hesap butonları */}
-        <IconButton aria-label="show cart items" color="inherit">
-          <Badge badgeContent={4} color="secondary">
-            <ShoppingCartIcon />
-          </Badge>
-        </IconButton>
-        <Button color="inherit" style={iconStyle}>
-          Üye Ol
-        </Button>
-        <Button color="inherit" style={iconStyle}>
-          Giriş Yap
-        </Button>
       </Toolbar>
     </AppBar>
   );
