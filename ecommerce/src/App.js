@@ -1,8 +1,9 @@
 import React from 'react';
 import './App.css';
-import A_Login from './admin/login';
+import Login from './admin/login';
 import MainPage from './admin/MainPage';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
 import Users from './admin/Users'
 import Orders from './admin/Orders'
 import Sellers from './admin/Sellers'
@@ -11,20 +12,23 @@ import Categories from './admin/Categories'
 import Products from './admin/Products'
 import ProductAdd from './admin/ProductAdd'
 
-import S_Login from './seller/Login';
-import S_MainPage from './seller/MainPage';
-import S_SellerAdd from './seller/SellerAdd';
-import { AuthProvider } from './context/AuthContext';
-import S_Product from './seller/Product';
+// Adjust the names here
+import SellerLogin from './seller/Login';
+import SellerMainPage from './seller/MainPage';
+import SellerAdd from './seller/SellerAdd';
+import SellerProduct from './seller/Product';
+
+import UserLogin from './user/Login';
+
 function App() {
   return (
     <AuthProvider>
       <div className="App">
         <Router>
           <Routes>
-            {/* ADMİN */}
+            {/* ADMIN */}
             <Route path="/" element={<Navigate to="/admin/" />} />
-            <Route path="/admin" element={<A_Login />} />
+            <Route path="/admin" element={<Login />} />
             <Route path="/admin/dashboard" element={<MainPage />} />
             <Route path="/admin/users" element={<Users />} />
             <Route path="/admin/orders" element={<Orders />} />
@@ -34,11 +38,13 @@ function App() {
             <Route path="/admin/products" element={<Products />} />
             <Route path="/admin/productadd" element={<ProductAdd />} />
 
-            {/* SATICI */}
-            <Route path="/seller" element={<S_Login />} />
-            <Route path="/seller/dashboard" element={<S_MainPage />} />
-            <Route path="/seller/seller-add" element={<S_SellerAdd />} />
-            <Route path="/seller/product" element={<S_Product />} />
+            {/* SELLER */}
+            <Route path="/seller" element={<SellerLogin />} />
+            <Route path="/seller/dashboard" element={<SellerMainPage />} />
+            <Route path="/seller/seller-add" element={<SellerAdd />} />
+            <Route path="/seller/product" element={<SellerProduct />} />
+
+            <Route path="/user" element={<UserLogin />} />
 
           </Routes>
         </Router>
