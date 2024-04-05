@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Button, TextField, Typography, Card, CardContent, CardActions, Container } from '@mui/material';
 import { useAuth } from '../context/AuthContext'; // AuthContext'i içe aktar
 import api from '../api/api'; // API yapılandırmanızı içe aktar
-import { useNavigate } from 'react-router-dom'; // useNavigate hook'unu içe aktar
-
+import { Navigate, useNavigate } from 'react-router-dom'; // useHistory hook'unu içe aktar
+import Navbar from '../components/UserNavbar';
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { login } = useAuth(); // useAuth hook'unu kullan
-  const navigate = useNavigate(); // useNavigate hook'undan bir örnek al
+  const navigate = useNavigate(); // useHistory hook'undan bir örnek al
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,7 +29,8 @@ function LoginForm() {
     }
   };
 
-  return (
+  return (<>
+    <Navbar/>
     <Container component="main" maxWidth="xs">
       <Card>
         <CardContent>
@@ -64,7 +65,7 @@ function LoginForm() {
         </CardContent>
         <CardActions>
           <Button
-            type="button" // Burada onClick ile tetikleneceği için type'ı submit olmamalı
+            type="submit"
             fullWidth
             variant="contained"
             color="primary"
@@ -75,6 +76,7 @@ function LoginForm() {
         </CardActions>
       </Card>
     </Container>
+    </>
   );
 }
 

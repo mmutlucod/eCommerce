@@ -20,7 +20,7 @@ import SellerProduct from './seller/Product';
 
 import UserLogin from './user/Login';
 import UserMainPage from './user/MainPage';
-
+import UserRegister from './user/Register';
 
 function App() {
   return (
@@ -29,7 +29,7 @@ function App() {
         <Router>
           <Routes>
             {/* ADMIN */}
-            <Route path="/" element={<Navigate to="/Mainpage/" />} />
+            <Route path="/" element={<Navigate to="/user/mainpage/" />} />
             <Route path="/admin" element={<Login />} />
             <Route path="/admin/dashboard" element={<MainPage />} />
             <Route path="/admin/users" element={<Users />} />
@@ -46,8 +46,9 @@ function App() {
             <Route path="/seller/seller-add" element={<SellerAdd />} />
             <Route path="/seller/product" element={<SellerProduct />} />
 
-            <Route path="/user" element={<UserLogin />} />
-            <Route path="/user/mainpage" element={<UserMainPage />} />
+            <Route path="/user/mainpage" element={< UserMainPage/>} />
+            <Route path="/user/login" element={< UserLogin/>} />
+            <Route path="/user/register" element={< UserRegister/>} />
           </Routes>
         </Router>
       </div>

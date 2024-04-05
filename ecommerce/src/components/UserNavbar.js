@@ -4,7 +4,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonIcon from '@mui/icons-material/Person'; // Profil ikonu için
 import LocationOnIcon from '@mui/icons-material/LocationOn'
+import { useNavigate } from 'react-router-dom';
 export default function Navbar() {
+    let navigate = useNavigate();
   return (
     <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
       <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
@@ -49,10 +51,10 @@ export default function Navbar() {
           <IconButton color="inherit">
             <PersonIcon />
           </IconButton>
-          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/register')}>
             Üye Ol
           </Typography>
-          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/login')} >
             Giriş Yap
           </Typography>
           {/* Dikey Ayırıcı */}
