@@ -9,6 +9,7 @@ import Sellers from './admin/Sellers'
 import Brands from './admin/Brands'
 import Categories from './admin/Categories'
 import Products from './admin/Products'
+import ProductAdd from './admin/ProductAdd'
 
 import S_Login from './seller/Login';
 import S_MainPage from './seller/MainPage';
@@ -31,6 +32,7 @@ function App() {
             <Route path="/admin/brands" element={<Brands />} />
             <Route path="/admin/categories" element={<Categories />} />
             <Route path="/admin/products" element={<Products />} />
+            <Route path="/admin/productadd" element={<ProductAdd />} />
 
             {/* SATICI */}
             <Route path="/seller" element={<S_Login />} />
