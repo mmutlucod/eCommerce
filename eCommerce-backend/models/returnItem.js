@@ -15,7 +15,7 @@ const ReturnItem = sequelize.define('returnItem', {
     },
     condition: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     seller_product_id: {
         type: Sequelize.INTEGER,

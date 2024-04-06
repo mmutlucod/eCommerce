@@ -16,6 +16,7 @@ const productQuestion = sequelize.define('productQuestion', {
     answer: Sequelize.TEXT,
     date_asked: Sequelize.DATE,
     date_answered: Sequelize.DATE,
+    is_public: Sequelize.INTEGER,
     approval_status_id: {
         type: Sequelize.INTEGER,
         defaultValue: 0

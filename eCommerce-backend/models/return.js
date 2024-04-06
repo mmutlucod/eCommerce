@@ -9,7 +9,7 @@ const Return = sequelize.define('return', {
         primaryKey: true
     },
     reason: Sequelize.TEXT,
-    returnDate: {
+    return_date: {
         type: Sequelize.DATE,
         defaultValue: Sequelize.NOW
     },

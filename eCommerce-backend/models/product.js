@@ -17,6 +17,10 @@ const Product = sequelize.define('product', {
     },
     stock_code: Sequelize.STRING,
     max_buy: Sequelize.INTEGER,
+    slug: {
+        type: Sequelize.STRING,
+        unique: true // Slug'ın benzersiz olduğundan emin olun.
+    },
     category_id: Sequelize.INTEGER,
     approval_status_id: {
         type: Sequelize.INTEGER,

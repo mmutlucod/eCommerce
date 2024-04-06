@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt"); // Şifreleri güvenli bir şekilde saklamak için bcrypt kütüphanesini kullanıyoruz
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
-const { errors } = require("ethers");
 const Cart = require("../models/cart");
 const CartItem = require("../models/cartItem");
 const sellerProduct = require("../models/sellerProduct");
@@ -19,6 +18,11 @@ const UserFavoriteProduct = require("../models/userFavoriteProduct");
 const ProductComment = require("../models/productComment");
 const ApprovalStatus = require("../models/approval_status");
 const SellerComment = require("../models/sellerComment");
+const Follow = require("../models/follow");
+const Return = require("../models/return");
+const ReturnItem = require("../models/returnItem");
+const productQuestion = require("../models/productQuestion");
+const { Op, Sequelize } = require("sequelize");
 
 //KULLANICI İŞLEMLERİ 
 
@@ -727,27 +731,104 @@ const getorders = async (req, res) => {
 const getOrderItems = async (req, res) => {
   try {
     const { orderId } = req.body;
-    const orderItems = await OrderItem.findAll(
-      {
-        where: { order_id: orderId },
-        include: [
-          {
-            model: sellerProduct,
-            include: [
-              {
-                model: Seller
-              },
-              {
-                model: Product
-              }
-            ]
-          },
-          {
-            model: orderStatus
-          }]
-      });
+    const orderItems = await OrderItem.findAll({
+      where: { order_id: orderId },
+      include: [
+        {
+          model: sellerProduct,
+          include: [
+            {
+              model: Seller
+            },
+            {
+              model: Product
+            }
+          ]
+        },
+        {
+          model: orderStatus
+        }
+      ]
+    });
 
-    return res.status(200).json(orderItems);
+    if (orderItems.length === 0) {
+      return res.status(404).json({ success: false, message: "Siparişe ait ürün bulunamadı." });
+    }
+
+    // Eğer siparişin durumu 4 ise, tüm sipariş iptal edilmiş demektir
+    const isOrderCancelled = orderItems[0].orderStatus && orderItems[0].orderStatus.order_status_id === 5;
+
+    let totalRefundAmount = 0;
+    let remainingItemsCount = 0;
+
+    if (isOrderCancelled) {
+      // Sipariş tamamen iptal edildiyse, tüm ürünler için iade tutarını hesapla
+      orderItems.forEach(item => {
+        totalRefundAmount += item.quantity * item.price;
+      });
+      remainingItemsCount = 0; // Tüm sipariş iptal edildiği için kalan ürün yok
+    } else {
+      // Sipariş kısmen iptal edildiyse, iptal edilen ve kalan ürünleri hesapla
+      orderItems.forEach(item => {
+        if (item.canceled_quantity > 0) {
+          totalRefundAmount += item.canceled_quantity * item.price;
+        }
+        if (item.quantity > item.canceled_quantity) {
+          remainingItemsCount += 1;
+        }
+      });
+    }
+
+    // İade bilgilerini getir
+    const returnItems = await ReturnItem.findAll({
+      include: [{
+        model: OrderItem,
+        where: { order_id: orderId }
+      }]
+    });
+
+
+    const response = {
+      orderItems: orderItems,
+      refundInfo: isOrderCancelled
+        ? `Siparişiniz tamamen iptal edilmiştir. Toplam iade edilecek tutar: ${totalRefundAmount} TL.`
+        : {
+          totalRefundAmount: totalRefundAmount,
+          remainingItemsCount: remainingItemsCount,
+          canceledItemsCount: orderItems.length - remainingItemsCount,
+          refundMessage: `${remainingItemsCount} ürününüzden ${orderItems.length - remainingItemsCount} tanesi iptal edildi. ${totalRefundAmount} TL iade edilecektir.`
+        },
+      returnItems: returnItems // İade bilgilerini yanıta ekle
+    };
+
+    return res.status(200).json(response);
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const cancelOrderItem = async (req, res) => {
+  try {
+    const { orderItemId, cancelQuantity } = req.body;
+
+    // Sipariş öğesini bul
+    const orderItem = await OrderItem.findByPk(orderItemId);
+
+    if (!orderItem) {
+      return res.status(404).json({ success: false, message: "Sipariş öğesi bulunamadı." });
+    }
+
+    // İptal edilecek miktarın mevcut sipariş miktarını aşmadığını kontrol et
+    if (cancelQuantity > orderItem.quantity) {
+      return res.status(400).json({ success: false, message: "İptal edilecek miktar, mevcut sipariş miktarından fazla olamaz." });
+    }
+
+    // İptal edilen miktarı güncelle
+    const newCanceledQuantity = (orderItem.canceled_quantity || 0) + cancelQuantity;
+    await orderItem.update({ canceled_quantity: newCanceledQuantity });
+
+    // Başarılı yanıt dön
+    return res.status(200).json({ success: true, message: "Sipariş öğesi başarıyla iptal edildi.", orderItem: orderItem });
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -816,6 +897,31 @@ const createOrder = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+const cancelOrder = async (req, res) => {
+  try {
+    const { orderId } = req.body; // İptal edilecek siparişin ID'si
+
+    // Siparişi bul
+    const order = await Order.findByPk(orderId);
+
+    if (!order) {
+      return res.status(404).json({ success: false, message: "Sipariş bulunamadı." });
+    }
+
+    // Siparişin iptal edilebilir durumda olup olmadığını kontrol et (örneğin, kargoya verilmemiş)
+    if (order.order_status_id >= 3) { // Burada 3, 4 ve 5, kargoya verilmiş veya iptal edilmiş siparişleri temsil ediyor
+      return res.status(400).json({ success: false, message: "Sipariş zaten kargoya verilmiş veya iptal edilmiş durumda ve iptal edilemez." });
+    }
+
+    // Sipariş durumunu 'iptal edildi' olarak güncelle
+    await order.update({ order_status_id: 5 });
+
+    return res.status(200).json({ success: true, message: "Sipariş başarıyla iptal edildi." });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
 //FAVORİ İŞLEMLERİ
 const getFavorites = async (req, res) => {
   try {
@@ -1193,6 +1299,314 @@ const deleteSellerComments = async (req, res) => {
   }
 }
 
+// SATICI TAKİP İŞLEMLERİ
+
+const toggleFollowSeller = async (req, res) => {
+  try {
+    const { sellerId } = req.body; // Kullanıcı ve satıcı ID'leri, istek gövdesinden alınır
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // İlk olarak, mevcut takip ilişkisini kontrol et
+    const existingFollow = await Follow.findOne({
+      where: { user_id: user.user_id, seller_id: sellerId }
+    });
+
+    if (existingFollow) {
+      // Eğer takip ilişkisi varsa, takipten çıkar (ilişkiyi sil)
+      await existingFollow.destroy();
+      return res.status(200).json({ success: true, message: "Satıcı takipten çıkarıldı." });
+    } else {
+      // Eğer takip ilişkisi yoksa, yeni bir takip ilişkisi oluştur
+      await Follow.create({ user_id: user.user_id, seller_id: sellerId });
+      return res.status(201).json({ success: true, message: "Satıcı takip edilmeye başlandı." });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const checkFollowStatus = async (req, res) => {
+  try {
+
+    const user = await User.findOne({ where: { email: req.user.email } });
+    const { sellerId } = req.params; // Kullanıcı ve satıcı ID'leri, sorgu parametreleri olarak alınır
+
+    const follow = await Follow.findOne({
+      where: {
+        user_id: user.user_id,
+        seller_id: sellerId
+      }
+    });
+
+    return res.status(200).json({ isFollowing: !!follow });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Sunucu hatası." });
+  }
+}
+const getFollowedSellers = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+    // Kullanıcının takip ettiği satıcıları sorgula
+    const followedSellers = await Follow.findAll({
+      where: { user_id: user.user_id },
+      include: [{
+        model: Seller, // Takip edilen satıcıların bilgileri
+        required: true
+      }]
+    });
+
+    if (!followedSellers.length) {
+      return res.status(404).json({ success: false, message: "Takip edilen satıcı bulunamadı." });
+    }
+
+    // Sadece satıcı bilgilerini döndürmek için bir map işlemi
+    const sellersInfo = followedSellers.map(follow => follow.seller);
+
+    return res.status(200).json({ success: true, followedSellers: sellersInfo });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+// İADE İŞLEMLERİ
+
+const createReturnRequest = async (req, res) => {
+  const { orderId, reason, returnItems } = req.body; // `returnItems` her bir iade edilecek ürün için { orderItemId, quantity, condition } bilgilerini içeren bir array.
+
+  try {
+    const existingReturn = await Return.findOne({
+      where: {
+        order_id: orderId // Örneğin, kullanıcı ID'sini ilişkilendirdiğinizi varsayıyoruz
+      }
+    });
+
+    // Eğer aynı `orderId` ve `userId` ile bir kayıt varsa, yeni bir iade talebi oluşturmayı reddet
+    if (existingReturn) {
+      return res.status(409).json({ success: false, message: "Bu sipariş için zaten bir iade talebi mevcut." });
+    }
+
+    // Eğer mevcut bir iade talebi yoksa, yeni bir iade talebi oluştur
+    const newReturn = await Return.create({
+      reason: reason,
+      order_id: orderId,
+      return_date: new Date(),
+      approval_status_id: 3, // Örneğin, 3 'Onay Bekleniyor' durumunu ifade edebilir
+    });
+
+    // Her bir `returnItem` için, ilgili `orderItem`'ı bul ve `ReturnItem` tablosunda kayıt oluştur.
+    const returnItemPromises = returnItems.map(async (item) => {
+      // İlgili `orderItem`'ı bul
+      const orderItem = await OrderItem.findOne({
+        where: {
+          order_item_id: item.orderItemId
+        }
+      });
+
+      // Eğer bulunan `orderItem` için iade miktarı, sipariş miktarını geçmiyorsa iade kaydını oluştur
+      if (orderItem && item.quantity <= orderItem.quantity) {
+        return ReturnItem.create({
+          return_id: newReturn.return_id,
+          quantity: item.quantity,
+          condition: item.condition,
+          seller_product_id: orderItem.seller_product_id
+        });
+      } else {
+        // Hatalı iade miktarı veya bulunamayan orderItem durumları için hata yönetimi
+        throw new Error(`Hatalı iade talebi: OrderItem ${item.orderItemId} için miktar aşımı veya bulunamadı.`);
+      }
+    });
+
+    // Tüm `returnItem` kayıtlarını oluştur
+    await Promise.all(returnItemPromises);
+
+    res.status(201).json({ success: true, message: "İade talebi başarıyla oluşturuldu." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+/**   
+  "orderId": 123,
+  "reason": "Ürün bozuk çıktı",
+  "returnItems": 
+  [
+      { "orderItemId": 1, "quantity": 2, "condition": "Bozuk" },
+      { "orderItemId": 2, "quantity": 1, "condition": "Açılmış" }
+  ] 
+    
+*/
+const getUserReturnRequests = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı." });
+    }
+
+    // Kullanıcının siparişlerini bul
+    const userOrders = await Order.findAll({
+      where: { user_id: user.user_id },
+    });
+
+    const orderIds = userOrders.map(order => order.order_id);
+
+    // Bu siparişlere ait iade taleplerini bul
+    const returnRequests = await Return.findAll({
+      where: { order_id: orderIds }, // Varsayım: Return modelinde order_id alanı var
+      include: [{
+        model: ReturnItem,
+        include: [{
+          model: sellerProduct, // SellerProduct modeli ReturnItem ile ilişkilendirilmeli
+          // SellerProduct modelinizde ekstra ilişkilendirilmiş modeller varsa buraya dahil edilebilir.
+        }]
+      }]
+    });
+
+    res.status(200).json(returnRequests);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+const cancelReturnRequest = async (req, res) => {
+  const { returnId } = req.body; // İptal edilecek iade talebinin ID'si
+
+  try {
+    // İade talebini ve ilişkili `ReturnItem` kayıtlarını bul
+    const returnRequest = await Return.findByPk(returnId);
+    if (!returnRequest) {
+      return res.status(404).json({ success: false, message: "İade talebi bulunamadı." });
+    }
+
+    // İlişkili `ReturnItem` kayıtlarını sil
+    await ReturnItem.destroy({
+      where: {
+        return_id: returnId
+      }
+    });
+
+    // İade talebini sil
+    await returnRequest.destroy();
+
+    res.status(200).json({ success: true, message: "İade talebi başarıyla iptal edildi." });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+// ÜRÜN SORU İŞLEMLERİ
+
+const askQuestion = async (req, res) => {
+  try {
+    const newQuestion = await productQuestion.create({
+      ...req.body,
+      date_asked: new Date(),
+      approval_status_id: 3
+      // Diğer gerekli alanları da burada ekleyebilirsiniz
+    });
+
+    res.status(201).json({ message: 'Soru başarıyla eklendi.', question: newQuestion });
+  } catch (error) {
+    res.status(500).json({ message: 'Soru eklenirken bir hata oluştu.', error: error.message });
+  }
+}
+const listMyQuestions = async (req, res) => {
+  try {
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    const questions = await productQuestion.findAll({
+      where: { user_id: user.user_id },
+      order: [['date_asked', 'DESC']],
+    });
+
+    if (questions.length > 0) {
+      res.status(200).json(questions);
+    } else {
+      res.status(404).json({ message: 'Soru bulunamadı.' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Soruları yüklerken bir hata oluştu.', error: error.message });
+  }
+}
+
+const getAnsweredQuestionsForProduct = async (req, res) => {
+  const { productId } = req.params; // Ürün ID'si URL parametresinden alınır
+
+  try {
+    const questions = await productQuestion.findAll({
+      where: {
+        product_id: productId,
+        answer: {
+          [Op.not]: null, // answer alanı null olmayan kayıtları getir
+          [Op.not]: '' // ve answer alanı boş string olmayan kayıtları getir
+        }
+      },
+      order: [['date_asked', 'DESC']] // En son sorulan soruları ilk sırada getir
+    });
+
+    if (questions.length > 0) {
+      res.status(200).json(questions);
+    } else {
+      res.status(404).json({ message: 'Cevaplanmış soru bulunamadı.' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Soruları yüklerken bir hata oluştu.', error: error.message });
+  }
+};
+
+// SLUG İLE VERİ ÇEKME İŞLEMLERİ
+
+const getProductsBySlug = async (req, res) => {
+
+}
+const getProductsBySellerSlug = async (req, res) => {
+  const { productSlug } = req.params;
+  const { mg } = req.query; // Mağaza slug'ı query parametresinden alınır
+  try {
+    let seller = null;
+    if (mg) {
+      seller = await Seller.findOne({ where: { slug: mg } });
+      if (!seller) {
+        return res.status(404).json({ message: 'Belirtilen satıcı bulunamadı.' });
+      }
+    }
+    const product = await Product.findOne({ where: { slug: productSlug } });
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Ürün bulunamadı' });
+    }
+
+    const products = await sellerProduct.findOne({
+      where: {
+        product_id: product.product_id,
+        seller_id: seller.seller_id,
+        is_active: 1
+      },
+      include: [{
+        model: Seller
+      },
+      {
+        model: Product,
+        include: [{
+          model: Brand
+        },
+        {
+          model: Category
+        }]
+      }],
+    })
+
+    return res.status(200).json(products);
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const getProductsByCategorySlug = async (req, res) => {
+
+}
+const getProductsByBrandSlug = async (req, res) => {
+
+}
 
 
 
@@ -1213,11 +1627,14 @@ module.exports = {
   getLists, createList, deleteList, updateList,
   addItemToList, getItemsByListId, removeItemFromList, getPublicListItemsBySlug,
   getAddresses, createAddress, updateAddress, deleteAddress,
-  getorders, getOrderItems, createOrder,
+  getorders, getOrderItems, createOrder, cancelOrderItem, cancelOrder,
   getFavorites, addFavoriteItem, deleteFavoriteItem,
   getProductCommentsByUser, getProductComments, createProductComments,
   updateProductComments, deleteProductComments,
   getSellerCommentsByUser, getSellerComments, createSellerComment,
-  updateSellerComments, deleteSellerComments
-
+  updateSellerComments, deleteSellerComments,
+  toggleFollowSeller, checkFollowStatus, getFollowedSellers,
+  createReturnRequest, getUserReturnRequests, cancelReturnRequest,
+  askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
+  getProductsBySellerSlug
 };

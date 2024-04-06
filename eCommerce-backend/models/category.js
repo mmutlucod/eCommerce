@@ -22,6 +22,10 @@ const Category = sequelize.define('category', {
             key: 'id' // İlişkili modelin hangi sütunuyla ilişkilendirildiği
         }
     },
+    slug: {
+        type: Sequelize.STRING,
+        unique: true // Slug'ın benzersiz olduğundan emin olun.
+    },
     approval_status_id: {
         type: Sequelize.INTEGER,
         defaultValue: 0
