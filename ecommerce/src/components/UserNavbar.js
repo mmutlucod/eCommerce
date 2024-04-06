@@ -46,7 +46,7 @@ export default function Navbar() {
           <IconButton color="inherit">
             <LocationOnIcon />
           </IconButton>
-          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/address-add')}>
             Teslimat Adresi Ekle
           </Typography>
           <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Container,
+  Grid,
   Paper,
   List,
   Typography,
@@ -10,11 +10,13 @@ import {
   Card,
   CardContent,
   CardActions,
-  Grid,
+  Container,
+  IconButton
 } from '@mui/material';
-import Navbar from '../components/UserNavbar'; // Navbar component'inizin yolu
-import { renderMenuItems } from './RenderMenuItems'; // Menu öğelerini render etmek için kullanılan fonksiyon
-import api from '../api/api'; // API iletişimini sağlayan modülün yolu
+import AddIcon from '@mui/icons-material/Add';
+import Navbar from '../components/UserNavbar';
+import { renderMenuItems } from './RenderMenuItems';
+import api from '../api/api';
 
 const OrdersPage = () => {
   const [selectedItem, setSelectedItem] = useState('orders'); // Başlangıç değeri olarak 'orders'
@@ -37,12 +39,13 @@ const OrdersPage = () => {
   return (
     <>
       <Navbar />
-      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 8 }}>
-        <Box sx={{ width: '200px', mr: 2 }}>
-          <Paper elevation={0} square>
-            <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
-          </Paper>
-        </Box>
+      <Container maxWidth="lg" sx={{ mt: 8 }}>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} md={3}>
+            <Paper elevation={0} square>
+              <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
+            </Paper>
+          </Grid>
         <Box flex={1} sx={{ maxWidth: '750px', mx: 4 }}>
           <Paper sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -84,7 +87,8 @@ const OrdersPage = () => {
             )}
           </Paper>
         </Box>
-      </Box>
+        </Grid>
+      </Container>
     </>
   );
 };

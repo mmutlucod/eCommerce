@@ -134,7 +134,7 @@ const updateUserDetail = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Kullanıcı Bulunamadı' });
     }
 
-    await user.update();
+    await user.update(req.body)
 
     return res.status(200).json({ success: true, message: 'Bilgileriniz güncellendi' });
 
