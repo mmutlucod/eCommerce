@@ -18,6 +18,7 @@ const OrderItem = require("../models/orderItem");
 const UserFavoriteProduct = require("../models/userFavoriteProduct");
 const ProductComment = require("../models/productComment");
 const ApprovalStatus = require("../models/approval_status");
+const SellerComment = require("../models/sellerComment");
 
 //KULLANICI İŞLEMLERİ 
 
@@ -322,7 +323,7 @@ const getProducts = async (req, res) => {
     }).then(favs => favs.map(fav => fav.product_id));
 
     let products = await sellerProduct.findAll({
-      where: { is_active: 1 },
+      where: { is_active: 1, },
       include: [{
         model: Seller
       },
@@ -350,9 +351,11 @@ const getProducts = async (req, res) => {
 
     const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
       const isFavorite = favoriteProductsIds.includes(product.product.product_id);
+      const stockStatus = product.stock_quantity === 0 ? 'Stokta yok' : 'Stokta var';
       return {
         ...product.toJSON(),
-        isFavorite: isFavorite
+        isFavorite: isFavorite, // FAVORİ DURUMU
+        stockStatus: stockStatus //STOK DURUMU
       };
     });
 
@@ -813,9 +816,6 @@ const createOrder = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-
-
-
 //FAVORİ İŞLEMLERİ
 const getFavorites = async (req, res) => {
   try {
@@ -854,11 +854,16 @@ const deleteFavoriteItem = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-// ÜRÜN DEĞERLENDİRME İŞLEMLERİ
+// ÜRÜN DEĞERLENDİRME İŞLEMLERİ 
 
-const getProductComments = async (req, res) => {
+// (kullanıcının yorumları)
+const getProductCommentsByUser = async (req, res) => {
   try {
+    // Kullanıcıyı doğrulayın
     const user = await User.findOne({ where: { email: req.user.email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı." });
+    }
 
     const productComments = await ProductComment.findAll({
       where: {
@@ -867,25 +872,26 @@ const getProductComments = async (req, res) => {
       },
       include: [
         {
-          model: ApprovalStatus
+          model: ApprovalStatus,
+          attributes: ['status_name']
         },
         {
-          model: User
+          model: User,
+          attributes: ['name', 'surname']
         },
+        // sellerProduct modelini doğrudan Product modeli ile değiştir
         {
-          model: sellerProduct,
+          model: Product,
           include: [
             {
-              model: Product,
-              include: [
-                {
-                  model: Brand
-                }
-              ]
+              model: Brand,
+              attributes: ['brand_name']
             }
-          ]
+          ],
+          attributes: ['product_name', 'description']
         }
-      ]
+      ],
+      order: [['comment_date', 'DESC']] // Yorumları yorum tarihine göre sırala
     });
 
     // Kullanıcı adlarını formatlayarak güncelle
@@ -896,6 +902,67 @@ const getProductComments = async (req, res) => {
         // Soyadını da formatlamak için benzer bir işlem yapabilirsiniz.
       }
       return comment;
+    });
+
+    return res.status(200).json(formattedComments);
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+// (ürüne gelen yorumlar)
+const getProductComments = async (req, res) => {
+  try {
+    const { productId } = req.params; // Ürün ID'si, genellikle bir route parametresi olarak alınır
+
+    const productComments = await ProductComment.findAll({
+      where: {
+        product_id: productId, // "seller_product_id" yerine doğrudan "product_id" kullanılır
+        is_deleted: 0 // Silinmemiş yorumları filtrele
+      },
+      include: [
+        {
+          model: ApprovalStatus, // Bu modelin ProductComment ile ilişkilendirilmiş olması gerekiyor
+          attributes: ['status_name']
+        },
+        {
+          model: User, // Kullanıcı modeli, ProductComment ile ilişkilendirilmiş olmalı
+          attributes: ['name', 'surname']
+        },
+        // Aşağıdaki ilişkilendirme varsayımsaldır ve gerçek model yapınıza bağlıdır
+        // Eğer Product modeli doğrudan ProductComment ile ilişkilendirilmişse:
+        {
+          model: Product,
+          include: [
+            {
+              model: Brand, // Brand modeli, Product ile ilişkilendirilmiş olmalı
+              attributes: ['brand_name']
+            }
+          ],
+          attributes: ['product_name', 'description']
+        }
+      ],
+      order: [['comment_date', 'DESC']] // createdAt yerine modelde tanımlı olan comment_date kullanılır
+    });
+
+    // Kullanıcı adlarını ve yorumları formatlayarak güncelle
+    const formattedComments = productComments.map(comment => {
+      // Eğer is_public false ise, kullanıcı adını ve soyadını formatla
+      // Bu formatlama fonksiyonunun tanımı burada verilmemiştir
+      if (comment.is_public === 0) {
+        comment.user.name = "Anonymous";
+        comment.user.surname = "";
+      }
+      return {
+        commentId: comment.comment_id,
+        comment: comment.comment,
+        rating: comment.rating,
+        isPublic: comment.is_public,
+        approvalStatus: comment.ApprovalStatus?.status_name,
+        userName: `${comment.user.name} ${comment.user.surname}`,
+        productName: comment.Product?.product_name,
+        brandName: comment.Product?.Brand?.brand_name,
+      };
     });
 
     return res.status(200).json(formattedComments);
@@ -939,7 +1006,8 @@ const createProductComments = async (req, res) => {
       comment: comment,
       rating: rating,
       is_public: isPublic,
-      is_deleted: 0
+      is_deleted: 0,
+      comment_date: new Date()
     });
 
     return res.status(201).json(newComment);
@@ -988,6 +1056,146 @@ const deleteProductComments = async (req, res) => {
   }
 }
 
+//SATICI DEĞERLENDİRME İŞLEMLERİ 
+
+// (kullanıcının yorumları)
+const getSellerCommentsByUser = async (req, res) => {
+  try {
+    // user ID
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Satıcıya yapılan yorumları sorgula
+    const sellerComments = await SellerComment.findAll({
+      where: {
+        user_id: user.user_id,
+        is_deleted: 0 // Silinmemiş yorumları filtrele
+      },
+      include: [
+        {
+          model: User, // Yorumu yapan kullanıcı
+          attributes: ['id', 'name', 'surname'] // Yalnızca belirli kullanıcı bilgilerini dahil et
+        },
+        {
+          model: ApprovalStatus, // Yorumun onay durumu
+        }
+      ],
+      order: [['createdAt', 'DESC']] // Yorumları oluşturulma tarihine göre sırala
+    });
+
+    // İsteğe bağlı olarak kullanıcı adını formatlayabilirsiniz
+    const formattedComments = sellerComments.map(comment => {
+      if (comment.is_public === 0) {
+        comment.User.name = formatUserName(comment.User.name, comment.is_public);
+        comment.User.surname = formatUserName(comment.User.surname, comment.is_public);
+        // İsteğe bağlı olarak, kullanıcı soyadını da formatlayabilirsiniz
+      }
+      return comment;
+    });
+
+    return res.status(200).json(formattedComments);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+// (satıcıya yapılan tüm yorumlar)
+const getSellerComments = async (req, res) => {
+  try {
+    const { sellerId } = req.params;
+
+    // Satıcıya yapılan yorumları getir
+    const sellerComments = await SellerComment.findAll({
+      where: { seller_id: sellerId, is_public: 1 },
+      include: [{
+        model: User,
+        attributes: ['name', 'username', 'email'] // İsteğe bağlı: kullanıcı adı ve email dışındaki bilgileri gizle
+      }]
+    });
+
+    if (!sellerComments) {
+      return res.status(404).json({ success: false, message: "Yorumlar bulunamadı." });
+    }
+
+    return res.status(200).json({ success: true, comments: sellerComments });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const createSellerComment = async (req, res) => {
+  try {
+    const { sellerId, comment, rating } = req.body;
+    const isPublic = req.body.isPublic !== undefined ? req.body.isPublic : 1;
+
+    // Kullanıcıyı doğrula
+    const user = await User.findOne({ where: { email: req.user.email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Kullanıcı bulunamadı." });
+    }
+
+    // Satıcıyı kontrol et
+    const seller = await Seller.findOne({ where: { seller_id: sellerId } });
+    if (!seller) {
+      return res.status(404).json({ success: false, message: "Satıcı bulunamadı." });
+    }
+
+    // Yeni satıcı yorumu oluştur
+    const newSellerComment = await SellerComment.create({
+      user_id: user.user_id,
+      seller_id: sellerId,
+      comment: comment,
+      rating: rating,
+      is_public: isPublic,
+      comment_date: new Date()
+    });
+
+    return res.status(201).json({ success: true, sellerComment: newSellerComment });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const updateSellerComments = async (req, res) => {
+  try {
+    const { commentId, isPublic } = req.body;
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Yalnızca yorumun sahibi is_public değerini güncelleyebilir
+    const updated = await SellerComment.update(
+      { is_public: isPublic },
+      { where: { comment_id: commentId, user_id: user.user_id } }
+    );
+
+    if (updated[0] > 0) {
+      return res.status(200).json({ success: true, message: "Satıcı yorumu durumu güncellendi." });
+    } else {
+      return res.status(404).json({ success: false, message: "Satıcı yorumu bulunamadı veya güncellenemedi." });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+const deleteSellerComments = async (req, res) => {
+  try {
+    const { commentId } = req.body;
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Yalnızca yorumun sahibi yorumu silmek için işaretleyebilir
+    const updated = await SellerComment.update(
+      { is_deleted: 1 },
+      { where: { comment_id: commentId, user_id: user.user_id } }
+    );
+
+    if (updated[0] > 0) {
+      return res.status(200).json({ success: true, message: "Satıcı yorumu başarıyla silindi." });
+    } else {
+      return res.status(404).json({ success: false, message: "Satıcı yorumu bulunamadı veya zaten silinmiş." });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
+
+
 // Kullanıcı adı ve soyadını formatlayan yardımcı fonksiyon
 function formatUserName(name, isPublic) {
   if (isPublic === 1) {
@@ -1007,6 +1215,9 @@ module.exports = {
   getAddresses, createAddress, updateAddress, deleteAddress,
   getorders, getOrderItems, createOrder,
   getFavorites, addFavoriteItem, deleteFavoriteItem,
-  getProductComments, createProductComments, updateProductComments, deleteProductComments
+  getProductCommentsByUser, getProductComments, createProductComments,
+  updateProductComments, deleteProductComments,
+  getSellerCommentsByUser, getSellerComments, createSellerComment,
+  updateSellerComments, deleteSellerComments
 
 };

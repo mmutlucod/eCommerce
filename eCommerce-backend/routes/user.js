@@ -54,11 +54,24 @@ router.get('/favorites', authMiddleware, userController.getFavorites);
 router.post('/addFavoriteItem', authMiddleware, userController.addFavoriteItem);
 router.post('/deleteFavoriteItem', authMiddleware, userController.deleteFavoriteItem);
 
-// DEĞERLENDİRME İŞLEMLERİ
+// ÜRÜN DEĞERLENDİRME  İŞLEMLERİ
 
-router.get('/product-comments', authMiddleware, userController.getProductComments);
+router.get('/product-comments/:productId', authMiddleware, userController.getProductComments);
+router.get('/my-product-comments', authMiddleware, userController.getProductCommentsByUser);
 router.post('/create-product-comment', authMiddleware, userController.createProductComments);
 router.post('/update-product-comment', authMiddleware, userController.updateProductComments);
 router.post('/delete-product-comment', authMiddleware, userController.deleteProductComments);
+
+// SATICI DEĞERLENDİRME İŞLEMLERİ
+
+router.get('/seller-comments/:sellerId', authMiddleware, userController.getSellerComments);
+router.get('/my-seller-comments', authMiddleware, userController.getSellerCommentsByUser);
+router.post('/create-seller-comment', authMiddleware, userController.createSellerComment);
+router.post('/update-seller-comment', authMiddleware, userController.updateSellerComments);
+router.post('/delete-seller-comment', authMiddleware, userController.deleteSellerComments);
+
+
+
+
 
 module.exports = router;
