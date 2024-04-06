@@ -19,7 +19,6 @@ const UserFavoriteProduct = require("../models/userFavoriteProduct");
 const ProductComment = require("../models/productComment");
 const ApprovalStatus = require("../models/approval_status");
 
-
 //KULLANICI İŞLEMLERİ 
 
 const login = async (req, res) => {
@@ -141,30 +140,81 @@ const updateUserDetail = async (req, res) => {
 //SEPET İŞLEMLERİ
 const addItem = async (req, res) => {
   try {
-    const { productId, quantity } = req.body;
+    const { sellerProductId, quantity } = req.body;
 
+    // Kullanıcıyı doğrulayın
     const user = await User.findOne({ where: { email: req.user.email } });
-    const cart = await Cart.findOne({ where: { user_id: user.user_id } });
-
-    if (!cart) {
-      await Cart.create({
-        user_id: user.user_id
-      })
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
     }
-    const item = await CartItem.findOne({ where: { cart_id: cart.cart_id, seller_product_id: productId } });
-    if (item) {
-      item.quantity += quantity;
-      await item.save();
+
+    // Satıcı ürününü ve ilişkili ürün bilgilerini kontrol edin
+    const sp = await sellerProduct.findByPk(sellerProductId, {
+      include: [Product]
+    });
+    if (!sp) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // İlk olarak stok adedini kontrol edin
+    let maxQuantityAllowed = sp.stock;
+
+    console.log(sp.stock, sp.product.max_buy)
+    // Eğer stok miktarı max_buy'dan azsa, kullanıcının ekleyebileceği maksimum miktarı buna göre ayarlayın
+    if (sp.stock < sp.product.max_buy) {
+      maxQuantityAllowed = sp.stock;
     } else {
-      await CartItem.create({
-        cart_id: cart.cart_id,
-        seller_product_id: productId,
-        quantity: quantity
-      })
+      // Eğer stok miktarı max_buy'dan fazla veya eşitse, max_buy değerini kullanın
+      maxQuantityAllowed = sp.product.max_buy;
     }
 
-    return res.status(200).json({ success: false, message: 'Ürün sepete eklendi.' })
+    // Kullanıcının sepetindeki mevcut miktarı dikkate alarak son miktarı hesaplayın
+    let finalQuantity = quantity;
 
+    // Kullanıcının sepetini bul veya oluştur
+    let cart = await Cart.findOne({ where: { user_id: user.user_id } });
+    if (!cart) {
+      cart = await Cart.create({ user_id: user.user_id });
+    }
+
+    // Sepet öğesini bul veya oluştur
+    let cartItem = await CartItem.findOne({
+      where: {
+        cart_id: cart.cart_id,
+        seller_product_id: sellerProductId,
+      },
+    });
+
+    if (cartItem) {
+      // Sepette zaten varsa, yeni miktarı hesapla
+      let potentialNewQuantity = cartItem.quantity + quantity;
+      if (potentialNewQuantity < maxQuantityAllowed) {
+        cartItem.quantity = finalQuantity;
+        await cartItem.save();
+      } else {
+        return res.status(404).json({ success: false, message: 'Sepete eklenecek maksimum ürün sayısına ulaştınız.' });
+      }
+    } else {
+      // Sepet öğesi yoksa, yeni bir tane oluştur
+      finalQuantity = cartItem.quantity;
+      if (potentialNewQuantity < maxQuantityAllowed) {
+        await CartItem.create({
+          cart_id: cart.cart_id,
+          seller_product_id: sellerProductId,
+          quantity: finalQuantity,
+        });
+      } else {
+        await CartItem.create({
+          cart_id: cart.cart_id,
+          seller_product_id: sellerProductId,
+          quantity: maxQuantityAllowed,
+        });
+        return res.status(200).json({ success: true, message: 'Maximum ürün adedi kadar sepete eklendi.' });
+      }
+
+    }
+
+    return res.status(200).json({ success: true, message: "Item added to cart", cartItem });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -291,7 +341,7 @@ const getProducts = async (req, res) => {
     // Ürünleri benzersiz hale getir ve en düşük fiyatlı olanı seç
     const uniqueProductsMap = new Map();
     products.forEach(product => {
-      const productId = product.product.produc_id;
+      const productId = product.product.product_id;
       if (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price) {
         uniqueProductsMap.set(productId, product);
       }
@@ -700,7 +750,71 @@ const getOrderItems = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-//create-order eklenecek
+const createOrder = async (req, res) => {
+  try {
+    // Kullanıcıyı doğrulayın
+    const user = await User.findOne({ where: { email: req.user.email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Kullanıcının sepetini sorgulayın
+    const cart = await Cart.findOne({
+      where: { user_id: user.user_id },
+      include: [{ model: CartItem, include: [sellerProduct] }]
+    });
+    if (!cart || !cart.cartItems.length) {
+      return res.status(400).json({ success: false, message: 'Cart is empty' });
+    }
+
+    // Siparişin toplam fiyatını hesaplayın
+    const total_price = cart.cartItems.reduce((accumulator, item) => {
+      const itemTotal = item.quantity * item.sellerProduct.price;
+      return accumulator + itemTotal;
+    }, 0);
+
+    // Yeni siparişi oluşturun
+    const order = await Order.create({
+      user_id: user.user_id,
+      order_date: new Date(),
+      total_price: total_price,
+      order_status_id: 1
+    });
+
+    // Sipariş öğelerini oluşturun ve stoktan düşürün
+    const updateStockPromises = cart.cartItems.map(async item => {
+      const orderItem = await OrderItem.create({
+        order_id: order.order_id,
+        seller_product_id: item.seller_product_id,
+        quantity: item.quantity,
+      });
+
+      // Stoktan düşür
+      const sp = await sellerProduct.findByPk(item.seller_product_id);
+      if (sp && sp.stock >= item.quantity) {
+        await sp.update({
+          stock: sp.stock - item.quantity
+        });
+      } else {
+        // Stokta yeterli ürün yoksa hata döndür
+        throw new Error('Insufficient stock for product ID: ' + item.seller_product_id);
+      }
+
+      return orderItem;
+    });
+
+    await Promise.all(updateStockPromises);
+
+    // Sepeti temizleyin (opsiyonel)
+    await CartItem.destroy({ where: { cart_id: cart.cart_id } });
+
+    return res.status(200).json({ success: true, order });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
 
 //FAVORİ İŞLEMLERİ
 const getFavorites = async (req, res) => {
@@ -891,7 +1005,7 @@ module.exports = {
   getLists, createList, deleteList, updateList,
   addItemToList, getItemsByListId, removeItemFromList, getPublicListItemsBySlug,
   getAddresses, createAddress, updateAddress, deleteAddress,
-  getorders, getOrderItems,
+  getorders, getOrderItems, createOrder,
   getFavorites, addFavoriteItem, deleteFavoriteItem,
   getProductComments, createProductComments, updateProductComments, deleteProductComments
 

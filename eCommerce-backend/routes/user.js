@@ -46,6 +46,7 @@ router.delete('/addresses/:addressId', authMiddleware, userController.deleteAddr
 
 router.get('/orders', authMiddleware, userController.getorders);
 router.get('/orderItems', authMiddleware, userController.getOrderItems);
+router.post('/create-order', authMiddleware, userController.createOrder);
 
 //FAVORİ İŞLEMLERİ
 

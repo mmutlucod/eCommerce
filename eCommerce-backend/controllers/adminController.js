@@ -163,7 +163,8 @@ const createProduct = async (req, res) => {
         // Yeni ürünü veritabanına ekle
         const product = await Product.create({
             ...req.body,
-            approval_status_id: 1
+            approval_status_id: 1,
+            max_buy: 10
         });
 
         // Ürün başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön
