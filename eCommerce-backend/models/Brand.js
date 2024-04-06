@@ -12,6 +12,10 @@ const Brand = sequelize.define('Brand', {
     brand_name: Sequelize.STRING,
     description: Sequelize.TEXT,
     seller_id: Sequelize.INTEGER,
+    slug: {
+        type: Sequelize.STRING,
+        unique: true // Slug'ın benzersiz olduğundan emin olun.
+    },
     approval_status_id: {
         type: Sequelize.INTEGER,
         defaultValue: 0

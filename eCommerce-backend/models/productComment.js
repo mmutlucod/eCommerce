@@ -10,8 +10,10 @@ const ProductComment = sequelize.define('ProductComment', {
         primaryKey: true
     },
     user_id: Sequelize.INTEGER,
-    seller_product_id: Sequelize.INTEGER,
+    product_id: Sequelize.INTEGER,
+    seller_id: Sequelize.INTEGER,
     comment: Sequelize.TEXT,
+    comment_date: Sequelize.DATE,
     rating: Sequelize.INTEGER,
     is_public: Sequelize.INTEGER, //isim gizliliği
     is_deleted: Sequelize.INTEGER, //silinen yorum

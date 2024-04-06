@@ -12,6 +12,7 @@ const SellerComment = sequelize.define('SellerComment', {
     user_id: Sequelize.INTEGER,
     seller_id: Sequelize.INTEGER,
     comment: Sequelize.TEXT,
+    comment_date: Sequelize.DATE,
     rating: Sequelize.INTEGER,
     is_public: Sequelize.INTEGER,
     is_deleted: Sequelize.INTEGER

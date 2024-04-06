@@ -18,6 +18,10 @@ const Seller = sequelize.define('seller', {
     tax_identity_number: Sequelize.INTEGER,
     city: Sequelize.STRING,
     district: Sequelize.STRING,
+    slug: {
+        type: Sequelize.STRING,
+        unique: true // Slug'ın benzersiz olduğundan emin olun.
+    },
     reference_code: Sequelize.STRING,
     password: Sequelize.STRING,
     approval_status_id: {
@@ -33,12 +37,14 @@ Seller.afterSync(async () => {
         {
             username: 'umutkarakas',
             password: '$2b$10$NHlsLPkdBkp/V/gZGt3WKuVIBO4NBdLdZXbfj7x9RD.uob9chwCBC',
-            approval_status_id: 1
+            approval_status_id: 1,
+            slug: 'umutkarakas'
         },
         {
             username: 'mustafamutlu',
             password: '$2b$10$izywZ7O/s/9A7ObokD1pfOqqqaXYcPMuxUnOM/MDV.a0Joj1ZJGae',
-            approval_status_id: 1
+            approval_status_id: 1,
+            slug: 'mustafamutlu'
         }
     ];
 
