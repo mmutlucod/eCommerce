@@ -21,7 +21,7 @@ import SellerProduct from './seller/Product';
 import UserLogin from './user/Login';
 import UserMainPage from './user/MainPage';
 import UserRegister from './user/Register';
-
+import UserProfil from './user/Profil';
 function App() {
   return (
     <AuthProvider>
@@ -47,8 +47,9 @@ function App() {
             <Route path="/seller/product" element={<SellerProduct />} />
 
             <Route path="/user/mainpage" element={< UserMainPage/>} />
-            <Route path="/user/login" element={< UserLogin/>} />
-            <Route path="/user/register" element={< UserRegister/>} />
+            <Route path="/user/login" element={< UserRegister/>} />
+            <Route path="/user/auth" element={< UserRegister/>} />
+            <Route path="/user/profile" element={< UserProfil/>} />
           </Routes>
         </Router>
       </div>

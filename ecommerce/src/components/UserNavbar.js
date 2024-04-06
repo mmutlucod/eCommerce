@@ -1,12 +1,14 @@
 import React from 'react';
-import { AppBar, Toolbar, IconButton, InputBase, Box, Badge, Typography, Divider } from '@mui/material';
+import { AppBar, Toolbar, Button,IconButton, InputBase, Box, Badge, Typography, Divider } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonIcon from '@mui/icons-material/Person'; // Profil ikonu için
 import LocationOnIcon from '@mui/icons-material/LocationOn'
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 export default function Navbar() {
     let navigate = useNavigate();
+    const { token, logout } = useAuth();
   return (
     <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
       <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
@@ -51,12 +53,25 @@ export default function Navbar() {
           <IconButton color="inherit">
             <PersonIcon />
           </IconButton>
-          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/register')}>
+          {token ? (
+          <>
+            <Typography vvariant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/profile')} style={{ cursor: 'pointer' }}>
+              Profilim
+            </Typography>
+            <Button color="inherit" onClick={logout}>Çıkış Yap</Button>
+          </>
+        ) : (
+          // Kullanıcı giriş yapmamışsa gösterilecek kısım
+          <>
+            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/auth')}>
             Üye Ol
           </Typography>
-          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/login')} >
+          <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/auth')} >
             Giriş Yap
           </Typography>
+          </>
+        )}
+          
           {/* Dikey Ayırıcı */}
           
           <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
