@@ -22,6 +22,7 @@ import UserLogin from './user/Login';
 import UserMainPage from './user/MainPage';
 import UserRegister from './user/Register';
 import UserProfil from './user/Profil';
+import UserOrders from './user/Orders';
 function App() {
   return (
     <AuthProvider>
@@ -50,6 +51,7 @@ function App() {
             <Route path="/user/login" element={< UserRegister/>} />
             <Route path="/user/auth" element={< UserRegister/>} />
             <Route path="/user/profile" element={< UserProfil/>} />
+            <Route path="/user/orders" element={< UserOrders/>} />
           </Routes>
         </Router>
       </div>
