@@ -156,6 +156,7 @@ function Categories() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
+                      {console.log(categories)}
                       {categories.map((category, index) => (
                         <TableRow
                           key={category.id}
@@ -223,7 +224,7 @@ function AddEditCategoryDialog({ open, onClose, handleChange, handleSubmit, hand
           type="text"
           fullWidth
           variant="standard"
-          value={isEditMode ? editCategory.name : newCategory.name}
+          value={isEditMode ? editCategory.category_name : newCategory.name}
           onChange={isEditMode ? handleEditChange : handleChange}
         />
         <TextField
@@ -243,7 +244,7 @@ function AddEditCategoryDialog({ open, onClose, handleChange, handleSubmit, hand
           type="text"
           fullWidth
           variant="standard"
-          value={isEditMode ? editCategory.categoryNumber : newCategory.categoryNumber}
+          value={isEditMode ? editCategory.id : newCategory.categoryNumber}
           onChange={isEditMode ? handleEditChange : handleChange}
         />
         <TextField

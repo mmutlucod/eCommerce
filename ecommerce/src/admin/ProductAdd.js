@@ -127,7 +127,7 @@ function ProductAdd() {
             />
           </Grid>
           <Grid item xs={12}>
-            <FormControl fullWidth>
+            {/* <FormControl fullWidth>
               <InputLabel>Onay Durumu</InputLabel>
               <Select
                 name="approvalStatusId"
@@ -139,7 +139,7 @@ function ProductAdd() {
                   <MenuItem key={status.approval_status_id} value={status.approval_status_id}>{status.status_name}</MenuItem>
                 ))}
               </Select>
-            </FormControl>
+            </FormControl> */}
           </Grid>
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary">
