@@ -317,57 +317,7 @@ const getCartItems = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-const getProducts = async (req, res) => {
-  try {
-    const user = await User.findOne({ where: { email: req.user.email } });
 
-    const favoriteProductsIds = await UserFavoriteProduct.findAll({
-      where: { user_id: user.user_id },
-      attributes: ['product_id']
-    }).then(favs => favs.map(fav => fav.product_id));
-
-    let products = await sellerProduct.findAll({
-      where: { is_active: 1, },
-      include: [{
-        model: Seller
-      },
-      {
-        model: Product,
-        include: [{
-          model: Brand
-        },
-        {
-          model: Category
-        }]
-      }],
-      order: [['price', 'ASC']], // Fiyata göre sırala
-    });
-
-    // Ürünleri benzersiz hale getir ve en düşük fiyatlı olanı seç
-    const uniqueProductsMap = new Map();
-    products.forEach(product => {
-      const productId = product.product.product_id;
-      if (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price) {
-        uniqueProductsMap.set(productId, product);
-      }
-    });
-    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
-
-    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
-      const isFavorite = favoriteProductsIds.includes(product.product.product_id);
-      const stockStatus = product.stock_quantity === 0 ? 'Stokta yok' : 'Stokta var';
-      return {
-        ...product.toJSON(),
-        isFavorite: isFavorite, // FAVORİ DURUMU
-        stockStatus: stockStatus //STOK DURUMU
-      };
-    });
-
-    return res.status(200).json(productsWithFavoritesAndPrice);
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-}
 
 //LİSTE İŞLEMLERİ
 const getLists = async (req, res) => {
@@ -1570,32 +1520,22 @@ const getAnsweredQuestionsForProduct = async (req, res) => {
 
 // SLUG İLE VERİ ÇEKME İŞLEMLERİ
 
-const getProductsBySlug = async (req, res) => {
-
-}
-const getProductsBySellerSlug = async (req, res) => {
-  const { productSlug } = req.params;
-  const { mg } = req.query; // Mağaza slug'ı query parametresinden alınır
+//TÜm ürünleri çekme
+const getProducts = async (req, res) => {
   try {
-    let seller = null;
-    if (mg) {
-      seller = await Seller.findOne({ where: { slug: mg } });
-      if (!seller) {
-        return res.status(404).json({ message: 'Belirtilen satıcı bulunamadı.' });
+    let favoriteProductsIds = [];
+    if (req.user && req.user.email) {
+      const user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
       }
     }
-    const product = await Product.findOne({ where: { slug: productSlug } });
 
-    if (!product) {
-      return res.status(404).json({ success: false, message: 'Ürün bulunamadı' });
-    }
-
-    const products = await sellerProduct.findOne({
-      where: {
-        product_id: product.product_id,
-        seller_id: seller.seller_id,
-        is_active: 1
-      },
+    let products = await sellerProduct.findAll({
+      where: { is_active: 1 },
       include: [{
         model: Seller
       },
@@ -1608,20 +1548,308 @@ const getProductsBySellerSlug = async (req, res) => {
           model: Category
         }]
       }],
-    })
+      order: [['price', 'ASC']], // Fiyata göre sırala
+    });
 
-    return res.status(200).json(products);
+    // Ürünleri benzersiz hale getir, en düşük fiyatlı ve stokta olanı seç
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.product.product_id;
+      if (product.stock > 0 && (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price)) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = favoriteProductsIds.includes(product.product.product_id);
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite: req.user && req.user.email ? isFavorite : undefined, // Giriş yapılmışsa favori durumunu, yapmamışsa undefined döndür
+        stockStatus: stockStatus // STOK DURUMU
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+//Ürün bilgilerini çekme slug a göre
+const getProductsBySlug = async (req, res) => {
+  const { productSlug } = req.params; // Ürün slug'ı URL parametresinden alınır
+  try {
+    let user = null;
+    let favoriteProductsIds = [];
+    if (req.user) {
+      user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
+      }
+    }
+
+    const product = await Product.findOne({ where: { slug: productSlug } });
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Ürün bulunamadı' });
+    }
+
+    let products = await sellerProduct.findAll({
+      where: { product_id: product.product_id, is_active: 1 },
+      include: [{
+        model: Seller
+      }, {
+        model: Product,
+        include: [{
+          model: Brand
+        }, {
+          model: Category
+        }]
+      }],
+      order: [['price', 'ASC']], // Fiyata göre sırala
+    });
+
+    // Ürünleri benzersiz hale getir ve en düşük fiyatlı olanı seç
+    // Ve sadece favori ürünlerle ilgili işlemler giriş yapılmışsa gerçekleştirilir
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.product.product_id;
+      if (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite: req.user && req.user.email ? isFavorite : undefined, // Giriş yapılmışsa favori durumunu, yapmamışsa undefined döndür
+        stockStatus: stockStatus //STOK DURUMU
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+//Eğer satıcı girilmemişse sistemdeki en ucuz ürünü getirir.
+const getProductsBySellerSlug = async (req, res) => {
+  const { productSlug } = req.params; // Ürün slug'ı URL parametresinden alınır
+  const { mg } = req.query; // Mağaza slug'ı query parametresinden alınır
+  try {
+    let user = null;
+    let favoriteProductsIds = [];
+    if (req.user) {
+      user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
+      }
+    }
+
+    const product = await Product.findOne({ where: { slug: productSlug } });
+    if (!product) {
+      return res.status(404).json({ success: false, message: 'Ürün bulunamadı' });
+    }
+
+    // Öncelikle mg değerine göre satıcıyı bulmaya çalış
+    let seller = await Seller.findOne({ where: { slug: mg } });
+    let productsQuery = { product_id: product.product_id, is_active: 1 };
+
+    // Eğer mg değeri ile satıcı bulunamazsa, bu sorgu koşulunu kaldır (herhangi bir satıcının ürününü getir)
+    if (!seller) {
+      productsQuery = { ...productsQuery }; // Satıcı sınırlamasını kaldır
+    } else {
+      productsQuery = { ...productsQuery, seller_id: seller.seller_id }; // Belirli bir satıcı için sınırla
+    }
+
+    let products = await sellerProduct.findAll({
+      where: productsQuery,
+      include: [{
+        model: Seller
+      }, {
+        model: Product,
+        include: [{
+          model: Brand
+        }, {
+          model: Category
+        }]
+      }],
+      order: [['price', 'ASC']], // Fiyata göre sırala
+    });
+
+    if (products.length === 0) {
+      // Eğer belirli bir satıcıya ait ürün yoksa, genel sorgulama yap
+      products = await sellerProduct.findAll({
+        where: { product_id: product.product_id, is_active: 1 },
+        include: [{ model: Seller }, { model: Product, include: [{ model: Brand }, { model: Category }] }],
+        order: [['price', 'ASC']],
+      });
+    }
+
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.product.product_id;
+      if (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite: isFavorite, // FAVORİ DURUMU
+        stockStatus: stockStatus //STOK DURUMU
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+// Kategoriye göre ürün çekme
 const getProductsByCategorySlug = async (req, res) => {
+  const { categorySlug } = req.params; // Kategori slug'ı URL parametresinden alınır
 
+  try {
+    let user = null;
+    let favoriteProductsIds = [];
+
+    // Eğer kullanıcı giriş yapmışsa, favori ürünlerin ID'lerini al
+    if (req.user) {
+      user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
+      }
+    }
+
+    // İlgili kategoriyi bul
+    const category = await Category.findOne({ where: { slug: categorySlug } });
+    if (!category) {
+      return res.status(404).json({ success: false, message: 'Kategori bulunamadı' });
+    }
+
+    // Kategoriye ait ürünleri bul
+    let products = await sellerProduct.findAll({
+      where: {
+        is_active: 1,
+      },
+      include: [{
+        model: Product,
+        required: true, // Bu, INNER JOIN'e benzer bir davranış sergiler
+        where: { category_id: category.id },
+        include: [{
+          model: Brand
+        }, {
+          model: Category
+        }]
+      }],
+      order: [['price', 'ASC']]
+    });
+
+
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.product.product_id;
+      if (product.stock > 0 && (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price)) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = favoriteProductsIds.includes(product.product.product_id);
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite: req.user && req.user.email ? isFavorite : undefined, // Giriş yapılmışsa favori durumunu, yapmamışsa undefined döndür
+        stockStatus: stockStatus // STOK DURUMU
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
 }
+// Markaya göre ürün çekme
 const getProductsByBrandSlug = async (req, res) => {
+  const { brandSlug } = req.params; // Marka slug'ı URL parametresinden alınır
 
+  try {
+    let user = null;
+    let favoriteProductsIds = [];
+
+    // Eğer kullanıcı giriş yapmışsa, favori ürünlerin ID'lerini al
+    if (req.user) {
+      user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
+      }
+    }
+
+    // İlgili markayı bul
+    const brand = await Brand.findOne({ where: { slug: brandSlug } });
+    if (!brand) {
+      return res.status(404).json({ success: false, message: 'Marka bulunamadı' });
+    }
+
+    // Markaya ait ürünleri bul
+    let products = await sellerProduct.findAll({
+      include: [{
+        model: Product,
+        where: { brand_id: brand.brand_id },
+        include: [{ model: Brand }, { model: Category }]
+      }],
+      where: { is_active: 1 },
+      order: [['price', 'ASC']]
+    });
+
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.product.product_id;
+      if (product.stock > 0 && (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price)) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = favoriteProductsIds.includes(product.product.product_id);
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite: req.user && req.user.email ? isFavorite : undefined, // Giriş yapılmışsa favori durumunu, yapmamışsa undefined döndür
+        stockStatus: stockStatus // STOK DURUMU
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
 }
+
 
 
 
@@ -1651,5 +1879,5 @@ module.exports = {
   toggleFollowSeller, checkFollowStatus, getFollowedSellers,
   createReturnRequest, getUserReturnRequests, cancelReturnRequest,
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
-  getProductsBySellerSlug
+  getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug
 };

@@ -42,4 +42,36 @@ const roleCheckMiddleware = (allowedRoles) => {
         }
     };
 };
-module.exports = { authMiddleware, roleCheckMiddleware };
+// authOptionalMiddleware.js
+const authOptionalMiddleware = (req, res, next) => {
+    // Authorization header'dan token'ı al
+    const authHeader = req.headers.authorization;
+
+    // Token var mı ve "Bearer " ile başlıyor mu kontrol et
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        // Eğer token yoksa veya format yanlışsa, req.user'ı boş olarak ayarla ve sonraki middleware'e geç
+        req.user = null;
+        return next();
+    }
+
+    // "Bearer " önekini kaldır ve token'ı al
+    const token = authHeader.split(' ')[1];
+
+    try {
+        // Token'ı doğrula
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        // Token doğrulandıktan sonra, decoded bilgisini request nesnesine ekle
+        req.user = decoded;
+
+        // Sonraki middleware'e geç
+        next();
+    } catch (error) {
+        // Token doğrulanamazsa, req.user'ı boş olarak ayarla ve sonraki middleware'e geç
+        req.user = null;
+        next();
+    }
+};
+
+
+module.exports = { authMiddleware, roleCheckMiddleware, authOptionalMiddleware };
