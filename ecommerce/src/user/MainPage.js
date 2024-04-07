@@ -15,6 +15,7 @@ function MainPage() {
         <Categories />
         {/* Burada diğer içerik bileşenleri yer alabilir */}
       </Box>
+      
       <Footer />
     </Box>
   );
