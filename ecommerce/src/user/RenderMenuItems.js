@@ -10,18 +10,18 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import HomeWorkIcon from '@mui/icons-material/HomeWork';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 
-// Menü öğelerinin tanımı
+
 const menuItems = [
   { id: 'orders', label: 'Siparişlerim', icon: <ShoppingCartIcon />, link: "/user/orders" },
   { id: 'profile', label: 'Kullanıcı Bilgileri', icon: <PersonOutlineIcon />, link: "/user/profile" },
+  { id: 'address-info', label: 'Adres Bilgilerim', icon: <HomeWorkIcon />, link: "/user/address-info" },
+  { id: 'favorites', label: 'Favorilerim', icon: <StarBorderIcon />, link: "/user/favorites" },
+  { id: 'card-preferences', label: 'Kayıtlı Kartlarım', icon: <CreditCardIcon />, link: "/user/card-preferences" },
   { id: 'coupons', label: 'İndirim Kuponlarım', icon: <CardGiftcardIcon />, link: "/user/coupons" },
   { id: 'reviews', label: 'Değerlendirmelerim', icon: <StarBorderIcon />, link: "/user/reviews" },
-  { id: 'address-info', label: 'Adres Bilgilerim', icon: <HomeWorkIcon />, link: "/user/address-info" },
-  { id: 'card-preferences', label: 'Kayıtlı Kartlarım', icon: <CreditCardIcon />, link: "/user/card-preferences" }
 ];
 
 
-// selectedItem ve setSelectedItem argümanlarını kabul edecek şekilde fonksiyonu güncelleyin
 const renderMenuItems = (selectedItem, setSelectedItem) => {
     return menuItems.map(item => (
       <Link to={item.link} key={item.id} style={{ textDecoration: 'none', color: 'inherit' }}>

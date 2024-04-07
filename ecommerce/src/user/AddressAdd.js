@@ -75,7 +75,7 @@ const AddAddressPage = () => {
     street: '',
     city: '',
     state: '',
-    country: '',
+   
     postal_code: ''
   });
 
@@ -169,15 +169,7 @@ const AddAddressPage = () => {
                   onChange={handleChange}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Ülke"
-                  name="country"
-                  value={addressDetails.country}
-                  onChange={handleChange}
-                />
-              </Grid>
+          
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth

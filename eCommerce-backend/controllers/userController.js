@@ -926,7 +926,7 @@ const cancelOrder = async (req, res) => {
 const getFavorites = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email: req.user.email } });
-    const favorites = await Product.findAll({ where: { user_id: user.user_id } });
+    const favorites = await UserFavoriteProduct.findAll({ where: { user_id: user.user_id } });
     return res.status(200).json(favorites);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

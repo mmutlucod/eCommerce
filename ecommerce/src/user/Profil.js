@@ -9,12 +9,43 @@ import {
   Typography,
   Divider,
   Switch,
-  FormControlLabel,Container
+  FormControlLabel,Container, CssBaseline,
+  ThemeProvider,
+  createTheme
 } from '@mui/material';
 import Navbar from '../components/UserNavbar'; 
 import { renderMenuItems } from './RenderMenuItems';
 import api from '../api/api'; // API iletişimi sağlayan modülünüz
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#4B0082', // Navbar ve butonlar için mor renk
+    },
+    secondary: {
+      main: '#FFD700', // İkincil eylemler ve butonlar için sarı renk
+    },
+    background: {
+      default: '#f4f4f4', // Sayfanın arka plan rengi
+    },
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // Kart gölgelendirme
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontWeight: 'bold', // Buton yazı tipi kalınlığı
+        },
+      },
+    },
+  },
+});
 const UserProfile = () => {
   const [selectedItem, setSelectedItem] = useState('profile');
   // Kullanıcı bilgileri ve şifre güncellemesi için state tanımlamaları
@@ -82,6 +113,8 @@ const UserProfile = () => {
   
   return (
     <>
+    <ThemeProvider theme={theme}>
+      <CssBaseline /> 
       <Navbar />
       <Container maxWidth="lg" sx={{ mt: 8 }}>
         <Grid container spacing={3} justifyContent="center">
@@ -142,6 +175,7 @@ const UserProfile = () => {
         </Box>
       </Grid>
       </Container>
+      </ThemeProvider>
     </>
   );
 };

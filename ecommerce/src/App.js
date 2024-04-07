@@ -25,6 +25,7 @@ import UserProfil from './user/Profil';
 import UserOrders from './user/Orders';
 import UserAddress from './user/Address';
 import UserAddressAdd from './user/AddressAdd';
+import UserFavorites from './user/Favorites';
 function App() {
   return (
     <AuthProvider>
@@ -49,6 +50,7 @@ function App() {
             <Route path="/seller/seller-add" element={<SellerAdd />} />
             <Route path="/seller/product" element={<SellerProduct />} />
 
+
             <Route path="/user/mainpage" element={< UserMainPage/>} />
             <Route path="/user/login" element={< UserRegister/>} />
             <Route path="/user/auth" element={< UserRegister/>} />
@@ -56,6 +58,7 @@ function App() {
             <Route path="/user/orders" element={< UserOrders/>} />
             <Route path="/user/address-info" element={< UserAddress/>} />
             <Route path="/user/address-add" element={< UserAddressAdd/>} />
+            <Route path="/user/favorites" element={< UserFavorites/>} />
           </Routes>
         </Router>
       </div>

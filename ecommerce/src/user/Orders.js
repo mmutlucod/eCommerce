@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+
 import {
   Box,
   Grid,
@@ -11,13 +12,45 @@ import {
   CardContent,
   CardActions,
   Container,
-  IconButton
+  IconButton,  CssBaseline,
+  ThemeProvider,
+  createTheme
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Navbar from '../components/UserNavbar';
 import { renderMenuItems } from './RenderMenuItems';
 import api from '../api/api';
 
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#4B0082', // Navbar ve butonlar için mor renk
+    },
+    secondary: {
+      main: '#FFD700', // İkincil eylemler ve butonlar için sarı renk
+    },
+    background: {
+      default: '#f4f4f4', // Sayfanın arka plan rengi
+    },
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // Kart gölgelendirme
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontWeight: 'bold', // Buton yazı tipi kalınlığı
+        },
+      },
+    },
+  },
+});
 const OrdersPage = () => {
   const [selectedItem, setSelectedItem] = useState('orders'); // Başlangıç değeri olarak 'orders'
   const [orders, setOrders] = useState([]); // Sipariş listesi için state
@@ -38,6 +71,8 @@ const OrdersPage = () => {
 
   return (
     <>
+        <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Navbar />
       <Container maxWidth="lg" sx={{ mt: 8 }}>
         <Grid container spacing={3} justifyContent="center">
@@ -89,6 +124,7 @@ const OrdersPage = () => {
         </Box>
         </Grid>
       </Container>
+      </ThemeProvider>
     </>
   );
 };
