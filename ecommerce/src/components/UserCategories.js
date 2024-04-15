@@ -9,6 +9,7 @@ const CategoriesBar = () => {
     const fetchCategories = async () => {
       try {
         const response = await api.get('/admin/categories');
+        
         setCategories(response.data);
       } catch (error) {
         console.error("An error occurred while fetching the categories:", error);

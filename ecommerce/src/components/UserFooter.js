@@ -118,7 +118,7 @@ const Footer = () => {
           <Typography variant="body2">
             © Telif Hakkı 2024 noVa
           </Typography>
-          {/* ... Ekstra bilgiler ve logolar ... */}
+          
         </Box>
       </Box>
     

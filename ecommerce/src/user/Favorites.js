@@ -1,26 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box,
-  Container,
-  Typography,
-  Paper,
-  List,
-  Grid,
   Card,
-  CardMedia,
-  CardContent,
+  CardActionArea,
   CardActions,
+  CardContent,
+  CardMedia,
+  Typography,
   Button,
+  Grid,
   IconButton,
-  CssBaseline,
   ThemeProvider,
-  createTheme
+  createTheme,
+  CssBaseline,
+  Container,
+  List,
+  ListItem,
+  ListItemText
 } from '@mui/material';
+import { renderMenuItems } from './RenderMenuItems';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import Navbar from '../components/UserNavbar'; // Navbar komponenti
-import { renderMenuItems } from './RenderMenuItems'; // Yan menü komponenti
-import api from '../api/api'; // API işlemleri için
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import CloseIcon from '@mui/icons-material/Close';
+import Navbar from '../components/UserNavbar';
+import api from '../api/api';
 
+const ProductCard = ({ product, onRemove }) => (
+    <Card sx={{ maxWidth: 345, m: 2 }}>
+      <CardActionArea>
+        <CardMedia
+          component="img"
+          height="140"
+          image={product.imageUrl}
+          alt={product.name}
+        />
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
+            {product.name}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {product.description}
+          </Typography>
+          <Typography variant="h6" color="primary">
+            {`${product.price} TL`}
+          </Typography>
+          {/* Add other product details here */}
+        </CardContent>
+      </CardActionArea>
+      <CardActions disableSpacing>
+        <IconButton aria-label="remove from favorites" onClick={() => onRemove(product.id)}>
+          <CloseIcon />
+        </IconButton>
+        <Box flexGrow={1} />
+        <IconButton aria-label="add to cart">
+          <ShoppingCartIcon />
+        </IconButton>
+      </CardActions>
+    </Card>
+  );
 const theme = createTheme({
     palette: {
       primary: {
@@ -80,51 +117,63 @@ const FavoritesPage = () => {
       console.error('Ürün favorilerden kaldırılırken hata oluştu:', error);
     }
   };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Navbar />
-      <Container maxWidth="lg" sx={{ mt: 8 }}>
-        <Grid container spacing={3}>
-          {/* Side menu */}
+      <Container maxWidth="lg">
+        <Grid container spacing={2}>
           <Grid item xs={12} md={3}>
-            <Paper elevation={0} square>
-              <List>
-                {renderMenuItems(selectedItem, setSelectedItem)}
-              </List>
-            </Paper>
+            <List component="nav" aria-label="sidebar navigation">
+              {renderMenuItems(selectedItem, setSelectedItem)}
+            </List>
           </Grid>
-          {/* Favorite items content */}
           <Grid item xs={12} md={9}>
             <Typography variant="h4" gutterBottom>
               Beğendiklerim
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* Burada favori ürünler listelenir */}
+            <Grid container spacing={2}>
               {favorites.length > 0 ? (
-                favorites.map((item, index) => (
-                  <Card key={index} sx={{ display: 'flex', marginBottom: 2 }}>
-                    <CardContent sx={{ flex: '1 0 auto' }}>
-                      <Typography component="div" variant="h5">
-                        {item.title}
-                      </Typography>
-                      {/* Add other item details you want to show */}
-                    </CardContent>
-                    <CardActions>
-                      <IconButton aria-label="remove from favorites" onClick={() => handleRemoveFavorite(item.id)}>
-                        <FavoriteIcon />
-                      </IconButton>
-                    </CardActions>
-                  </Card>
+                favorites.map((product) => (
+                  <Grid item key={product.id} xs={12} sm={6} md={4}>
+                    <Card>
+                      <CardActionArea>
+                        <CardMedia
+                          component="img"
+                          image={product.imageUrl}
+                          alt={product.name}
+                        />
+                        <CardContent>
+                          <Typography gutterBottom variant="h5" component="h2">
+                            {product.name}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary" component="p">
+                            {product.description}
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                      <CardActions>
+                        <IconButton aria-label="remove from favorites" onClick={() => handleRemoveFavorite(product.id)}>
+                          <FavoriteIcon />
+                        </IconButton>
+                        <Button size="small" color="primary">
+                          Sepete Ekle
+                        </Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
                 ))
               ) : (
-                <Typography variant="subtitle1">Favori ürününüz bulunmamaktadır.</Typography>
+                <Typography variant="subtitle1">Henüz favori ürününüz yok.</Typography>
               )}
-            </Box>
+            </Grid>
           </Grid>
         </Grid>
       </Container>
     </ThemeProvider>
   );
-}  
+};
 
 export default FavoritesPage;
