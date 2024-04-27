@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/userController');
-const { authMiddleware, roleCheckMiddleware } = require('../middlewares/AuthMiddleware');
+const { authMiddleware, roleCheckMiddleware, authOptionalMiddleware } = require('../middlewares/AuthMiddleware');
 
 
 // KULLANICI İŞLEMLERİ
@@ -19,7 +19,7 @@ router.get('/my-basket', authMiddleware, userController.getCartItems);
 router.post('/add-item', authMiddleware, userController.addItem);
 router.post('/increase-item', authMiddleware, userController.increaseItem);
 router.post('/delete-item', authMiddleware, userController.deleteItem);
-router.get('/products', authMiddleware, userController.getProducts)
+
 
 //LİSTE İŞLEMLERİ
 
@@ -101,6 +101,12 @@ router.get('/products/:productId/answered-questions', userController.getAnswered
 
 //SLUG KULLANIMI
 
-router.get('/products/:productSlug', userController.getProductsBySellerSlug);
+router.get('/products', authOptionalMiddleware, userController.getProducts);
+router.get('/products:/:productSlug', authOptionalMiddleware, userController.getProductsBySlug);
+router.get('/products/:productSlug', authOptionalMiddleware, userController.getProductsBySellerSlug);
+router.get('/category/:categorySlug', authOptionalMiddleware, userController.getProductsByCategorySlug);
+router.get('/brand/:brandSlug', authOptionalMiddleware, userController.getProductsByBrandSlug);
+
+
 
 module.exports = router;
