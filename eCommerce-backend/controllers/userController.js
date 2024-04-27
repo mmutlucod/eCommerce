@@ -23,6 +23,7 @@ const Return = require("../models/return");
 const ReturnItem = require("../models/returnItem");
 const productQuestion = require("../models/productQuestion");
 const { Op, Sequelize } = require("sequelize");
+const sequelize = require("../utility/db");
 
 //KULLANICI İŞLEMLERİ 
 
@@ -876,7 +877,7 @@ const cancelOrder = async (req, res) => {
 const getFavorites = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email: req.user.email } });
-favorites = await UserFavoriteProduct.findAll({
+    favorites = await UserFavoriteProduct.findAll({
       where: { user_id: user.user_id },
       include: [
         {
@@ -1561,13 +1562,39 @@ const getProducts = async (req, res) => {
     });
     const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
 
+
+    for (let product of uniqueLowestPriceProducts) {
+      const ratingsData = await ProductComment.findAll({
+        include: [{
+          model: sellerProduct,
+          attributes: [], // sellerProduct'tan herhangi bir özellik çekmeyeceğiz
+          include: [{
+            model: Product,
+            where: { product_id: product.product_id },
+            attributes: [] // İç içe include yapısı kullanıyorsak, bu seviyede de attributes boş bırakılmalı
+          }]
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'], // Ortalama puanı hesapla
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount'] // Yorum sayısını hesapla
+        ],
+        raw: true
+      });
+
+      // Eğer hiç yorum yoksa, ortalamaRating ve RatingCount 0 olacak şekilde ayarla
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
+    }
+
     const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
       const isFavorite = favoriteProductsIds.includes(product.product.product_id);
       const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
       return {
         ...product.toJSON(),
         isFavorite: req.user && req.user.email ? isFavorite : undefined, // Giriş yapılmışsa favori durumunu, yapmamışsa undefined döndür
-        stockStatus: stockStatus // STOK DURUMU
+        stockStatus: stockStatus, // STOK DURUMU
+        commentAvg: product.dataValues.commentAvg,
+        commentCount: product.dataValues.commentCount
       };
     });
 
