@@ -124,7 +124,7 @@ const ProductCards = () => {
                   readOnly
                 />
                 <CustomTypography variant="body2">
-                  {`(${product.commentCount || 0} reviews)`}
+                  {`(${product.commentCount || 0} değerlendirme)`}
                 </CustomTypography>
               </Box>
               <CustomTypography variant="h6" mt={1}>
@@ -133,7 +133,7 @@ const ProductCards = () => {
             </CustomCardContent>
             <CardActions>
               <CustomButton size="medium" fullWidth>
-                Add to Cart
+                Sepete Ekle
               </CustomButton>
             </CardActions>
           </CustomCard>
