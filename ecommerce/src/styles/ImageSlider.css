@@ -1,0 +1,11 @@
+/* ImageSlider.css */
+.slick-dots li button:before {
+    font-size: 12px; /* Nokta boyutunu ayarla */
+    color: #000; /* İçinde bulunmadığınız resimlerin dot rengi (koyu) */
+    opacity: 0.75; /* Opaklık vererek görünürlüğünü azalt */
+}
+
+.slick-dots li.slick-active button:before {
+    color: #fff; /* İçinde bulunduğunuz resmin dot rengi (beyaz) */
+    opacity: 1; /* Opaklık tam */
+}

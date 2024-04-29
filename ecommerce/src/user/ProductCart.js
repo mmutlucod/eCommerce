@@ -6,20 +6,73 @@ import Typography from '@mui/material/Typography';
 import CardActions from '@mui/material/CardActions';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import Rating from '@mui/material/Rating';
+import CustomBadge from '@mui/material/Badge';
+import { styled } from '@mui/material/styles';
+import api from '../api/api';
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import ImageSlider from '../components/ImageSlider';
+import { images } from '../App';
+const CustomCard = styled(Card)(({ theme }) => ({
+  flex: '1 0 calc(25% - 16px)', // Hesaplama her kart için %25 genişlik ve aralarında 8px boşluk sağlar
+  maxWidth: 300, // Maksimum genişlik
+  margin: '20px 8px', // Dikey marjin ve yatay padding
+  transition: '0.3s',
+  boxShadow: '0 8px 40px -12px rgba(0,0,0,0.1)',
+  '&:hover': {
+    boxShadow: '0 16px 70px -12.125px rgba(0,0,0,0.1)',
+    '& $CardMedia': {
+      transform: 'scale(1.05)',
+    },
+    cursor: 'pointer',
+  },
+}));
 
-import api from '../api/api'; // api.js dosyanız varsayılan adıyla.
 
-const ProductCard = () => {
-  const [product, setProduct] = useState(null);
+const CustomCardMedia = styled(CardMedia)({
+  paddingTop: '56.25%',
+  transition: 'transform 0.3s ease-in-out',
+});
+
+const CustomCardContent = styled(CardContent)({
+  textAlign: 'left',
+  padding: '16px',
+});
+
+const CustomTypography = styled(Typography)({
+  color: '#2c3e50',
+  fontWeight: 'bold',
+});
+
+const CustomButton = styled(Button)(({ theme }) => ({
+  margin: 'auto',
+  display: 'block',
+  
+  backgroundColor: '#e67e22',
+  color: 'white',
+  transition: 'background-color 0.2s',
+  '&:hover': {
+    backgroundColor: '#d35400',
+  },
+}));
+
+const ProductNameTypography = styled(Typography)(({ theme }) => ({
+  color: theme.palette.text.secondary, // Bu kısım metnin rengini ayarlar
+  marginLeft: theme.spacing(1), // Marka ve model arasındaki boşluk için
+}));
+const ProductCards = () => {
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [hata, setHata] = useState('');
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await api.get('user/product');
-        setProduct(response.data);
+        const response = await api.get('user/products');
+        setProducts(response.data);
       } catch (err) {
         setHata(err.message);
       } finally {
@@ -27,51 +80,67 @@ const ProductCard = () => {
       }
     };
 
-    fetchProduct();
+    fetchProducts();
   }, []);
+  const handleCardClick = (productId) => {
+    // İstenen işlemi burada gerçekleştirebilirsiniz, örneğin bir sayfaya yönlendirme
+    console.log(`Ürün ID'si ${productId} olan kart tıklandı.`);
+    // Yönlendirme için React Router kullanıyorsanız:
+    // history.push(`/product/${productId}`);
+  };
 
   if (loading) return <div>Yükleniyor...</div>;
   if (hata) return <div>Hata: {hata}</div>;
-
+ 
+  
   return (
-    product && (
-      <Card sx={{ maxWidth: 345 }}>
-        <CardMedia
-          component="img"
-          height="194"
-          image={product.imageUrl}
-          alt={product.name}
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="div">
-            {product.name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {product.description}
-          </Typography>
-          <Typography variant="h5" color="primary">
-            {product.price} TL
-          </Typography>
-          {product.discountPrice && (
-            <Typography variant="body2" color="text.secondary" sx={{ textDecoration: 'line-through' }}>
-              {product.originalPrice} TL
-            </Typography>
-          )}
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '8px' }}>
-            <Typography variant="body2">
-              {product.rating} Yıldız
-            </Typography>
-            <Typography variant="body2">
-              {product.numberOfReviews} Değerlendirme
-            </Typography>
-          </Box>
-        </CardContent>
-        <CardActions>
-          <Button size="small">Sepete Ekle</Button>
-        </CardActions>
-      </Card>
-    )
+    <>
+      <ImageSlider images={images}/>
+      <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
+        {products.map((product) => (
+          <CustomCard key={product.product_id}
+                      onClick={() => handleCardClick(product.product_id)}>
+            {product.fastDelivery && (
+              <CustomBadge color="error" badgeContent="Fast Delivery" />
+            )}
+            <CustomCardMedia
+              image={product.imageUrl}
+              title={product.product.name}
+            />
+            <CustomCardContent>
+              <Box display="flex" justifyContent="start" alignItems="center">
+                <CustomTypography variant="subtitle1" noWrap>
+                  {product.product.Brand.brand_name || 'Unknown Brand'}
+                </CustomTypography>
+                <ProductNameTypography variant="subtitle1" noWrap>
+                  {product.product.name}
+                </ProductNameTypography>
+              </Box>
+              <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
+                <Rating
+                  name="half-rating-read"
+                  value={parseFloat(product.commentAvg) || 0}
+                  precision={0.5}
+                  readOnly
+                />
+                <CustomTypography variant="body2">
+                  {`(${product.commentCount || 0} reviews)`}
+                </CustomTypography>
+              </Box>
+              <CustomTypography variant="h6" mt={1}>
+                {product.price ? `${product.price.toFixed(2)} TL` : 'Price Unknown'}
+              </CustomTypography>
+            </CustomCardContent>
+            <CardActions>
+              <CustomButton size="medium" fullWidth>
+                Add to Cart
+              </CustomButton>
+            </CardActions>
+          </CustomCard>
+        ))}
+      </Box>
+    </>
   );
 };
 
-export default ProductCard;
+export default ProductCards;

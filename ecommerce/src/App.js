@@ -26,7 +26,18 @@ import UserOrders from './user/Orders';
 import UserAddress from './user/Address';
 import UserAddressAdd from './user/AddressAdd';
 import UserFavorites from './user/Favorites';
+import ProductCart from './user/ProductCart';
+
+
+export const images = [
+  "https://n11scdn.akamaized.net/a1/org/24/04/26/50/30/87/81/38/19/97/83/96/43595415462427475004.jpg",
+  "https://n11scdn.akamaized.net/a1/org/24/04/26/63/89/62/43/75/83/27/68/78/01130236963544872031.jpg",
+  "https://n11scdn.akamaized.net/a1/org/24/04/24/81/55/40/56/74/28/01/14/99/1646350707450756961.jpg"
+];
 function App() {
+
+  
+
   return (
     <AuthProvider>
       <div className="App">
@@ -59,8 +70,10 @@ function App() {
             <Route path="/user/address-info" element={< UserAddress/>} />
             <Route path="/user/address-add" element={< UserAddressAdd/>} />
             <Route path="/user/favorites" element={< UserFavorites/>} />
+            
           </Routes>
         </Router>
+      
       </div>
     </AuthProvider>
   );
