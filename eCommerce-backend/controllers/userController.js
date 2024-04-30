@@ -1974,5 +1974,5 @@ module.exports = {
   createReturnRequest, getUserReturnRequests, cancelReturnRequest,
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug,
-  getCategories, getSubCategoriesById
+  getCategories, getSubCategoriesById, searchProducts
 };
