@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
-import CardMedia from '@mui/material/CardMedia';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CardActions from '@mui/material/CardActions';
@@ -10,16 +9,17 @@ import Rating from '@mui/material/Rating';
 import CustomBadge from '@mui/material/Badge';
 import { styled } from '@mui/material/styles';
 import api from '../api/api';
-import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ImageSlider from '../components/ImageSlider';
 import MenuBar from '../components/MenuBar';
 import { images } from '../App';
 import ImageCarousel from '../components/ImageCarousel'
+
 const CustomCard = styled(Card)(({ theme }) => ({
   flex: '1 0 calc(25% - 16px)', // Hesaplama her kart için %25 genişlik ve aralarında 8px boşluk sağlar
   maxWidth: 250, // Maksimum genişlik
+  minHeight: 380,
   margin: '20px 8px', // Dikey marjin ve yatay padding
   transition: '0.3s',
   boxShadow: '0 8px 40px -12px rgba(0,0,0,0.1)',
@@ -33,10 +33,10 @@ const CustomCard = styled(Card)(({ theme }) => ({
 }));
 
 
-const CustomCardMedia = styled(CardMedia)({
-  paddingTop: '56.25%',
-  transition: 'transform 0.3s ease-in-out',
-});
+// const CustomCardMedia = styled(CardMedia)({
+//   paddingTop: '56.25%',
+//   transition: 'transform 0.3s ease-in-out',
+// });
 
 const CustomCardContent = styled(CardContent)({
   textAlign: 'left',
