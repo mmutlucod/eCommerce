@@ -1918,12 +1918,31 @@ const getProductsByBrandSlug = async (req, res) => {
 
 // ARAMA İŞLEMLERİ
 
-// const searchProducts = async (req, res) => {
+const searchProducts = async (req, res) => {
 
-//   try {
-//     const { search } = req.query;
-//   }
-// }
+  try {
+    const { search } = req.query;
+    const products = await sellerProduct.findAll({
+      where: {
+        [Op.or]: [
+          { product_name: { [Op.like]: `%${query}%` } },
+          { productDescription: { [Op.like]: `%${query}%` } },
+          { productBrand: { [Op.like]: `%${query}%` } },
+          { '$Category.category_name$': { [Op.like]: `%${query}%` } }
+        ]
+      },
+      include: [{
+        model: Category, // Ürün kategorisi ilişkilendirme
+        as: 'SubCategories', // Modelinizde belirtilen 'as' ile uyumlu olmalı
+      }]
+    });
+
+    res.json(products);
+  } catch (error) {
+    console.error('Search error:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+}
 
 
 
