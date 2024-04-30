@@ -1546,6 +1546,7 @@ const getSubCategoriesById = async (req, res) => {
       include: [
         {
           model: Category,
+          as: 'SubCategories'
         }
       ]
     });
@@ -1917,7 +1918,12 @@ const getProductsByBrandSlug = async (req, res) => {
 
 // ARAMA İŞLEMLERİ
 
-const get
+const searchProducts = async (req, res) => {
+
+  try {
+    const { search } = req.query;
+  }
+}
 
 
 
