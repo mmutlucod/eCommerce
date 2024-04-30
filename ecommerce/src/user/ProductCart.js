@@ -14,6 +14,7 @@ import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ImageSlider from '../components/ImageSlider';
+import MenuBar from '../components/MenuBar';
 import { images } from '../App';
 const CustomCard = styled(Card)(({ theme }) => ({
   flex: '1 0 calc(25% - 16px)', // Hesaplama her kart için %25 genişlik ve aralarında 8px boşluk sağlar
@@ -96,6 +97,7 @@ const ProductCards = () => {
   return (
     <>
       <ImageSlider images={images}/>
+      <MenuBar/>
       <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
         {products.map((product) => (
           <CustomCard key={product.product_id}
