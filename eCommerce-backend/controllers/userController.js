@@ -1519,44 +1519,6 @@ const getAnsweredQuestionsForProduct = async (req, res) => {
   }
 };
 
-//KATEGORİ ÇEKME
-
-const getCategories = async (req, res) => {
-  try {
-    const categories = await Category.findAll({
-      where: { approval_status_id: 1, category_id: null }, //SADECE ANA KATEGORİLER GELECEK
-      include: [
-        {
-          model: Category,
-        }
-      ]
-    });
-
-    return res.status(200).json(categories);
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-}
-
-const getSubCategoriesById = async (req, res) => {
-  const { categoryId } = req.params;
-  try {
-    const categories = await Category.findAll({
-      where: { approval_status_id: 1, category_id: categoryId }, //SADECE ANA KATEGORİLER GELECEK
-      include: [
-        {
-          model: Category,
-          as: 'SubCategories',
-        }
-      ]
-    });
-
-    return res.status(200).json(categories);
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-}
-
 // SLUG İLE VERİ ÇEKME İŞLEMLERİ
 
 //TÜm ürünleri çekme
@@ -1916,16 +1878,6 @@ const getProductsByBrandSlug = async (req, res) => {
 }
 
 
-// ARAMA İŞLEMLERİ
-
-
-// const searchProducts = async (req, res) => {
-
-//   try {
-//     const { search } = req.query;
-//   }
-// }
-
 
 
 // Kullanıcı adı ve soyadını formatlayan yardımcı fonksiyon
@@ -1954,6 +1906,5 @@ module.exports = {
   toggleFollowSeller, checkFollowStatus, getFollowedSellers,
   createReturnRequest, getUserReturnRequests, cancelReturnRequest,
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
-  getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug,
-  getCategories, getSubCategoriesById
+  getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug
 };
