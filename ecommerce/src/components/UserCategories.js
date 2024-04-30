@@ -48,7 +48,7 @@ const CategoriesBar = () => {
       alignItems: 'center',
       flexWrap: 'wrap',
       padding: '10px',
-      backgroundColor: '#f9f9f9',  // Daha açık bir gri renk
+      backgroundColor: '#f0f0f0',  // Arka plan rengi ilk hali
     }}>
       {categories.map((category, index) => (
         <React.Fragment key={category.id}>
@@ -63,10 +63,10 @@ const CategoriesBar = () => {
                 textDecoration: 'none',
                 color: '#333',
                 fontWeight: 'bold',
-                fontSize: '1.1rem',  // Yazı boyutu arttırıldı
+                fontSize: '1.1rem',
                 padding: '0 8px',
                 '&:hover': {
-                  color: '#4B0082',  // Renk değişikliği üzerine gelince
+                  color: '#4B0082',
                 }
               }}
             >
@@ -80,13 +80,13 @@ const CategoriesBar = () => {
                 top: '100%',
                 zIndex: '1',
                 padding: '5px',
-                backgroundColor: '#f0f0f0',  
+                backgroundColor: 'white',  // Beyaz arka plan
                 boxShadow: '0 2px 5px rgba(0,0,0,0.15)'
               }}>
                 <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
                   {subCategories.map(sub => (
-                    <li key={sub.id} style={{ marginBottom: '12px', textAlign: 'left' }}>  
-                      <Link href={`/#${sub.name}`} sx={{ textDecoration: 'none', color: '#333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <li key={sub.id} style={{ marginBottom: '12px', textAlign: 'left' }}>
+                      <Link href={`/#${sub.name}`} sx={{ textDecoration: 'none', color: '#333', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold' }}>
                         {sub.category_name}
                         <ArrowForwardIosIcon sx={{ fontSize: '16px' }} /> 
                       </Link>

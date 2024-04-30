@@ -108,7 +108,6 @@ const ProductCards = () => {
               <CustomBadge color="error" badgeContent="Fast Delivery" />
 
             )}
-            {console.log(product.product.productImages[0].image_path)}
             <ImageCarousel images={product.product.productImages.map(img => img.image_path)} />
 
             <CustomCardContent>
@@ -127,12 +126,12 @@ const ProductCards = () => {
                   precision={0.5}
                   readOnly
                 />
-                <CustomTypography variant="body2">
-                  {`(${product.commentCount || 0} değerlendirme)`}
+                <CustomTypography variant="m" gap={100}>
+                  {`(${product.commentCount || 0})`}
                 </CustomTypography>
               </Box>
               <CustomTypography variant="h6" mt={1}>
-                {product.price ? `${product.price.toFixed(2)} TL` : 'Price Unknown'}
+                {product.price ? `${product.price.toFixed(2)} ₺` : 'Price Unknown'}
               </CustomTypography>
             </CustomCardContent>
             <CardActions>
