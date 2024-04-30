@@ -92,6 +92,12 @@ router.post('/create-product-question', authMiddleware, userController.askQuesti
 router.get('/my-questions', authMiddleware, userController.listMyQuestions);
 router.get('/products/:productId/answered-questions', userController.getAnsweredQuestionsForProduct); //Lokal işlem
 
+//KATEGORİ İŞLEMLERİ
+
+router.get('/categories', authOptionalMiddleware, userController.getCategories);
+router.get('/categories/:categoryId', authOptionalMiddleware, userController.getSubCategoriesById);
+
+
 //LOKAL İŞLEMLER
 // ürün sayfası => ürün bilgisi(açıklama, yorum, özellikler, kampanya**, ... )
 // ana sayfa => ürün bilgileri(foto,isim, marka), kategoriler(kategorilere göre ürün çekme),

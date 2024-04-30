@@ -9,7 +9,7 @@ const CategoriesBar = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await api.get('/admin/categories');
+        const response = await api.get('/user/categories');
         setCategories(response.data);
       } catch (error) {
         console.error("An error occurred while fetching the categories:", error);
