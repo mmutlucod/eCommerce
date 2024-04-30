@@ -106,9 +106,9 @@ const ProductCards = () => {
             {product.fastDelivery && (
               <CustomBadge color="error" badgeContent="Fast Delivery" />
             )}
-                {console.log(product)}
+                {/* {console.log(product.product.productImages[0].image_path)} */}
             <CustomCardMedia
-              // image={product.productImages.image_path || ''}
+              // image={product.product.productImages.image_path || ''}
               title={product.product.name}
             />
             <CustomCardContent>
