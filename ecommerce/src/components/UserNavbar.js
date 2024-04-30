@@ -2,30 +2,37 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Button, Badge } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import PersonIcon from '@mui/icons-material/Person';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+
+
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchModal from './SearchModal';
+ // Yolunuza göre düzenleyin
 
 export default function UserNavbar() {
     const navigate = useNavigate();
     const { token, logout } = useAuth();
     const [isSearchModalOpen, setSearchModalOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
     const handleOpenSearchModal = () => setSearchModalOpen(true);
     const handleCloseSearchModal = () => setSearchModalOpen(false);
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+        setDropdownOpen(true);
+    };
 
     return (
         <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
             <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                {/* Logo */}
                 <Box sx={{ backgroundColor: 'yellow', borderRadius: '10px 0 0 10px', display: 'flex', alignItems: 'center', py: '6px', px: '16px' }}>
                     <Typography variant="h6" noWrap sx={{ fontWeight: 'bold', color: '#4B0082' }}>
                         noVa
                     </Typography>
                 </Box>
-                {/* Arama Çubuğu */}
                 <Box sx={{ flexGrow: 1, backgroundColor: 'white', borderRadius: '0 4px 4px 0', display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
                     <InputBase
                         placeholder="Ürün, kategori, marka ara"
@@ -40,16 +47,15 @@ export default function UserNavbar() {
                                 height: '100%',
                             },
                         }}
+                        value={searchQuery}
+                        onChange={handleSearchChange}
                     />
                     <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: 'gray' }} onClick={handleOpenSearchModal}>
                         <SearchIcon />
                     </IconButton>
                 </Box>
-                {/* Dikey Ayırıcı */}
                 <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
-                {/* Diğer Navbar Öğeleri */}
                 <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
-                    {/* Teslimat Adresi */}
                     <IconButton color="inherit" onClick={() => navigate('/user/address-add')}>
                         <LocationOnIcon />
                     </IconButton>
@@ -57,9 +63,8 @@ export default function UserNavbar() {
                         Teslimat Adresi Ekle
                     </Typography>
                     <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
-                    {/* Profil ve Çıkış Yap */}
                     <IconButton color="inherit" onClick={() => navigate('/user/profile')}>
-                        <PersonIcon />
+                        <PersonOutlineIcon />
                     </IconButton>
                     {token ? (
                         <>
@@ -80,7 +85,6 @@ export default function UserNavbar() {
                             </Typography>
                         </>
                     )}
-                    {/* Sepet */}
                     <IconButton aria-label="show cart items" color="inherit">
                         <Badge badgeContent={4} color="secondary">
                             <ShoppingCartIcon />
@@ -88,6 +92,7 @@ export default function UserNavbar() {
                     </IconButton>
                 </Box>
             </Toolbar>
+            <SearchModal query={searchQuery} open={dropdownOpen} />
             <SearchModal open={isSearchModalOpen} onClose={handleCloseSearchModal} />
         </AppBar>
     );
