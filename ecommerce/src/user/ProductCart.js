@@ -16,9 +16,10 @@ import "slick-carousel/slick/slick-theme.css";
 import ImageSlider from '../components/ImageSlider';
 import MenuBar from '../components/MenuBar';
 import { images } from '../App';
+import ImageCarousel from '../components/ImageCarousel'
 const CustomCard = styled(Card)(({ theme }) => ({
   flex: '1 0 calc(25% - 16px)', // Hesaplama her kart için %25 genişlik ve aralarında 8px boşluk sağlar
-  maxWidth: 300, // Maksimum genişlik
+  maxWidth: 250, // Maksimum genişlik
   margin: '20px 8px', // Dikey marjin ve yatay padding
   transition: '0.3s',
   boxShadow: '0 8px 40px -12px rgba(0,0,0,0.1)',
@@ -50,7 +51,7 @@ const CustomTypography = styled(Typography)({
 const CustomButton = styled(Button)(({ theme }) => ({
   margin: 'auto',
   display: 'block',
-  
+
   backgroundColor: '#e67e22',
   color: 'white',
   transition: 'background-color 0.2s',
@@ -92,25 +93,23 @@ const ProductCards = () => {
 
   if (loading) return <div>Yükleniyor...</div>;
   if (hata) return <div>Hata: {hata}</div>;
- 
-  
+
+
   return (
     <>
-      <ImageSlider images={images}/>
-      <MenuBar/>
+      <ImageSlider images={images} />
+      <MenuBar />
       <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
-    
         {products.map((product) => (
+
           <CustomCard key={product.product_id}
-                      onClick={() => handleCardClick(product.product_id)}>
+            onClick={() => handleCardClick(product.product_id)}>
             {product.fastDelivery && (
               <CustomBadge color="error" badgeContent="Fast Delivery" />
+
             )}
-                {/* {console.log(product.product.productImages[0].image_path)} */}
-            <CustomCardMedia
-              // image={product.product.productImages.image_path || ''}
-              title={product.product.name}
-            />
+            <ImageCarousel images={product.product.productImages.map(img => img.image_path)} />
+
             <CustomCardContent>
               <Box display="flex" justifyContent="start" alignItems="center">
                 <CustomTypography variant="subtitle1" noWrap>
@@ -127,12 +126,12 @@ const ProductCards = () => {
                   precision={0.5}
                   readOnly
                 />
-                <CustomTypography variant="body2">
-                  {`(${product.commentCount || 0} değerlendirme)`}
+                <CustomTypography variant="m" gap={100}>
+                  {`(${product.commentCount || 0})`}
                 </CustomTypography>
               </Box>
               <CustomTypography variant="h6" mt={1}>
-                {product.price ? `${product.price.toFixed(2)} TL` : 'Price Unknown'}
+                {product.price ? `${product.price.toFixed(2)} ₺` : 'Price Unknown'}
               </CustomTypography>
             </CustomCardContent>
             <CardActions>
