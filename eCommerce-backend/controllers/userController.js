@@ -24,6 +24,7 @@ const ReturnItem = require("../models/returnItem");
 const productQuestion = require("../models/productQuestion");
 const { Op, Sequelize } = require("sequelize");
 const sequelize = require("../utility/db");
+const productImage = require("../models/productImage");
 
 //KULLANICI İŞLEMLERİ 
 
@@ -1584,6 +1585,9 @@ const getProducts = async (req, res) => {
         },
         {
           model: Category
+        },
+        {
+          model: productImage
         }]
       }],
       order: [['price', 'ASC']], // Fiyata göre sırala
@@ -1950,6 +1954,9 @@ const searchProducts = async (req, res) => {
         },
         {
           model: Category
+        },
+        {
+          model: productImage
         }]
       }],
       order: [['price', 'ASC']], // Fiyata göre sırala
