@@ -95,6 +95,8 @@ router.get('/products/:productId/answered-questions', userController.getAnswered
 //KATEGORİ İŞLEMLERİ
 
 router.get('/categories', authOptionalMiddleware, userController.getCategories);
+router.get('/categories/:categoryId', authOptionalMiddleware, userController.getSubCategoriesById);
+
 
 //LOKAL İŞLEMLER
 // ürün sayfası => ürün bilgisi(açıklama, yorum, özellikler, kampanya**, ... )
