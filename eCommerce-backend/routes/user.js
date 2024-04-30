@@ -97,6 +97,9 @@ router.get('/products/:productId/answered-questions', userController.getAnswered
 router.get('/categories', authOptionalMiddleware, userController.getCategories);
 router.get('/categories/:categoryId', authOptionalMiddleware, userController.getSubCategoriesById);
 
+//ARAMA İŞLEMLERİ
+
+router.get('/urunAra', authOptionalMiddleware, userController.searchProducts);
 
 //LOKAL İŞLEMLER
 // ürün sayfası => ürün bilgisi(açıklama, yorum, özellikler, kampanya**, ... )

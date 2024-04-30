@@ -1542,7 +1542,7 @@ const getSubCategoriesById = async (req, res) => {
   const { categoryId } = req.params;
   try {
     const categories = await Category.findAll({
-      where: { approval_status_id: 1, category_id: categoryId }, //SADECE ANA KATEGORİLER GELECEK
+      where: { approval_status_id: 1, id: categoryId }, //SADECE ANA KATEGORİLER GELECEK
       include: [
         {
           model: Category,
@@ -1919,30 +1919,98 @@ const getProductsByBrandSlug = async (req, res) => {
 // ARAMA İŞLEMLERİ
 
 const searchProducts = async (req, res) => {
-
   try {
+    let favoriteProductsIds = [];
+    if (req.user && req.user.email) {
+      const user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
+      }
+    }
+
+    // Arama kelimesi alınır
     const { search } = req.query;
-    const products = await sellerProduct.findAll({
+
+    let products = await sellerProduct.findAll({
       where: {
+        is_active: 1,
         [Op.or]: [
-          { product_name: { [Op.like]: `%${query}%` } },
-          { productDescription: { [Op.like]: `%${query}%` } },
-          { productBrand: { [Op.like]: `%${query}%` } },
-          { '$Category.category_name$': { [Op.like]: `%${query}%` } }
+          { '$Product.product_name$': { [Op.like]: `%${search}%` } },
+          { '$Product.Brand.brand_name$': { [Op.like]: `%${search}%` } },
+          { '$Product.Category.category_name$': { [Op.like]: `%${search}%` } }
         ]
       },
-      include: [{
-        model: Category, // Ürün kategorisi ilişkilendirme
-        as: 'SubCategories', // Modelinizde belirtilen 'as' ile uyumlu olmalı
-      }]
+      include: [
+        {
+          model: Seller
+        },
+        {
+          model: Product,
+          include: [
+            {
+              model: Brand
+            },
+            {
+              model: Category
+            }
+          ]
+        }
+      ],
+      order: [['price', 'ASC']]
     });
 
-    res.json(products);
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.Product.product_id;
+      if (product.stock > 0 && (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price)) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    for (let product of uniqueLowestPriceProducts) {
+      const ratingsData = await ProductComment.findAll({
+        include: [{
+          model: sellerProduct,
+          attributes: [],
+          include: [{
+            model: Product,
+            where: { product_id: product.Product.product_id },
+            attributes: []
+          }]
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+        ],
+        raw: true
+      });
+
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
+    }
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = favoriteProductsIds.includes(product.Product.product_id);
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite: req.user && req.user.email ? isFavorite : undefined,
+        stockStatus,
+        commentAvg: product.dataValues.commentAvg,
+        commentCount: product.dataValues.commentCount
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
   } catch (error) {
-    console.error('Search error:', error);
-    res.status(500).json({ success: false, message: 'Internal server error' });
+    return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 
 
 
@@ -1975,5 +2043,5 @@ module.exports = {
   createReturnRequest, getUserReturnRequests, cancelReturnRequest,
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug,
-  getCategories, getSubCategoriesById
+  getCategories, getSubCategoriesById, searchProducts
 };
