@@ -99,14 +99,16 @@ const ProductCards = () => {
       <ImageSlider images={images}/>
       <MenuBar/>
       <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
+    
         {products.map((product) => (
           <CustomCard key={product.product_id}
                       onClick={() => handleCardClick(product.product_id)}>
             {product.fastDelivery && (
               <CustomBadge color="error" badgeContent="Fast Delivery" />
             )}
+                {console.log(product)}
             <CustomCardMedia
-              image={product.product.productImages.image_path}
+              // image={product.productImages.image_path || ''}
               title={product.product.name}
             />
             <CustomCardContent>
