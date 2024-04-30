@@ -126,7 +126,7 @@ const ProductCards = () => {
                   precision={0.5}
                   readOnly
                 />
-                <CustomTypography variant="m" gap={100}>
+                <CustomTypography variant="m" marginRight={'100%'}>
                   {`(${product.commentCount || 0})`}
                 </CustomTypography>
               </Box>
