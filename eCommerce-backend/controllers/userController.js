@@ -1917,7 +1917,6 @@ const getProductsByBrandSlug = async (req, res) => {
 
 // ARAMA İŞLEMLERİ
 
-const get
 
 
 

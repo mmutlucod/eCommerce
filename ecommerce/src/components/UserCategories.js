@@ -5,6 +5,7 @@ import { Box, Typography, Link, Paper } from '@mui/material';
 const CategoriesBar = () => {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState(null);
+  const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -19,12 +20,24 @@ const CategoriesBar = () => {
     fetchCategories();
   }, []);
 
+  const fetchSubCategories = async (categoryId) => {
+    try {
+      const response = await api.get(`/user/category/${categoryId}`);
+      setSubCategories(response.data);
+    } catch (error) {
+      console.error("An error occurred while fetching subcategories:", error);
+      setSubCategories([]);  // Hata durumunda sub kategorileri temizle
+    }
+  };
+
   const handleMouseEnter = (category) => {
     setActiveCategory(category);
+    fetchSubCategories(category.id);
   };
 
   const handleMouseLeave = () => {
     setActiveCategory(null);
+    setSubCategories([]);
   };
 
   return (
@@ -72,6 +85,18 @@ const CategoriesBar = () => {
                 <Typography variant="body2">
                   {category.description || "No description available."}
                 </Typography>
+                <Typography variant="body2" sx={{ mt: 2 }}>
+                  Alt Kategoriler:
+                </Typography>
+                {subCategories.length > 0 ? (
+                  <ul>
+                    {subCategories.map(sub => (
+                      <li key={sub.id}>{sub.name}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <Typography variant="body2">Alt kategoriler yükleniyor veya bulunamadı.</Typography>
+                )}
               </Paper>
             )}
           </Box>
