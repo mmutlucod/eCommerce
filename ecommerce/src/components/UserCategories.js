@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 import { Box, Typography, Link, Paper } from '@mui/material';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';  // Material UI'dan ikon import edildi
 
 const CategoriesBar = () => {
   const [categories, setCategories] = useState([]);
@@ -22,11 +23,11 @@ const CategoriesBar = () => {
 
   const fetchSubCategories = async (categoryId) => {
     try {
-      const response = await api.get(`/user/category/${categoryId}`);
+      const response = await api.get(`/user/categories/${categoryId}`);
       setSubCategories(response.data);
     } catch (error) {
       console.error("An error occurred while fetching subcategories:", error);
-      setSubCategories([]);  // Hata durumunda sub kategorileri temizle
+      setSubCategories([]);  // Clear subcategories on error
     }
   };
 
@@ -47,7 +48,7 @@ const CategoriesBar = () => {
       alignItems: 'center',
       flexWrap: 'wrap',
       padding: '10px',
-      backgroundColor: '#f0f0f0',
+      backgroundColor: '#f9f9f9',  // Daha açık bir gri renk
     }}>
       {categories.map((category, index) => (
         <React.Fragment key={category.id}>
@@ -62,10 +63,10 @@ const CategoriesBar = () => {
                 textDecoration: 'none',
                 color: '#333',
                 fontWeight: 'bold',
-                fontSize: '1rem',
+                fontSize: '1.1rem',  // Yazı boyutu arttırıldı
                 padding: '0 8px',
                 '&:hover': {
-                  color: '#4B0082',
+                  color: '#4B0082',  // Renk değişikliği üzerine gelince
                 }
               }}
             >
@@ -74,29 +75,24 @@ const CategoriesBar = () => {
             {activeCategory === category && (
               <Paper sx={{
                 position: 'absolute',
-                width: '200px',
+                width: '150px',
                 left: '0',
                 top: '100%',
                 zIndex: '1',
-                padding: '10px',
-                backgroundColor: 'white',
+                padding: '5px',
+                backgroundColor: '#f0f0f0',  
                 boxShadow: '0 2px 5px rgba(0,0,0,0.15)'
               }}>
-                <Typography variant="body2">
-                  {category.description || "No description available."}
-                </Typography>
-                <Typography variant="body2" sx={{ mt: 2 }}>
-                  Alt Kategoriler:
-                </Typography>
-                {subCategories.length > 0 ? (
-                  <ul>
-                    {subCategories.map(sub => (
-                      <li key={sub.id}>{sub.name}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <Typography variant="body2">Alt kategoriler yükleniyor veya bulunamadı.</Typography>
-                )}
+                <ul style={{ listStyleType: 'none', padding: 0, margin: 0 }}>
+                  {subCategories.map(sub => (
+                    <li key={sub.id} style={{ marginBottom: '12px', textAlign: 'left' }}>  
+                      <Link href={`/#${sub.name}`} sx={{ textDecoration: 'none', color: '#333', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {sub.category_name}
+                        <ArrowForwardIosIcon sx={{ fontSize: '16px' }} /> 
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
               </Paper>
             )}
           </Box>

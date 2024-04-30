@@ -106,7 +106,7 @@ const ProductCards = () => {
               <CustomBadge color="error" badgeContent="Fast Delivery" />
             )}
             <CustomCardMedia
-              image={product.imageUrl}
+              image={product.product.productImages.image_path}
               title={product.product.name}
             />
             <CustomCardContent>
