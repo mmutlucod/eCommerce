@@ -1546,7 +1546,7 @@ const getSubCategoriesById = async (req, res) => {
       include: [
         {
           model: Category,
-          as: 'SubCategories'
+          as: 'SubCategories',
         }
       ]
     });
@@ -1919,6 +1919,7 @@ const getProductsByBrandSlug = async (req, res) => {
 // ARAMA İŞLEMLERİ
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 const searchProducts = async (req, res) => {
 
@@ -1927,6 +1928,14 @@ const searchProducts = async (req, res) => {
   }
 }
 >>>>>>> d20aef304908062ef05bbb85e7c85d3e4d3d5bef
+=======
+// const searchProducts = async (req, res) => {
+
+//   try {
+//     const { search } = req.query;
+//   }
+// }
+>>>>>>> bc43e86b916c6280ab4a1f699b40f934181d5099
 
 
 
