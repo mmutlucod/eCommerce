@@ -25,6 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/admin', adminRoutes);
 app.use('/seller', sellerRoutes);
 app.use('/user', userRoutes);
+
 app.use(express.static('public'));
 
 app.listen(port, () => {
