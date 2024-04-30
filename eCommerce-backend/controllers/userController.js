@@ -1546,7 +1546,6 @@ const getSubCategoriesById = async (req, res) => {
       include: [
         {
           model: Category,
-          as: 'SubCategories',
         }
       ]
     });
