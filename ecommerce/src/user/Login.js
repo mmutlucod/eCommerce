@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button, TextField, Typography, Card, CardContent, CardActions, Container } from '@mui/material';
 import { useAuth } from '../context/AuthContext'; // AuthContext'i içe aktar
 import api from '../api/api'; // API yapılandırmanızı içe aktar
-import { Navigate, useNavigate } from 'react-router-dom'; // useHistory hook'unu içe aktar
+import { useNavigate } from 'react-router-dom'; // useHistory hook'unu içe aktar
 import Navbar from '../components/UserNavbar';
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -30,7 +30,7 @@ function LoginForm() {
   };
 
   return (<>
-    <Navbar/>
+    <Navbar />
     <Container component="main" maxWidth="xs">
       <Card>
         <CardContent>
@@ -76,7 +76,7 @@ function LoginForm() {
         </CardActions>
       </Card>
     </Container>
-    </>
+  </>
   );
 }
 

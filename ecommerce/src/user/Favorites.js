@@ -15,8 +15,6 @@ import {
   CssBaseline,
   Container,
   List,
-  ListItem,
-  ListItemText
 } from '@mui/material';
 import { renderMenuItems } from './RenderMenuItems';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -26,67 +24,67 @@ import Navbar from '../components/UserNavbar';
 import api from '../api/api';
 
 const ProductCard = ({ product, onRemove }) => (
-    <Card sx={{ maxWidth: 345, m: 2 }}>
-      <CardActionArea>
-        <CardMedia
-          component="img"
-          height="140"
-          image={product.imageUrl}
-          alt={product.name}
-        />
-        <CardContent>
-          <Typography gutterBottom variant="h5" component="div">
-            {product.name}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {product.description}
-          </Typography>
-          <Typography variant="h6" color="primary">
-            {`${product.price} TL`}
-          </Typography>
-          {/* Add other product details here */}
-        </CardContent>
-      </CardActionArea>
-      <CardActions disableSpacing>
-        <IconButton aria-label="remove from favorites" onClick={() => onRemove(product.id)}>
-          <CloseIcon />
-        </IconButton>
-        <Box flexGrow={1} />
-        <IconButton aria-label="add to cart">
-          <ShoppingCartIcon />
-        </IconButton>
-      </CardActions>
-    </Card>
-  );
+  <Card sx={{ maxWidth: 345, m: 2 }}>
+    <CardActionArea>
+      <CardMedia
+        component="img"
+        height="140"
+        image={product.imageUrl}
+        alt={product.name}
+      />
+      <CardContent>
+        <Typography gutterBottom variant="h5" component="div">
+          {product.name}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {product.description}
+        </Typography>
+        <Typography variant="h6" color="primary">
+          {`${product.price} TL`}
+        </Typography>
+        {/* Add other product details here */}
+      </CardContent>
+    </CardActionArea>
+    <CardActions disableSpacing>
+      <IconButton aria-label="remove from favorites" onClick={() => onRemove(product.id)}>
+        <CloseIcon />
+      </IconButton>
+      <Box flexGrow={1} />
+      <IconButton aria-label="add to cart">
+        <ShoppingCartIcon />
+      </IconButton>
+    </CardActions>
+  </Card>
+);
 const theme = createTheme({
-    palette: {
-      primary: {
-        main: '#4B0082', // Navbar ve butonlar için mor renk
-      },
-      secondary: {
-        main: '#FFD700', // İkincil eylemler ve butonlar için sarı renk
-      },
-      background: {
-        default: '#f4f4f4', // Sayfanın arka plan rengi
-      },
+  palette: {
+    primary: {
+      main: '#4B0082', // Navbar ve butonlar için mor renk
     },
-    components: {
-      MuiCard: {
-        styleOverrides: {
-          root: {
-            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // Kart gölgelendirme
-          },
-        },
-      },
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            fontWeight: 'bold', // Buton yazı tipi kalınlığı
-          },
+    secondary: {
+      main: '#FFD700', // İkincil eylemler ve butonlar için sarı renk
+    },
+    background: {
+      default: '#f4f4f4', // Sayfanın arka plan rengi
+    },
+  },
+  components: {
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // Kart gölgelendirme
         },
       },
     },
-  });
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontWeight: 'bold', // Buton yazı tipi kalınlığı
+        },
+      },
+    },
+  },
+});
 const FavoritesPage = () => {
   const [selectedItem, setSelectedItem] = useState('favorites'); // Yan menüde seçili öğe
   const [favorites, setFavorites] = useState([]); // Favori ürünler listesi
