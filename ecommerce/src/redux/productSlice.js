@@ -31,5 +31,7 @@ export const fetchCartData = () => async (dispatch) => {
         dispatch(setInitialCart(response.data)); // Çekilen verileri Redux store'una setInitialCart ile atıyoruz
     } catch (error) {
         console.error('Error fetching cart data:', error);
+        // Hata durumunda herhangi bir geri bildirim yapmadan sadece hatayı console'a yazdırabiliriz
+        // Ayrıca, isteği yeniden deneme veya kullanıcıya bir hata mesajı gösterme gibi başka işlemler de yapılabilir
     }
 };

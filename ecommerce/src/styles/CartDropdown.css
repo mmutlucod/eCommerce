@@ -1,19 +1,27 @@
 /* CartDropdown.css */
 .cart-dropdown {
-    position: absolute;
-    right: 0;
+    position: fixed;
+    top: 70px; /* Navbar'ın altında ve sabit olarak duracak */
+    right: 20px;
+    background-color: #f8f9fa; /* Arkaplan rengi */
+    border: 1px solid #dcdcdc; /* Kenarlık rengi */
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
     width: 300px;
-    background-color: white;
-    border: 1px solid #ccc;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    padding: 10px;
-    z-index: 1000;
+    z-index: 999; /* Diğer elementlerin üzerinde olacak */
 }
 
 .cart-title {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
+    color: #6c757d; /* Başlık rengi */
+}
+
+.cart-items {
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .cart-item {
@@ -22,52 +30,106 @@
 }
 
 .item-image img {
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
     margin-right: 10px;
 }
 
 .item-details {
-    flex-grow: 1;
+    flex: 1;
 }
 
 .item-name {
-    font-size: 14px;
     font-weight: bold;
+    color: #343a40; /* Ürün adı rengi */
 }
 
 .item-options {
-    font-size: 12px;
-    color: #666;
+    font-size: 14px;
+    color: #6c757d; /* Opsiyonlar rengi */
 }
 
 .item-price {
-    font-size: 14px;
-    color: #333;
     font-weight: bold;
+    color: #343a40; /* Fiyat rengi */
 }
 
-.checkout-button, .view-cart-button {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    font-size: 14px;
-    cursor: pointer;
+.cart-total {
+    margin-top: 20px;
+    border-top: 1px solid #dcdcdc;
+    padding-top: 10px;
 }
 
-.checkout-button {
-    background-color: #FFA500;
-    color: white;
-    border: none;
+.total-items,
+.total-amount {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #6c757d; /* Metin rengi */
 }
 
+.checkout-button,
 .view-cart-button {
-    background-color: #ccc;
-    color: black;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #ffc107; /* Turuncu renk */
+    color: #fff;
     border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    transition: background-color 0.3s;
 }
 
-/* Ekleme: Butonlara hover efekti */
-.checkout-button:hover, .view-cart-button:hover {
-    opacity: 0.9;
+/* Dropdown menü */
+.cart-dropdown {
+    position: fixed;
+    top: 70px;
+    right: 20px;
+    background-color: #f8f9fa;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+    z-index: 999;
 }
+
+/* Butonlar */
+.checkout-button,
+.view-cart-button {
+    display: inline-block;
+    width: calc(50% - 5px);
+    padding: 8px;
+    margin-top: 10px;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+/* Sol taraftaki "Sepete Git" butonu */
+.view-cart-button {
+    background-color: #e9ecef;
+    border: 1px solid #ccc; /* Gri tonunda sınırlar */
+    color: #495057; /* Buton metin rengi */
+}
+
+/* Sağ taraftaki "Siparişi Tamamla" butonu */
+.checkout-button {
+    background-color: #cb411b; /* Turuncu tonu */
+    float: right;
+    margin-right: 0;
+}
+/* .view-cart-button:hover{
+    pointer-events: all;
+}
+.cart-dropdown:hover {
+    pointer-events: all;
+} */

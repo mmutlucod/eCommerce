@@ -1,11 +1,25 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import '../styles/CartDropdown.css'; // Stiller için CSS dosyası
+import api from '../api/api'
 
 const CartDropdown = () => {
-    const cartItems = useSelector(state => state.cart.items); // cart items'ı global stateden çeker
+    const [cartItems, setCartItems] = useState([]); // Sepet ürünlerini tutacak state
 
-    console.log(cartItems)
+    useEffect(() => {
+        // Backend API'den sepet verilerini çeken fonksiyon
+        const fetchCartItems = async () => {
+            try {
+                const response = await api.get('/user/my-basket'); // Backend API'den sepet verilerini çekiyoruz
+                setCartItems(response.data); // Gelen verileri state'e kaydediyoruz
+            } catch (error) {
+                console.error('Error fetching cart data:', error);
+            }
+        };
+
+        // Sayfa yüklendiğinde sepet verilerini çek
+        fetchCartItems();
+    }, []); // useEffect'i sadece bir kez çalıştırmak için boş bağımlılık dizisi kullandık
 
     return (
         <div className="cart-dropdown">
@@ -14,9 +28,9 @@ const CartDropdown = () => {
             </div>
             <div className="cart-items">
                 {cartItems.map(item => (
-                    <div key={item.id} className="cart-item">
+                    <div key={item.product_id} className="cart-item">
                         <div className="item-image">
-                            <img src={item.imageUrl} alt={item.name} />
+                            <img src={item.imageUrl} alt={item.product_name} />
                         </div>
                         <div className="item-details">
                             <div className="item-name">{item.name}</div>
