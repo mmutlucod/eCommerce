@@ -1,0 +1,73 @@
+/* CartDropdown.css */
+.cart-dropdown {
+    position: absolute;
+    right: 0;
+    width: 300px;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    padding: 10px;
+    z-index: 1000;
+}
+
+.cart-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.cart-item {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.item-image img {
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+}
+
+.item-details {
+    flex-grow: 1;
+}
+
+.item-name {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.item-options {
+    font-size: 12px;
+    color: #666;
+}
+
+.item-price {
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+}
+
+.checkout-button, .view-cart-button {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.checkout-button {
+    background-color: #FFA500;
+    color: white;
+    border: none;
+}
+
+.view-cart-button {
+    background-color: #ccc;
+    color: black;
+    border: none;
+}
+
+/* Ekleme: Butonlara hover efekti */
+.checkout-button:hover, .view-cart-button:hover {
+    opacity: 0.9;
+}

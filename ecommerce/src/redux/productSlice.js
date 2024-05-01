@@ -1,38 +1,35 @@
-// productsSlice.js
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from './api'; // api dosyanızın yolunu doğru şekilde belirtiniz
+import api from './api'; // Yukarıdaki axios örneğini içeren dosya
 
-export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
+// cartSlice.js
+import { createSlice } from '@reduxjs/toolkit';
+
+const initialState = {
+    items: [], // Sepetteki ürünlerin listesi
+    totalAmount: 0 // Toplam ücret
+};
+
+const cartSlice = createSlice({
+    name: 'cart',
+    initialState,
+    reducers: {
+        setInitialCart(state, action) {
+            const { items, totalAmount } = action.payload;
+            state.items = items;
+            state.totalAmount = totalAmount;
+        },
+        // Diğer reducer'lar burada...
+    }
+});
+
+export const { setInitialCart } = cartSlice.actions;
+export default cartSlice.reducer;
+
+// Redux thunk kullanarak backend API'den verileri çeken ve setInitialCart aksiyonunu dispatch eden bir action creator
+export const fetchCartData = () => async (dispatch) => {
     try {
-        const response = await api.get('/user/my-basket'); // API'nizin ürünler endpoint'i
-        return response.data;
+        const response = await api.get('/user/my-basket'); // Backend API'den cart verilerini çekiyoruz
+        dispatch(setInitialCart(response.data)); // Çekilen verileri Redux store'una setInitialCart ile atıyoruz
     } catch (error) {
-        return Promise.reject(error);
+        console.error('Error fetching cart data:', error);
     }
-});
-
-const productsSlice = createSlice({
-    name: 'products',
-    initialState: {
-        products: [],
-        status: 'idle', // 'idle', 'loading', 'succeeded', 'failed'
-        error: null
-    },
-    reducers: {},
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchProducts.pending, (state) => {
-                state.status = 'loading';
-            })
-            .addCase(fetchProducts.fulfilled, (state, action) => {
-                state.status = 'succeeded';
-                state.products = action.payload;
-            })
-            .addCase(fetchProducts.rejected, (state, action) => {
-                state.status = 'failed';
-                state.error = action.error.message || 'Failed to fetch products';
-            });
-    }
-});
-
-export default productsSlice.reducer;
+};
