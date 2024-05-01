@@ -723,6 +723,9 @@ const getApprovalStatusById = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+
+//ürün onay, yorum onay, soru cevap onay
+
 module.exports = {
     login, register, listAdmins,
     getProducts, getProductsById, createProduct, editProduct, deleteProduct, searchProduct,

@@ -265,8 +265,7 @@ const searchSellerProducts = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
-};
-
+}
 //ÜRÜN
 const getAllProducts = async (req, res) => {
     try {
