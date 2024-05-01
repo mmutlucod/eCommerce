@@ -15,6 +15,7 @@ router.get('/products', authMiddleware, sellerController.getSellerProducts);
 router.get('/products/:id', authMiddleware, sellerController.getSellerProductDetailsById);
 router.get('/searchSellerProducts', authMiddleware, sellerController.searchSellerProducts);
 router.get('/searchAllProducts', authMiddleware, sellerController.searchAllProducts);
+router.post('/create-product', authMiddleware, sellerController.createProduct);
 router.post('/create-seller-product', authMiddleware, sellerController.createSellerProduct);
 router.put('/products/:id', authMiddleware, sellerController.updateSellerProduct);
 router.put('/activateProduct/:id', authMiddleware, sellerController.activateSellerProduct);
@@ -27,13 +28,15 @@ router.get('/searchSellerBrands', authMiddleware, sellerController.searchSellerB
 router.post('/create-seller-brand', authMiddleware, sellerController.createBrand);
 router.put('/brands/:id', authMiddleware, sellerController.updateBrand);
 
-
 router.get('/categories', authMiddleware, sellerController.getAllCategories);
 router.get('/searchCategories', authMiddleware, sellerController.getAllCategoriesWithSearch);
 router.patch('/update-order-status/:id', authMiddleware, sellerController.updateOrderStatus);
 router.get('/orders', authMiddleware, sellerController.getSellerOrders);
+router.get('/orders/:orderStatusId', authMiddleware, sellerController.getSellerOrdersByStatusId);
 router.post('/update-shipping-code/:id', authMiddleware, sellerController.updateShippingCodeOrderItem);
 router.post('/cancel-order-item', authMiddleware, sellerController.cancelOrderItemQuantity);
+
+router.get('/my-questions', authMiddleware, sellerController.getQuestions);
 
 
 module.exports = router;

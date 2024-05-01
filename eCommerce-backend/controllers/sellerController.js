@@ -6,10 +6,11 @@ const Product = require('../models/product');
 const ApprovalStatus = require('../models/approval_status');
 const Brand = require('../models/Brand');
 const Category = require('../models/category');
-const { Sequelize, Op } = require('sequelize');
+const { Sequelize, Op, where } = require('sequelize');
 const OrderItem = require('../models/orderItem');
 const Order = require('../models/order');
 const OrderStatus = require('../models/orderStatus');
+const productQuestion = require('../models/productQuestion');
 
 //GİRİŞ
 const login = async (req, res) => {
@@ -296,7 +297,31 @@ const searchAllProducts = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+const createProduct = async (req, res) => {
+    try {
 
+        const product = Product.findOne({
+            where:
+            {
+                stock_code: req.body.stock_code
+            }
+        })
+
+        if (product) {
+            res.status(404).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
+        }
+
+        await Product.create({
+            approval_status_id: 3,
+            ...req.body,
+        })
+
+        res.status(200).json({ success: true, message: 'Ürün sisteme eklendi.' });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
 // MARKA
 const getAllBrands = async (req, res) => {
     try {
@@ -451,13 +476,65 @@ const getAllCategoriesWithSearch = async (req, res) => {
 //SİPARİŞLER
 const getSellerOrders = async (req, res) => {
     try {
-
         const seller = await Seller.findOne({ where: { username: req.user.username } });
         if (!seller) {
             return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
         }
         const sellerOrders = await OrderItem.findAll({
             where: { '$SellerProduct.seller_id$': seller.seller_id },
+            attributes: [
+                'quantity',
+                'order_id',
+                'canceled_quantity',
+                [Sequelize.literal('quantity + IFNULL(canceled_quantity, 0)'), 'total_quantity']
+            ],
+            include: [
+                {
+                    model: sellerProduct, // Model isminin doğru olduğundan emin olun.
+                    attributes: ['price'],
+                    where: { seller_id: seller.seller_id },
+                    include: [{
+                        model: Product,
+                        attributes: ['name'],
+                        include: [{
+                            model: Brand,
+                            attributes: ['brand_name']
+                        }]
+                    }],
+                    required: true
+                },
+                {
+                    model: OrderStatus,
+                    attributes: ['status_name'],
+                    required: false
+                }
+            ],
+        });
+
+        // İptal öncesi ve anlık miktarları ile birlikte sonucu döndür
+        const modifiedSellerOrders = sellerOrders.map(order => ({
+            ...order.get({ plain: true }),
+            total_quantity: order.dataValues.total_quantity, // Toplam miktar (İptal edilmeyen + İptal edilen)
+            remaining_quantity: order.quantity, // Kalan miktar (İptal edilmeyen)
+            canceled_quantity: order.canceled_quantity || 0, // İptal edilen miktar
+            cancellation_info: order.canceled_quantity ? `${order.canceled_quantity} tanesi iptal edildi.` : 'İptal edilen ürün yok.'
+        }));
+
+        return res.status(200).json(modifiedSellerOrders);
+    } catch (error) {
+        console.error('Error fetching seller orders:', error);
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+const getSellerOrdersByStatusId = async (req, res) => {
+    try {
+        const { orderStatusId } = req.params;
+        const seller = await Seller.findOne({ where: { username: req.user.username } });
+        if (!seller) {
+            return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+        }
+        const sellerOrders = await OrderItem.findAll({
+            where: { '$SellerProduct.seller_id$': seller.seller_id, order_status_id: orderStatusId },
             attributes: [
                 'quantity',
                 'order_id',
@@ -597,6 +674,19 @@ const updateOrderStatus = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 }
+//SORU İŞLEMLERİ
+const getQuestions = async (req, res) => {
+    try {
+        const seller = await Seller.findOne({ where: { username: req.user.username } });
+        if (!seller) {
+            return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+        }
+        const questions = await productQuestion.findAll({ where: { seller_id: seller.seller_id } })
+        res.status(200).json(questions);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
 
 //ALT KATEGORİLERİ ÇEKME ASYNC FUNC.
 async function fetchCategoriesWithSubcategories() {
@@ -649,5 +739,6 @@ module.exports = {
     getAllBrands, getSellerBrands, createBrand, updateBrand, searchAllBrands, searchSellerBrands,
     getAllCategories, getAllCategoriesWithSearch,
     getSellerOrders, cancelOrderItemQuantity, updateShippingCodeOrderItem, updateOrderStatus,
-    searchAllProducts
+    searchAllProducts, getSellerOrdersByStatusId, createProduct,
+    getQuestions
 }
