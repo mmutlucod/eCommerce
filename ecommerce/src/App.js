@@ -36,7 +36,7 @@ export const images = [
 ];
 function App() {
 
-  
+
 
   return (
     <AuthProvider>
@@ -62,18 +62,18 @@ function App() {
             <Route path="/seller/product" element={<SellerProduct />} />
 
 
-            <Route path="/user/mainpage" element={< UserMainPage/>} />
-            <Route path="/user/login" element={< UserRegister/>} />
-            <Route path="/user/auth" element={< UserRegister/>} />
-            <Route path="/user/profile" element={< UserProfil/>} />
-            <Route path="/user/orders" element={< UserOrders/>} />
-            <Route path="/user/address-info" element={< UserAddress/>} />
-            <Route path="/user/address-add" element={< UserAddressAdd/>} />
-            <Route path="/user/favorites" element={< UserFavorites/>} />
-            
+            <Route path="/user/mainpage" element={< UserMainPage />} />
+            <Route path="/user/login" element={< UserRegister />} />
+            <Route path="/user/auth" element={< UserRegister />} />
+            <Route path="/user/profile" element={< UserProfil />} />
+            <Route path="/user/orders" element={< UserOrders />} />
+            <Route path="/user/address-info" element={< UserAddress />} />
+            <Route path="/user/address-add" element={< UserAddressAdd />} />
+            <Route path="/user/favorites" element={< UserFavorites />} />
+
           </Routes>
         </Router>
-      
+
       </div>
     </AuthProvider>
   );
