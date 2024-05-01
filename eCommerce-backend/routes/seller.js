@@ -40,5 +40,8 @@ router.get('/my-questions', authMiddleware, sellerController.getQuestions);
 router.patch('/my-questions/:questionId', authMiddleware, sellerController.answerQuestion);
 
 router.get('/comments', authMiddleware, sellerController.getComments);
-router.get('/comments/:sellerProductId', authMiddleware, sellerController.getCommentsById)
+router.get('/comments/:sellerProductId', authMiddleware, sellerController.getCommentsById);
+
+
+
 module.exports = router;
