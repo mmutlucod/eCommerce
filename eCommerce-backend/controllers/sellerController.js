@@ -11,6 +11,8 @@ const OrderItem = require('../models/orderItem');
 const Order = require('../models/order');
 const OrderStatus = require('../models/orderStatus');
 const productQuestion = require('../models/productQuestion');
+const { errors } = require('ethers');
+const ProductComment = require('../models/productComment');
 
 //GİRİŞ
 const login = async (req, res) => {
@@ -687,7 +689,65 @@ const getQuestions = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+const answerQuestion = async (req, res) => {
+    try {
+        const seller = await Seller.findOne({ where: { username: req.user.username } });
+        if (seller) {
+            res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+        }
 
+        const { questionId } = req.params;
+
+        const question = await productQuestion.findOne({ where: { seller_id: seller.seller_id, question_id: questionId } })
+
+        await question.update({
+            ...req.body,
+            date_asked: new Date(),
+            approval_status_id: 3
+        });
+
+        res.status(200).json({ success: true, message: 'Soru cevaplandı.' });
+    }
+    catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+//YORUM İŞLEMLERİ
+
+const getComments = async (req, res) => {
+    try {
+        const seller = await Seller.findOne({ where: { username: req.user.username } });
+        const comment = await ProductComment.findAll({
+            where: {
+                approval_status_id: 1
+            },
+            include: [
+                {
+                    model: Seller,
+                    where: { seller_id: seller.seller_id }
+                }
+            ]
+        })
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const getCommentsById = async (req, res) => {
+    try {
+        const { sellerProductId } = req.params;
+        const comments = await ProductComment.findAll({
+            where: {
+                approval_status_id: 1,
+                seller_product_id: sellerProductId
+            }
+        })
+        res.status(200).json(comments)
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
 
 //ALT KATEGORİLERİ ÇEKME ASYNC FUNC.
 async function fetchCategoriesWithSubcategories() {
@@ -741,5 +801,5 @@ module.exports = {
     getAllCategories, getAllCategoriesWithSearch,
     getSellerOrders, cancelOrderItemQuantity, updateShippingCodeOrderItem, updateOrderStatus,
     searchAllProducts, getSellerOrdersByStatusId, createProduct,
-    getQuestions,
+    getQuestions, answerQuestion, getComments, getCommentsById
 }

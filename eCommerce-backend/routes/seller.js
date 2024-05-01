@@ -37,6 +37,8 @@ router.post('/update-shipping-code/:id', authMiddleware, sellerController.update
 router.post('/cancel-order-item', authMiddleware, sellerController.cancelOrderItemQuantity);
 
 router.get('/my-questions', authMiddleware, sellerController.getQuestions);
+router.patch('/my-questions/:questionId', authMiddleware, sellerController.answerQuestion);
 
-
+router.get('/comments', authMiddleware, sellerController.getComments);
+router.get('/comments/:sellerProductId', authMiddleware, sellerController.getCommentsById)
 module.exports = router;

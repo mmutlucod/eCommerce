@@ -1494,7 +1494,6 @@ const listMyQuestions = async (req, res) => {
     res.status(500).json({ message: 'Soruları yüklerken bir hata oluştu.', error: error.message });
   }
 }
-
 const getAnsweredQuestionsForProduct = async (req, res) => {
   const { productId } = req.params; // Ürün ID'si URL parametresinden alınır
 
@@ -1518,7 +1517,7 @@ const getAnsweredQuestionsForProduct = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Soruları yüklerken bir hata oluştu.', error: error.message });
   }
-};
+}
 
 //KATEGORİ ÇEKME
 
