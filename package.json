@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "npm-git-install": "^0.3.0"
+    "@reduxjs/toolkit": "^2.2.3",
+    "npm-git-install": "^0.3.0",
+    "react-redux": "^9.1.1"
   }
 }
