@@ -1648,6 +1648,7 @@ const getProducts = async (req, res) => {
 }
 //Ürün bilgilerini çekme slug a göre
 const getProductsBySlug = async (req, res) => {
+  console.log('umut')
   const { productSlug } = req.params; // Ürün slug'ı URL parametresinden alınır
   try {
     let user = null;
