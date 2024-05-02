@@ -28,6 +28,8 @@ import UserAddressAdd from './user/AddressAdd';
 import UserFavorites from './user/Favorites';
 import ProductCart from './user/ProductCart';
 import UserCart from './components/Cart';
+import UserProductPage from './user/ProductPage';
+
 
 export const images = [
   "https://n11scdn.akamaized.net/a1/org/24/04/26/50/30/87/81/38/19/97/83/96/43595415462427475004.jpg",
@@ -71,6 +73,7 @@ function App() {
             <Route path="/user/address-add" element={< UserAddressAdd />} />
             <Route path="/user/favorites" element={< UserFavorites />} />
             <Route path="/sepetim" element={< UserCart />} />
+            <Route path="/urun/:productSlug" element={< UserProductPage />} />
           </Routes>
         </Router>
 

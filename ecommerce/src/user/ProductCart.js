@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Card from '@mui/material/Card';
+import { useNavigate } from 'react-router-dom';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CardActions from '@mui/material/CardActions';
@@ -64,10 +65,13 @@ const ProductNameTypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary, // Bu kısım metnin rengini ayarlar
   marginLeft: theme.spacing(1), // Marka ve model arasındaki boşluk için
 }));
+ 
 const ProductCards = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [hata, setHata] = useState('');
+  const [error, setError] = useState('');
+
+  const navigate = useNavigate(); // useNavigate hook'unu kullanmak için
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -76,7 +80,7 @@ const ProductCards = () => {
         const response = await api.get('user/products');
         setProducts(response.data);
       } catch (err) {
-        setHata(err.message);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -84,16 +88,13 @@ const ProductCards = () => {
 
     fetchProducts();
   }, []);
+
   const handleCardClick = (productId) => {
-    // İstenen işlemi burada gerçekleştirebilirsiniz, örneğin bir sayfaya yönlendirme
-    console.log(`Ürün ID'si ${productId} olan kart tıklandı.`);
-    // Yönlendirme için React Router kullanıyorsanız:
-    // history.push(`/product/${productId}`);
+    navigate(`/urun/${productId}`); // Ürün detay sayfasına yönlendirme
   };
 
   if (loading) return <div>Yükleniyor...</div>;
-  if (hata) return <div>Hata: {hata}</div>;
-
+  if (error) return <div>Hata: {error}</div>;
 
   return (
     <>
@@ -101,15 +102,11 @@ const ProductCards = () => {
       <MenuBar />
       <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
         {products.map((product) => (
-
-          <CustomCard key={product.product_id}
-            onClick={() => handleCardClick(product.product_id)}>
-            {product.fastDelivery && (
-              <CustomBadge color="error" badgeContent="Fast Delivery" />
-
-            )}
+          
+          <CustomCard key={product.product_id} onClick={() => handleCardClick(product.product.slug)}>
+            {console.log(product.product.slug)}
+            {product.fastDelivery && <CustomBadge color="error" badgeContent="Fast Delivery" />}
             <ImageCarousel images={product.product.productImages.map(img => img.image_path)} />
-
             <CustomCardContent>
               <Box display="flex" justifyContent="start" alignItems="center">
                 <CustomTypography variant="subtitle1" noWrap>
@@ -120,12 +117,7 @@ const ProductCards = () => {
                 </ProductNameTypography>
               </Box>
               <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                <Rating
-                  name="half-rating-read"
-                  value={parseFloat(product.commentAvg) || 0}
-                  precision={0.5}
-                  readOnly
-                />
+                <Rating name="half-rating-read" value={parseFloat(product.commentAvg) || 0} precision={0.5} readOnly />
                 <CustomTypography variant="m" marginRight={'100%'}>
                   {`(${product.commentCount || 0})`}
                 </CustomTypography>
