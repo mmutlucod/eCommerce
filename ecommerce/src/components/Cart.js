@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import CartItem from './CartItem';
-import api from '../api/api';  // Axios instance'ınızın olduğu dosyadan import ediniz
+import api from '../api/api'; // Axios instance'ınızın olduğu dosyadan import ediniz
 import Navbar from './UserNavbar';
+import EmptyCart from './EmptyCart';
+import FullCart from './FullCart';
 
 function Cart() {
     const [cartItems, setCartItems] = useState([]);
@@ -11,7 +12,7 @@ function Cart() {
         const fetchCartItems = async () => {
             setLoading(true);
             try {
-                const response = await api.get('/cart');
+                const response = await api.get('/user/my-basket');
                 setCartItems(response.data);
             } catch (error) {
                 console.error('Failed to fetch cart items:', error);
@@ -49,8 +50,11 @@ function Cart() {
         }
     };
 
+    const getProductCount = () => {
+        return cartItems.reduce((total, item) => total + item.quantity, 0);
+    };
     const getTotalPrice = () => {
-        return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+        return cartItems.reduce((total, item) => total + (item.quantity * item.sellerProduct.price), 0);
     };
 
     if (loading) {
@@ -58,27 +62,19 @@ function Cart() {
     }
 
     if (cartItems.length === 0) {
-        return (<>
-            <Navbar /><div>Your cart is empty.</div> </>);
+        return (
+            <>
+                <Navbar />
+                <EmptyCart />
+            </>
+        );
     }
 
-    return (<>
-        <Navbar />
-        <div>
-
-            <h2>Your Shopping Cart</h2>
-            {cartItems.map(item => (
-                <CartItem
-                    key={item.id}
-                    item={item}
-                    onUpdateQuantity={updateQuantity}
-                    onRemoveItem={removeItem}
-                />
-            ))}
-            <div>Total: ${getTotalPrice()}</div>
-            <button>Checkout</button>
-        </div>
-    </>
+    return (
+        <>
+            <Navbar />
+            <FullCart cartItems={cartItems} total={getTotalPrice()} count={getProductCount()} />
+        </>
     );
 }
 

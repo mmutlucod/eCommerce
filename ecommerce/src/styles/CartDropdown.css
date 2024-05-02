@@ -122,6 +122,7 @@
 }
 
 .button {
+    text-decoration: none;
     flex: 1;
     padding: 10px;
     color: #fff;
@@ -138,7 +139,7 @@
 }
 
 .checkout-button {
-    background-color: #e88717;
+    background-color: #ff6600;
 }
 
 .button:hover {
