@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
 import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Button, Badge, Link } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
