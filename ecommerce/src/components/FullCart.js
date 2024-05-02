@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/FullCart.css'
 
 function CartItem({ item, onUpdate, onRemove }) {
     return (
