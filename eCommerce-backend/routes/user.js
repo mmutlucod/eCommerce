@@ -111,7 +111,7 @@ router.get('/urunAra', authOptionalMiddleware, userController.searchProducts);
 //SLUG KULLANIMI
 
 router.get('/products', authOptionalMiddleware, userController.getProducts);
-router.get('/products:/:productSlug', authOptionalMiddleware, userController.getProductsBySlug);
+router.get('/product/:productSlug', authOptionalMiddleware, userController.getProductsBySlug);
 router.get('/products/:productSlug', authOptionalMiddleware, userController.getProductsBySellerSlug);
 router.get('/category/:categorySlug', authOptionalMiddleware, userController.getProductsByCategorySlug);
 router.get('/brand/:brandSlug', authOptionalMiddleware, userController.getProductsByBrandSlug);

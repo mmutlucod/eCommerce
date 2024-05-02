@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../styles/CartDropdown.css';
 import api from '../api/api';
+import { Link } from 'react-router-dom';
+
 
 const CartDropdown = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -50,8 +52,8 @@ const CartDropdown = () => {
                 ))}
             </div>
             <div className="buttons-container">
-                <button className="view-cart-button button">Sepete Git</button>
-                <button className="checkout-button button">Siparişi Tamamla</button>
+                <Link to="/sepetim" className="view-cart-button button">Sepete Git</Link>
+                <Link to="/siparisi-tamamla" className="checkout-button button">Siparişi Tamamla</Link>
             </div>
         </div>
     );

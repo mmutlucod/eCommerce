@@ -2,19 +2,24 @@ import React from 'react';
 
 function CartItem({ item, onUpdateQuantity, onRemoveItem }) {
     return (
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-            <div>
-                <img src={item.image} alt={item.name} style={{ width: '50px', height: '50px' }} />
-                <span>{item.name}</span>
+        <div className="cart-item">
+            <div className="product-info">
+                <img src={item.image} alt={item.name} className="product-image" />
+                <div className="product-details">
+                    <div className="product-name">{item.name}</div>
+                    <div className="seller-rating">Satıcı: {item.seller} <span className="rating">{item.rating}</span></div>
+                    <div className="shipping-info">{item.shipping}</div>
+                    <div className="insurance-option">{item.insurance}</div>
+                </div>
             </div>
-            <div>
-                <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>-</button>
-                <span>{item.quantity}</span>
-                <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>+</button>
-            </div>
-            <div>
-                <span>${item.price * item.quantity}</span>
-                <button onClick={() => onRemoveItem(item.id)}>Remove</button>
+            <div className="product-pricing">
+                <div className="quantity-controls">
+                    <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>-</button>
+                    <span>{item.quantity}</span>
+                    <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>+</button>
+                </div>
+                <div className="price">{item.price} TL</div>
+                <button onClick={() => onRemoveItem(item.id)} className="remove-item">Sil</button>
             </div>
         </div>
     );

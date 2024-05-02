@@ -1667,7 +1667,7 @@ const getProductsBySlug = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Ürün bulunamadı' });
     }
 
-    let products = await sellerProduct.findAll({
+    const sellerProductData = await sellerProduct.findOne({
       where: { product_id: product.product_id, is_active: 1 },
       include: [{
         model: Seller
@@ -1682,33 +1682,26 @@ const getProductsBySlug = async (req, res) => {
       order: [['price', 'ASC']], // Fiyata göre sırala
     });
 
-    // Ürünleri benzersiz hale getir ve en düşük fiyatlı olanı seç
-    // Ve sadece favori ürünlerle ilgili işlemler giriş yapılmışsa gerçekleştirilir
-    const uniqueProductsMap = new Map();
-    products.forEach(product => {
-      const productId = product.product.product_id;
-      if (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price) {
-        uniqueProductsMap.set(productId, product);
-      }
-    });
-    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+    if (!sellerProductData) {
+      return res.status(404).json({ success: false, message: 'Satıcı ürünü bulunamadı' });
+    }
 
-    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
-      const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
-      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
-      return {
-        ...product.toJSON(),
-        isFavorite: req.user && req.user.email ? isFavorite : undefined, // Giriş yapılmışsa favori durumunu, yapmamışsa undefined döndür
-        stockStatus: stockStatus //STOK DURUMU
-      };
-    });
+    const isFavorite = user ? favoriteProductsIds.includes(sellerProductData.product.product_id) : false;
+    const stockStatus = sellerProductData.stock === 0 ? 'Stokta yok' : 'Stokta var';
 
-    return res.status(200).json(productsWithFavoritesAndPrice);
+    const productWithFavoritesAndPrice = {
+      ...sellerProductData.toJSON(),
+      isFavorite: req.user && req.user.email ? isFavorite : undefined,
+      stockStatus: stockStatus
+    };
+
+    return res.status(200).json(productWithFavoritesAndPrice);
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 //Eğer satıcı girilmemişse sistemdeki en ucuz ürünü getirir.
 const getProductsBySellerSlug = async (req, res) => {
   const { productSlug } = req.params; // Ürün slug'ı URL parametresinden alınır
