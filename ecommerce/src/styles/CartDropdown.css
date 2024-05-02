@@ -1,135 +1,146 @@
-/* CartDropdown.css */
-.cart-dropdown {
-    position: fixed;
-    top: 70px; /* Navbar'ın altında ve sabit olarak duracak */
-    right: 20px;
-    background-color: #f8f9fa; /* Arkaplan rengi */
-    border: 1px solid #dcdcdc; /* Kenarlık rengi */
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 300px;
-    z-index: 999; /* Diğer elementlerin üzerinde olacak */
-}
-
-.cart-title {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #6c757d; /* Başlık rengi */
-}
-
-.cart-items {
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.cart-item {
-    display: flex;
-    margin-bottom: 10px;
-}
-
-.item-image img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    margin-right: 10px;
-}
-
-.item-details {
-    flex: 1;
-}
-
-.item-name {
-    font-weight: bold;
-    color: #343a40; /* Ürün adı rengi */
-}
-
-.item-options {
-    font-size: 14px;
-    color: #6c757d; /* Opsiyonlar rengi */
-}
-
-.item-price {
-    font-weight: bold;
-    color: #343a40; /* Fiyat rengi */
-}
-
-.cart-total {
-    margin-top: 20px;
-    border-top: 1px solid #dcdcdc;
-    padding-top: 10px;
-}
-
-.total-items,
-.total-amount {
-    font-size: 16px;
-    margin-bottom: 5px;
-    color: #6c757d; /* Metin rengi */
-}
-
-.checkout-button,
-.view-cart-button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    background-color: #ffc107; /* Turuncu renk */
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    text-align: center;
-    transition: background-color 0.3s;
-}
-
-/* Dropdown menü */
 .cart-dropdown {
     position: fixed;
     top: 70px;
     right: 20px;
-    background-color: #f8f9fa;
-    border: 1px solid #dcdcdc;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
     width: 300px;
-    z-index: 999;
+    background-color: #fff;
+    border: 2px solid whitesmoke;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(215, 0, 0, 0.15);
+    padding: 15px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+.cart-dropdown:hover{
+    display: flex;
 }
 
-/* Butonlar */
-.checkout-button,
-.view-cart-button {
-    display: inline-block;
-    width: calc(50% - 5px);
-    padding: 8px;
-    margin-top: 10px;
+.cart-dropdown::after {
+    content: '';
+    position: absolute;
+    top: -2.2px; /* Okun yukarı doğru çıkmasını sağlayacak */
+    right: 7px; /* Okun konumunu ayarla */
+    width: 22px;
+    height: 10px;
+    background: white;
+    transform: rotate(45deg);
+}
+
+.navbar:hover .cart-dropdown,
+.cart-dropdown:hover {
+    visibility: visible; /* Hover durumunda görünür yap */
+    opacity: 1;
+}
+
+.cart-header {
+    display: flex;
+    justify-content: space-between; /* İçerikleri baş ve sona yasla */
+    align-items: center; /* İçerikleri ortala */
+    font-size: 14px;
+    font-weight: bold;
+    color: black;
+    margin-bottom: 25px;
+}
+
+.cart-title,
+.cart-title-2 {
+    margin: 0; /* Varsayılan kenar boşluklarını kaldır */
+}
+
+
+.cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    max-height: 240px;
+    border: 5px solid;
+    
+}
+
+.cart-item {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.item-image img {
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+    border-radius: 4px;
+    object-fit: contain; /* Resmi orantılı bir şekilde küçült */
+}
+
+.item-details {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 75%; /* Tüm genişliği kapla */
+}
+
+.item-name {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.2; /* Satır yüksekliği */
+    max-height: 2.4em; /* Maksimum yükseklik 2 satır için */
+    overflow: hidden; /* Fazla içeriği gizle */
+    text-overflow: ellipsis; /* Taşan metin için "..." kullan */
+    display: block; /* Block seviyesinde görüntüle */
+    width: 100%; /* Genişlik maksimum */
+    text-align: left; /* Metni sola hizala */
+    word-wrap: break-word; /* Uzun kelimeleri alt satıra geçir */
+    word-break: break-word; /* Kelime taşması olduğunda kelimeleri böler */
+}
+
+
+.item-options {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%; /* Tüm genişliği kapla */
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.item-price {
+    color: #8625b7;
+    flex: 1; /* Sol tarafa yasla ve mümkün olduğunca alan kapla */
+    text-align: left;
+    margin-left: 8px;
+}
+
+.item-quantity {
+    color: #8625b7;
+    flex: 1; /* Sağ tarafa yasla */
+    text-align: right;
+    margin-right: 8px;
+}
+
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.button {
+    flex: 1;
+    padding: 10px;
     color: #fff;
+    font-size: 14px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 14px;
-    text-align: center;
-    transition: background-color 0.3s;
+    margin: 5px 2px 0;
+    transition: background-color 0.2s;
 }
 
-/* Sol taraftaki "Sepete Git" butonu */
 .view-cart-button {
-    background-color: #e9ecef;
-    border: 1px solid #ccc; /* Gri tonunda sınırlar */
-    color: #495057; /* Buton metin rengi */
+    background-color: #6c757d;
 }
 
-/* Sağ taraftaki "Siparişi Tamamla" butonu */
 .checkout-button {
-    background-color: #cb411b; /* Turuncu tonu */
-    float: right;
-    margin-right: 0;
+    background-color: #e88717;
 }
-/* .view-cart-button:hover{
-    pointer-events: all;
+
+.button:hover {
+    opacity: 0.9;
 }
-.cart-dropdown:hover {
-    pointer-events: all;
-} */
