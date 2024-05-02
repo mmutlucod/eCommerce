@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Button, Badge } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchModal from './SearchModal';
 import CartDropdown from './CartDropdown';  // CartDropdown komponentini import etmeyi unutmayın
+import api from '../api/api'
 
 export default function UserNavbar() {
     const navigate = useNavigate();
@@ -16,6 +17,25 @@ export default function UserNavbar() {
     const [searchQuery, setSearchQuery] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [cartDropdownOpen, setCartDropdownOpen] = useState(false);  // Sepet dropdown için state
+    const [cartItemCount, setCartItemCount] = useState(0);
+
+    const [cartItems, setCartItems] = useState([]);
+
+    useEffect(() => {
+        const fetchCartItems = async () => {
+            try {
+                const response = await api.get('/user/my-basket');
+                setCartItems(response.data);
+            } catch (error) {
+                console.error('Error fetching cart data:', error);
+            }
+        };
+
+        fetchCartItems();
+    }, []);
+
+    const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
+
 
     const handleOpenSearchModal = () => setSearchModalOpen(true);
     const handleCloseSearchModal = () => setSearchModalOpen(false);
@@ -90,7 +110,7 @@ export default function UserNavbar() {
                         onMouseLeave={() => setCartDropdownOpen(false)}
                         aria-label="show cart items"
                     >
-                        <Badge badgeContent={4} color="secondary">
+                        <Badge badgeContent={totalQuantity} color="secondary">
                             <ShoppingCartIcon />
                         </Badge>
                         {cartDropdownOpen && <CartDropdown />}
