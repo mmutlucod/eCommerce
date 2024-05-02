@@ -307,6 +307,9 @@ const getCartItems = async (req, res) => {
           model: Product,
           include: [{
             model: Brand
+          },
+          {
+            model: productImage
           }]
         }]
       }]
