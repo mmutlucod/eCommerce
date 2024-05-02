@@ -1,7 +1,9 @@
 .full-cart-container {
     display: flex;
     flex-direction: column;
+    justify-content: space-between; /* Kartlar ile sipariş özetinin arasına boşluk bırakır */
     margin: 20px;
+    margin-right: 25%;
 }
 
 .cart-item {
@@ -9,7 +11,7 @@
     align-items: center;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 2px;
     margin: 10px 0;
     padding: 10px;
 }
@@ -69,14 +71,20 @@
 }
 
 .order-summary {
-    margin-top: 20px;
+    position: fixed; /* Sabit konumlandırma */
+    top: 0;
+    right: 0; /* Sağ tarafa hizalar */
+    margin-top: 15vh;
+    margin-right: 2%;
     padding: 10px;
     background-color: #f7f7f7;
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 2px;
+    width: 20%;
+    height: 35vh;
 }
 
-.checkout-button {
+.checkout-buttons {
     background-color: #ff9800;
     color: white;
     text-decoration: none;
@@ -85,4 +93,5 @@
     display: block;
     width: max-content;
     margin-top: 10px;
+    margin-left: 33%;
 }

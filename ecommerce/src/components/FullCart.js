@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../styles/FullCart.css'
+import '../styles/FullCart.css';
 
 function CartItem({ item, onUpdate, onRemove }) {
     return (
@@ -23,17 +23,15 @@ function CartItem({ item, onUpdate, onRemove }) {
 
 function FullCart({ cartItems, total, onUpdate, onRemove }) {
     return (
-        <div className="cart-container">
-            <div className="cart-items">
-                {cartItems.map(item => (
-                    <CartItem key={item.id} item={item} onUpdate={onUpdate} onRemove={onRemove} />
-                ))}
-            </div>
+        <div className="full-cart-container">
+            {cartItems.map(item => (
+                <CartItem key={item.id} item={item} onUpdate={onUpdate} onRemove={onRemove} />
+            ))}
             <div className="order-summary">
                 <h3>Sipariş Özeti</h3>
                 <p>Toplam Ürün Sayısı: {cartItems.length}</p>
                 <p>Toplam Tutar: {total} TL</p>
-                <Link to="/checkout" className="checkout-button">Sepeti Onayla</Link>
+                <Link to="/checkout" className="checkout-buttons">Sepeti Onayla</Link>
             </div>
         </div>
     );
