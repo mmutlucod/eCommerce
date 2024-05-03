@@ -8,7 +8,7 @@ function EmptyCart() {
     return (
         <div className="empty-cart-container">
             <div className="empty-cart-info">
-                <ShoppingCartIcon style={{ fontSize: '40px', color: '#4B0082', marginLeft: '400px' }} />
+                <ShoppingCartIcon style={{ fontSize: '40px', color: '#4B0082', marginLeft: '40%' }} />
                 <p>Sepetinde ürün bulunmamaktadır.</p>
             </div>
             <Link to="/shop" className="start-shopping-button">Alışverişe Başla</Link>
