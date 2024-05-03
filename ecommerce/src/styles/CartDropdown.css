@@ -33,14 +33,14 @@
     opacity: 1;
 }
 
-.cart-header {
+.cart-header0 {
     display: flex;
     justify-content: space-between; /* İçerikleri baş ve sona yasla */
     align-items: center; /* İçerikleri ortala */
     font-size: 14px;
     font-weight: bold;
     color: black;
-    margin-bottom: 25px;
+    margin-bottom: 5px;
 }
 
 .cart-title,
@@ -57,9 +57,11 @@
     
 }
 
-.cart-item {
+.cart-itemX {
     display: flex;
-    margin-bottom: 15px;
+    background-color: #fff;
+    margin: 5px 0;
+    padding: 5px;
 }
 
 .item-image img {

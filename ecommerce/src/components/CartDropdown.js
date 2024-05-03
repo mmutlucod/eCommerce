@@ -26,7 +26,7 @@ const CartDropdown = () => {
 
     return (
         <div className="cart-dropdown">
-            <div className="cart-header">
+            <div className="cart-header0">
                 <div className="cart-title">
                     Sepetim ({totalQuantity} Ürün)
                 </div>
@@ -37,7 +37,7 @@ const CartDropdown = () => {
 
             <div className="cart-items">
                 {cartItems.map(item => (
-                    <div key={item.product_id} className="cart-item">
+                    <div key={item.product_id} className="cart-itemX">
                         <div className="item-image">
                             <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
                         </div>
