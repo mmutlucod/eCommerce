@@ -1,23 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Grid, Typography, Button, Rating, Chip, CircularProgress } from '@mui/material';
+import { Box, Grid, Typography, Button, Rating, CircularProgress, Paper } from '@mui/material';
 import NavBar from '../components/UserNavbar';
 import Footer from '../components/UserFooter';
 import ImageCarousel from '../components/ImageCarousel';
-import api from '../api/api'; // API dosyanızı import edin
+import api from '../api/api';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import '../styles/ProductPage.css'; // CSS dosyasını buraya import ediyoruz
+
+// Tema özelleştirmesi
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#003399',
+    },
+    secondary: {
+      main: '#FF6600',
+    },
+  },
+  typography: {
+    fontFamily: 'Arial, sans-serif',
+    h5: {
+      fontWeight: 'bold',
+    },
+  },
+});
 
 const ProductPage = () => {
-  const { productSlug } = useParams(); // Ürün ID'sini URL'den al
+  const { productSlug } = useParams();
   const [product, setProduct] = useState(null);
+  const [sellers, setSellers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchProduct = async () => {
+    const fetchProductAndSellers = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`/user/products/${productSlug}`); // API'den ürün bilgilerini çek
-        setProduct(response.data);
+        const productResponse = await api.get(`user/product/${productSlug}`);
+        setProduct(productResponse.data);
+       
       } catch (err) {
         setError('Ürün bilgileri yüklenirken bir hata oluştu: ' + err.message);
       } finally {
@@ -25,7 +47,7 @@ const ProductPage = () => {
       }
     };
 
-    fetchProduct();
+    fetchProductAndSellers();
   }, [productSlug]);
 
   if (loading) return <CircularProgress />;
@@ -33,34 +55,34 @@ const ProductPage = () => {
   if (!product) return <Typography>Ürün bulunamadı.</Typography>;
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <NavBar />
-      <Grid container spacing={2} sx={{ padding: 2 }}>
-        <Grid item xs={12} md={6}>
-          <ImageCarousel images={product.images.map(img => img.url)} />
-          <Box sx={{ marginTop: 2 }}>
-            {product.features.map((feature, index) => (
-              <Typography key={index} variant="body2">
-                {`${feature.label}: ${feature.value}`}
-              </Typography>
-            ))}
-          </Box>
-        </Grid>
-        <Grid item xs={12} md={6} sx={{ padding: 2 }}>
-          <Typography variant="h5" sx={{ fontWeight: 'bold' }}>{product.name}</Typography>
-          <Typography variant="subtitle1" color="textSecondary">{product.brand}</Typography>
-          <Rating value={product.rating} readOnly precision={0.1} />
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            {product.price ? `${product.price.toFixed(2)} ₺` : 'Fiyat bilgisi yok'}
-          </Typography>
-          <Box display="flex" flexDirection="column" alignItems="start" mt={2}>
-            <Button variant="contained" color="primary">Sepete Ekle</Button>
-            {/* Diğer bilgiler ve butonlar */}
-          </Box>
-        </Grid>
-      </Grid>
+      {console.log(product)}
+      <div className="product-container">
+        <div className="image-carousel-container">
+          {product.images && <ImageCarousel images={product.images.map(img => img.url)} />}
+        </div>
+        <div className="product-details">
+          <h1 className="product-name">{product.name}</h1>
+          <h2 className="product-brand">{product.brand}</h2>
+          <Rating className="product-rating" value={parseFloat(product.rating) || 0} readOnly precision={0.1} />
+          <p className="product-price">{product.price ? `${product.price.toFixed(2)} ₺` : 'Fiyat bilgisi yok'}</p>
+          <Button variant="contained" color="primary" className="add-to-cart-button">Sepete Ekle</Button>
+        </div>
+        <div className="other-sellers">
+          <h3>Diğer Satıcılar - Tümü ({sellers.length})</h3>
+          {sellers.map(seller => (
+            <div key={seller.id} className="seller">
+              <span className="seller-rating">{seller.rating}</span>
+              <span className="seller-shipment">{seller.shipment}</span>
+              <span className="seller-price">{seller.price} TL</span>
+              <Button variant="outlined" color="primary">Sepete Ekle</Button>
+            </div>
+          ))}
+        </div>
+      </div>
       <Footer />
-    </>
+    </ThemeProvider>
   );
 };
 
