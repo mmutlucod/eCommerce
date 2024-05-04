@@ -72,7 +72,7 @@
     object-fit: contain; /* Resmi orantılı bir şekilde küçült */
 }
 
-.item-details {
+.item-details0 {
     display: flex;
     flex-direction: column;
     align-items: start;

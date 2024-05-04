@@ -41,7 +41,7 @@ const CartDropdown = () => {
                         <div className="item-image">
                             <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
                         </div>
-                        <div className="item-details">
+                        <div className="item-details0">
                             <div className="item-name">{item.sellerProduct.product.name}</div>
                             <div className="item-options">
                                 <div className='item-price'>Fiyat: {item.sellerProduct.price} ₺ </div>
