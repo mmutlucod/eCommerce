@@ -104,7 +104,7 @@ const ProductCards = () => {
         {products.map((product) => (
           
           <CustomCard key={product.product_id} onClick={() => handleCardClick(product.product.slug)}>
-            {console.log(product.product.slug)}
+            {/* {console.log(product.product.slug)} */}
             {product.fastDelivery && <CustomBadge color="error" badgeContent="Fast Delivery" />}
             <ImageCarousel images={product.product.productImages.map(img => img.image_path)} />
             <CustomCardContent>
