@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/FullCart.css';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import DeleteIcon from '@mui/icons-material/Delete'; // Çöp kutusu ikonu için MUI kütüphanesinden DeleteIcon'u içe aktar
 
 function CartIcon({ itemCount }) {
     return (
@@ -43,17 +44,24 @@ function CartItem({ item, onUpdate, onRemove }) {
     );
 }
 
-function FullCart({ cartItems, total, onUpdate, onRemove }) {
+function FullCart({ cartItems, total, onUpdate, onRemove, onClearCart }) {
     const itemsBySeller = groupItemsBySeller(cartItems);
-
     return (
         <div className="full-cart-container">
             <div className='item-count'>
-                <ShoppingCartIcon style={{ display: 'flex', fontSize: '40px', color: '#4B0082', marginLeft: '2%' }} />Sepetim (5 Ürün)</div>
+                <ShoppingCartIcon style={{ display: 'flex', fontSize: '40px', color: '#4B0082', marginLeft: '2%' }} />
+                <div className='basket-text'>Sepetim (5 Ürün)</div>
+                <div className="clear-cart" onClick={onClearCart}>
+                    <div onClick={onClearCart}>
+                        <DeleteIcon /> {/* Çöp kutusu ikonu */}
+                        <span>Sepeti Boşalt</span>
+                    </div>
+                </div>
+            </div>
             {Object.entries(itemsBySeller).map(([seller, items]) => (
                 <div className="cart-item" key={seller}>
                     <div className="cart-header">
-                        <div>Satıcı:  <Link className='seller-link'>{seller}</Link>
+                        <div>Satıcı:  <Link to={'/satici/' + seller} className='seller-link'>{seller}</Link>
                         </div>
                     </div>
                     {items.map(item => (
@@ -63,11 +71,14 @@ function FullCart({ cartItems, total, onUpdate, onRemove }) {
             ))}
             <div className="order-summary">
                 <h3>Sipariş Özeti</h3>
-                <p>Toplam Ürün Sayısı: {cartItems.length}</p>
-                <p>Toplam Tutar: {total} TL</p>
+                <p>Ürünün Toplamı <span>{total} ₺</span></p>
+                <p>Kargo Toplamı <span>+34,99 ₺</span></p>
+                <p style={{ color: '#4B0082' }}>Kargo Bedava(Satıcı Karşılar) <span style={{ color: '#4B0082' }}>-34,99 ₺</span></p>
+                <div></div>
+                <p>Toplam Tutar <span>{total} ₺</span></p>
                 <Link to="/checkout" className="checkout-buttons">Sepeti Onayla</Link>
             </div>
-        </div>
+        </div >
     );
 }
 

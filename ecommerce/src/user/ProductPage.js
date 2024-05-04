@@ -16,7 +16,7 @@ const ProductPage = () => {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const response = await api.get(`/user/products/${productSlug}`); // API'den ürün bilgilerini çek
+        const response = await api.get(`/user/product/${productSlug}`); // API'den ürün bilgilerini çek
         setProduct(response.data);
       } catch (err) {
         setError('Ürün bilgileri yüklenirken bir hata oluştu: ' + err.message);

@@ -8,17 +8,58 @@
 
 .order-summary {
     position: fixed;
-    top: 0;
-    right: 0;
-    margin-top: 15vh;
-    margin-right: 2%;
-    padding: 10px;
-    background-color: #f7f7f7;
+    margin-left: 75%;
+    margin-top: 3.3%;
+    width: 20%; /* Sabit bir genişlik */
+    height: auto;
+    padding: 20px;
+    background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 2px;
-    width: 20%;
-    height: 35vh;
-    overflow: auto; /* Ekstra içeriği kaydırarak gösterir */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+}
+.order-summary h3 {
+    font-weight: 600;
+    display: flex;
+    margin-top: 2%;
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 15px;
+}
+.order-summary div {
+    border-top: 1px solid #ccc; /* Çizgi stilini kesik çizgi yap */
+    margin: 10px 0;
+}
+
+.order-summary p span{
+    font-weight: 700;
+}
+
+.order-summary p {
+    display: flex;
+    justify-content: space-between; /* İçerikleri sağa ve sola yasla */
+    margin-bottom: 10px;
+}
+
+.order-summary .summary-item {
+    display: flex;
+    justify-content: space-between; /* Elemanları kutunun sağına ve soluna yasla */
+    margin-bottom: 10px; /* Elemanlar arası boşluk */
+    font-size: 16px; /* Metin boyutunu ayarla */
+    color: #666; /* Metin rengini açık gri yap */
+}
+
+.order-summary .summary-total {
+    font-size: 20px;
+    font-weight: bold; /* Toplam tutarı kalın yazı tipiyle belirt */
+    border-top: 1px solid #ccc; /* Üstüne çizgi çek */
+    padding-top: 10px; /* Çizgi ile yazı arasında boşluk bırak */
+    margin-top: 10px; /* Önceki elemandan boşluk bırak */
+}
+
+.checkout-buttons:hover {
+    background-color: #e68a00;
 }
 
 /* Medya sorgusu: Ekran genişliği 768px ve altı için stil */
@@ -29,11 +70,9 @@
 
     .order-summary {
         position: relative; /* Sabit konumdan göreli konuma geçiş */
-        top: auto;
-        right: auto;
-        margin-top: 20px; /* Üstteki sepet öğelerinden biraz boşluk */
-        margin-right: 0;
-        width: 100%; /* Konteyner genişliğini tamamen kullanır */
+        margin-top: 4%; /* Üstteki sepet öğelerinden biraz boşluk */
+        margin-left: 3px;
+        width: 94%; /* Konteyner genişliğini tamamen kullanır */
         height: auto; /* İçerik boyutuna göre yükseklik ayarlar */
     }
 }
@@ -149,7 +188,7 @@
     cursor: pointer;
 }
 .checkout-buttons {
-    background-color: #ff9800;
+    background-color: #ff6600;
     color: white;
     text-decoration: none;
     padding: 10px 20px;
@@ -158,4 +197,30 @@
     width: max-content;
     margin-top: 10px;
     margin-left: 33%;
+}
+.basket-text{
+    margin-left: 2px;
+    font-weight: 400;
+    margin-top: 0.5%;
+    font-size: 20px;
+}
+.clear-cart div{
+    position: fixed; /* Pozisyonu sabitleyerek her zaman en üstte ve sağda kalmasını sağlar */
+    top: 15%; /* Üstten 20px boşluk bırakır */
+    right: 27%; /* Sağdan 20px boşluk bırakır */
+    display: flex;
+    align-items: center; /* İçeriği dikey olarak ortalar */
+    cursor: pointer; /* Fare imleci üzerine geldiğinde işaretçi olarak değişir */
+    z-index: 1000; /* Diğer içeriklerin üstünde yer almasını sağlar */
+}
+
+.clear-cart div span {
+    color: #f44336; /* Yazı rengini kırmızı yapar */
+    font-size: 14px; /* Yazı boyutunu ayarlar */
+    margin-left: 0; /* İkon ile yazı arasında boşluk bırakır */
+}
+
+.clear-cart div svg {
+    color: #f44336; /* İkon rengini kırmızı yapar */
+    font-size: 24px; /* İkon boyutunu büyütür */
 }
