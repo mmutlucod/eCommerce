@@ -65,7 +65,7 @@ const ProductNameTypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary, // Bu kısım metnin rengini ayarlar
   marginLeft: theme.spacing(1), // Marka ve model arasındaki boşluk için
 }));
- 
+
 const ProductCards = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -102,7 +102,7 @@ const ProductCards = () => {
       <MenuBar />
       <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
         {products.map((product) => (
-          
+
           <CustomCard key={product.product_id} onClick={() => handleCardClick(product.product.slug)}>
             {/* {console.log(product.product.slug)} */}
             {product.fastDelivery && <CustomBadge color="error" badgeContent="Fast Delivery" />}
