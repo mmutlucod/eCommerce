@@ -19,7 +19,7 @@ margin: 0 auto;
 const ImageCarousel = ({ images }) => {
     const settings = {
         dots: true, // Nokta göstergelerini aktif et
-        infinite: true, // Sonsuz döngü
+        infinite: false, // Sonsuz döngü
         speed: 500, // Geçiş hızı
         slidesToShow: 1, // Bir seferde kaç slayt gösterileceği
         slidesToScroll: 1, // Bir seferde kaç slayt geçileceği

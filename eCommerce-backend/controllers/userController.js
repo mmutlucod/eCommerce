@@ -1677,7 +1677,7 @@ const getProductsBySlug = async (req, res) => {
           model: Brand
         }, {
           model: Category
-        }]
+        },{model:productImage}]
       }],
       order: [['price', 'ASC']], // Fiyata göre sırala
     });
