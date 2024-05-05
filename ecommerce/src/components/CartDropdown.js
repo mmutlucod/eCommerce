@@ -37,7 +37,7 @@ const CartDropdown = () => {
 
             <div className="cart-items">
                 {cartItems.map(item => (
-                    <div key={item.product_id} className="cart-itemX">
+                    <Link style={{ textDecoration: 'none' }} to={'/urun/' + item.sellerProduct.product.slug}><div key={item.product_id} className="cart-itemX">
                         <div className="item-image">
                             <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
                         </div>
@@ -49,13 +49,13 @@ const CartDropdown = () => {
                             </div>
                         </div>
                     </div>
-                ))}
+                    </Link>))}
             </div>
             <div className="buttons-container">
                 <Link to="/sepetim" className="view-cart-button button">Sepete Git</Link>
                 <Link to="/siparisi-tamamla" className="checkout-button button">Siparişi Tamamla</Link>
             </div>
-        </div>
+        </div >
     );
 };
 
