@@ -166,7 +166,7 @@ const ProductCards = () => {
               <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
                 <Rating name="half-rating-read" value={parseFloat(product.commentAvg) || 0} precision={0.5} readOnly />
                 <CustomTypography variant="m" marginRight={'100%'}>
-                  {`(${product.commentCount || 0})`}
+                  {`(${product.commentCount})`}
                 </CustomTypography>
               </Box>
               <CustomTypography variant="h6" mt={1}>

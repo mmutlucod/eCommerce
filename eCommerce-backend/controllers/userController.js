@@ -1604,28 +1604,31 @@ const getProducts = async (req, res) => {
     });
     const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
 
-
     for (let product of uniqueLowestPriceProducts) {
       const ratingsData = await ProductComment.findAll({
+        where: {
+          '$sellerProduct.product_id$': product.product_id // `sellerProduct` üzerinden `product_id` ile filtreleme
+        },
         include: [{
           model: sellerProduct,
-          attributes: [], // sellerProduct'tan herhangi bir özellik çekmeyeceğiz
+          attributes: [],
           include: [{
             model: Product,
-            where: { product_id: product.product.product_id },
-            attributes: [
-              [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'], // Ortalama puanı hesapla
-              [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount'] // Yorum sayısını hesapla
-            ], // İç içe include yapısı kullanıyorsak, bu seviyede de attributes boş bırakılmalı
+            attributes: [] // `Product`'a ait özellikler bu seviyede istenmiyor
           }]
         }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+        ],
+        group: ['sellerProduct.product_id'], // Ürün ID'sine göre gruplama yaparak doğru sonuçlar elde et
         raw: true
       });
 
-      // Eğer hiç yorum yoksa, ortalamaRating ve RatingCount 0 olacak şekilde ayarla
-      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
-      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
     }
+
 
     const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
       const isFavorite = favoriteProductsIds.includes(product.product.product_id);
@@ -1686,24 +1689,27 @@ const getProductsBySlug = async (req, res) => {
 
     // Ürün yorumları ve puanlarının hesaplanması
     const ratingsData = await ProductComment.findAll({
+      where: {
+        '$sellerProduct.product_id$': product.product_id // `sellerProduct` üzerinden `product_id` ile filtreleme
+      },
       include: [{
         model: sellerProduct,
         attributes: [],
         include: [{
           model: Product,
-          where: { product_id: product.product_id },
-          attributes: []
+          attributes: [] // `Product`'a ait özellikler bu seviyede istenmiyor
         }]
       }],
       attributes: [
         [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
         [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
       ],
+      group: ['sellerProduct.product_id'], // Ürün ID'sine göre gruplama yaparak doğru sonuçlar elde et
       raw: true
     });
 
-    const commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
-    const commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
+    const commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+    const commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
 
     const isFavorite = user ? favoriteProductsIds.includes(sellerProductData.product.product_id) : false;
     const stockStatus = sellerProductData.stock === 0 ? 'Stokta yok' : 'Stokta var';
@@ -1745,11 +1751,9 @@ const getProductsBySellerSlug = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Ürün bulunamadı' });
     }
 
-    // Öncelikle mg değerine göre satıcıyı bulmaya çalış
     let seller = await Seller.findOne({ where: { slug: mg } });
     let productsQuery = { product_id: product.product_id, is_active: 1 };
 
-    // Eğer mg değeri ile satıcı bulunamazsa, bu sorgu koşulunu kaldır (herhangi bir satıcının ürününü getir)
     if (!seller) {
       productsQuery = { ...productsQuery }; // Satıcı sınırlamasını kaldır
     } else {
@@ -1771,30 +1775,6 @@ const getProductsBySellerSlug = async (req, res) => {
       order: [['price', 'ASC']], // Fiyata göre sırala
     });
 
-    if (products.length === 0) {
-      // Eğer belirli bir satıcıya ait ürün yoksa, genel sorgulama yap
-      products = await sellerProduct.findAll({
-        where: { product_id: product.product_id, is_active: 1 },
-        include: [{ model: Seller }, { model: Product, include: [{ model: Brand }, { model: Category }] }],
-        order: [['price', 'ASC']],
-      });
-    }
-
-    // Ürün yorumları ve puanlarının hesaplanması
-    for (let product of products) {
-      const ratingsData = await ProductComment.findAll({
-        where: { product_id: product.product_id },
-        attributes: [
-          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
-          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
-        ],
-        raw: true
-      });
-
-      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
-      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
-    }
-
     const uniqueProductsMap = new Map();
     products.forEach(product => {
       const productId = product.product.product_id;
@@ -1803,6 +1783,31 @@ const getProductsBySellerSlug = async (req, res) => {
       }
     });
     const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    for (let product of uniqueLowestPriceProducts) {
+      const ratingsData = await ProductComment.findAll({
+        where: {
+          '$sellerProduct.product_id$': product.product.product_id // `sellerProduct` üzerinden `product_id` ile filtreleme
+        },
+        include: [{
+          model: sellerProduct,
+          attributes: [],
+          include: [{
+            model: Product,
+            attributes: [] // `Product`'a ait özellikler bu seviyede istenmiyor
+          }]
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+        ],
+        group: ['sellerProduct.product_id'], // Ürün ID'sine göre gruplama yaparak doğru sonuçlar elde et
+        raw: true
+      });
+
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
+    }
 
     const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
       const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
@@ -1817,7 +1822,6 @@ const getProductsBySellerSlug = async (req, res) => {
     });
 
     return res.status(200).json(productsWithFavoritesAndPrice);
-
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -1861,20 +1865,6 @@ const getProductsByCategorySlug = async (req, res) => {
       order: [['price', 'ASC']]
     });
 
-    for (let product of products) {
-      const ratingsData = await ProductComment.findAll({
-        where: { product_id: product.product.product_id },
-        attributes: [
-          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
-          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
-        ],
-        raw: true
-      });
-
-      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
-      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
-    }
-
     const uniqueProductsMap = new Map();
     products.forEach(product => {
       const productId = product.product.product_id;
@@ -1883,6 +1873,31 @@ const getProductsByCategorySlug = async (req, res) => {
       }
     });
     const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    for (let product of uniqueLowestPriceProducts) {
+      const ratingsData = await ProductComment.findAll({
+        where: {
+          '$sellerProduct.product_id$': product.product.product_id // `sellerProduct` üzerinden `product_id` ile filtreleme
+        },
+        include: [{
+          model: sellerProduct,
+          attributes: [],
+          include: [{
+            model: Product,
+            attributes: [] // `Product`'a ait özellikler bu seviyede istenmiyor
+          }]
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+        ],
+        group: ['sellerProduct.product_id'], // Ürün ID'sine göre gruplama yaparak doğru sonuçlar elde et
+        raw: true
+      });
+
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
+    }
 
     const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
       const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
@@ -1901,6 +1916,7 @@ const getProductsByCategorySlug = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 // Markaya göre ürün çekme
 const getProductsByBrandSlug = async (req, res) => {
   const { brandSlug } = req.params;
@@ -1934,20 +1950,6 @@ const getProductsByBrandSlug = async (req, res) => {
       order: [['price', 'ASC']]
     });
 
-    for (let product of products) {
-      const ratingsData = await ProductComment.findAll({
-        where: { product_id: product.product.product_id },
-        attributes: [
-          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
-          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
-        ],
-        raw: true
-      });
-
-      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
-      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
-    }
-
     const uniqueProductsMap = new Map();
     products.forEach(product => {
       const productId = product.product.product_id;
@@ -1956,6 +1958,31 @@ const getProductsByBrandSlug = async (req, res) => {
       }
     });
     const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    for (let product of uniqueLowestPriceProducts) {
+      const ratingsData = await ProductComment.findAll({
+        where: {
+          '$sellerProduct.product_id$': product.product.product_id
+        },
+        include: [{
+          model: sellerProduct,
+          attributes: [],
+          include: [{
+            model: Product,
+            attributes: []
+          }]
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+        ],
+        group: ['sellerProduct.product_id'],
+        raw: true
+      });
+
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
+    }
 
     const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
       const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
@@ -1974,6 +2001,7 @@ const getProductsByBrandSlug = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 
 
 // ARAMA İŞLEMLERİ
