@@ -60,6 +60,7 @@ const ProductPage = () => {
       <Grid container spacing={2} sx={{ maxWidth: 1200, mx: 'auto', my: 5 }}>
         <Paper elevation={3} sx={{ width: '100%', display: 'flex', flexDirection: 'column', p: 3 }}>
           <Grid container spacing={2} justifyContent="center">
+            {console.log(product)}
             <Grid item xs={12} md={6} className="image-carousel" sx={{ position: 'relative' }}>
               {product && (
                 <SimpleImageSlider images={product.product.productImages.map(img => img.image_path)} showNavs={true} />
@@ -88,25 +89,12 @@ const ProductPage = () => {
                 </Card>
               )}
             </Grid>
-            <Grid item xs={12} md={6} sx={{ mt: 2 }}>
-              <Typography variant="h6">Özellikler:</Typography>
-              <Typography>{product?.product.description || 'Özellik bilgisi yükleniyor...'}</Typography>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6">Diğer Satıcılar - Tümü ({sellers.length})</Typography>
-              {console.log(sellers)}
-              {sellers.map(seller => (
-                <Box key={seller.id} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 1 }}>
-                  <Typography>{seller.name}</Typography>
-                  <Typography>{seller.price} TL</Typography>
-                  <Button variant="outlined" color="primary">Sepete Ekle</Button>
-                </Box>
-              ))}
-            </Grid>
+           
+           
           </Grid>
    
         </Paper>
-        <ProductTabs product={product} sellers={sellers} />
+        {product && <ProductTabs product={product.product} />} 
       </Grid>
       
       <Footer />
