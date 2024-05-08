@@ -17,11 +17,17 @@ const cartSlice = createSlice({
             const existingItem = state.items.find(item => item.id === newItem.id);
 
             if (existingItem) {
-                existingItem.quantity += newItem.quantity;
+                const potentialQuantity = existingItem.quantity + newItem.quantity;
+                if (potentialQuantity > newItem.maxBuy) {
+                    existingItem.quantity = newItem.maxBuy; // max_buy sınırına ulaştığında miktarı sabitle
+                } else {
+                    existingItem.quantity = potentialQuantity; // Normal ekleme
+                }
             } else {
-                state.items.push({ ...newItem, quantity: newItem.quantity });
+                const initialQuantity = newItem.quantity > newItem.maxBuy ? newItem.maxBuy : newItem.quantity;
+                state.items.push({ ...newItem, quantity: initialQuantity });
             }
-            state.totalAmount += newItem.price * newItem.quantity;
+            state.totalAmount = state.items.reduce((total, item) => total + (item.price * item.quantity), 0); // Toplam tutarı güncelle
         },
         removeItem(state, action) {
             const id = action.payload;
@@ -40,8 +46,13 @@ const cartSlice = createSlice({
             const { id, quantity } = action.payload;
             const item = state.items.find(item => item.id === id);
             if (item) {
-                state.totalAmount += (quantity - item.quantity) * item.price;
-                item.quantity = quantity;
+                if (quantity === 0) {
+                    // If quantity is set to 0, remove the item from the cart
+                    state.items = state.items.filter(item => item.id !== id);
+                }
+                const newQuantity = Math.min(item.maxBuy, quantity); // Ürün miktarını 5 ile sınırla
+                state.totalAmount += (newQuantity - item.quantity) * item.price; // Toplam tutarı güncelle
+                item.quantity = newQuantity; // Miktarı güncelle
             }
         },
         clearCart(state) {

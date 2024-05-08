@@ -99,23 +99,31 @@ const ProductCards = () => {
     try {
       const response = await api.get(`/user/productPhoto/${productId}`);
       const images = response.data;
-      const firstImage = images.length > 0 ? images[0] : null;  // İlk resim ya da yoksa null
-      dispatch({
+
+      if (images != null) {
+        return dispatch({
+          type: 'FETCH_PRODUCT_IMAGES_SUCCESS',
+          payload: images.image_path
+        });
+      }
+      return dispatch({
         type: 'FETCH_PRODUCT_IMAGES_SUCCESS',
-        payload: firstImage  // Sadece ilk resmi yollayın
+        payload: null
       });
     } catch (error) {
       dispatch({
         type: 'FETCH_PRODUCT_IMAGES_FAILURE',
         payload: error.response ? error.response.data : error.message
       });
+      return null; // Return null in case of error
     }
   };
 
 
+  const handleAddToCart = async (product) => {
+    const productPhoto = await dispatch(fetchProductImages(product.product_id));
 
-  const handleAddToCart = (product) => {
-    dispatch(fetchProductImages(product.product_id)).then(images => {
+    if (productPhoto) {
       dispatch(addItem({
         id: product.seller_product_id,
         productName: product.product.name,
@@ -123,11 +131,11 @@ const ProductCards = () => {
         quantity: 1,
         brandName: product.product.Brand.brand_name,
         maxBuy: product.product.max_buy,
-        productPhoto: images ? images[0] : null,
+        productPhoto: productPhoto.payload,
         sellerName: product.seller.username,
         brandSlug: product.product.Brand.slug
       }));
-    });
+    }
   };
 
 

@@ -1612,14 +1612,13 @@ const getProducts = async (req, res) => {
           attributes: [], // sellerProduct'tan herhangi bir özellik çekmeyeceğiz
           include: [{
             model: Product,
-            where: { product_id: product.product_id },
-            attributes: [] // İç içe include yapısı kullanıyorsak, bu seviyede de attributes boş bırakılmalı
+            where: { product_id: product.product.product_id },
+            attributes: [
+              [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'], // Ortalama puanı hesapla
+              [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount'] // Yorum sayısını hesapla
+            ], // İç içe include yapısı kullanıyorsak, bu seviyede de attributes boş bırakılmalı
           }]
         }],
-        attributes: [
-          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'], // Ortalama puanı hesapla
-          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount'] // Yorum sayısını hesapla
-        ],
         raw: true
       });
 
@@ -1676,7 +1675,7 @@ const getProductsBySlug = async (req, res) => {
           model: Brand
         }, {
           model: Category
-        },{model:productImage}]
+        }, { model: productImage }]
       }],
       order: [['price', 'ASC']], // Fiyata göre sırala
     });

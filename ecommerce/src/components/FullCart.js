@@ -4,24 +4,16 @@ import '../styles/FullCart.css';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DeleteIcon from '@mui/icons-material/Delete'; // Çöp kutusu ikonu için MUI kütüphanesinden DeleteIcon'u içe aktar
 import Footer from '../components/UserFooter';
-
-function CartIcon({ itemCount }) {
-    return (
-        <div className="cart-icon">
-            <i className="fa fa-shopping-cart"></i>
-            <span className="item-count">{itemCount}</span>
-        </div>
-    );
-}
+import { clearCart } from '../redux/cartSlice';
 
 function groupItemsBySeller(items) {
     return items.reduce((acc, item) => {
-        console.log(item)
+        console.log(item); // Hangi ürünün işlendiğini görmek için
         if (!item || !item.sellerName) {
-            console.error('Seller veya Seller Product eksik:', item);
+            console.error('Seller adı veya ürün eksik:', item);
             return acc; // Eksik veri varsa, bu item'i atlayın
         }
-        const sellerUsername = item.username;
+        const sellerUsername = item.sellerName; // Düzeltme: sellerName olarak değiştirildi
         if (!acc[sellerUsername]) {
             acc[sellerUsername] = [];
         }
@@ -30,11 +22,12 @@ function groupItemsBySeller(items) {
     }, {});
 }
 
+
 function CartItem({ item, onUpdate, onRemove }) {
     console.log(item);
     return (
         <div className="item-body">
-            <img src={`http://localhost:5000/img/${item.productPhoto}` ? `http://localhost:5000/img/${item.productPhoto}` : 'http://localhost:5000/img/empty.jpg'} alt={item.productName} />
+            <img src={item.productPhoto ? `http://localhost:5000/img/${item.productPhoto}` : 'http://localhost:5000/img/empty.jpg'} alt={item.productName} />
             <div className="item-details">
                 <p style={{ minWidth: '40%', maxWidth: '40%', fontSize: '14px', marginLeft: '2%', marginTop: '0.32%' }}> <Link className='markaLink' to={'/marka/' + item.brandSlug}>{item.brandName}</Link>{' ' + item.productName}</p>
                 <div className="item-controls">
@@ -44,7 +37,7 @@ function CartItem({ item, onUpdate, onRemove }) {
                         <button onClick={() => onUpdate(item.id, item.quantity + 1)}>+</button>
                     </div>
                     <div className="price">{item.price * item.quantity}₺</div>
-                    <div className='remove-button'>Sil</div>
+                    <div className='remove-button' onClick={() => onRemove(item.id)}>Sil</div>
                 </div>
             </div>
         </div>
@@ -77,7 +70,7 @@ function FullCart({ cartItems, total, onUpdate, onRemove, onClearCart }) {
                     {/* <ShoppingCartIcon style={{ fontSize: '40px', color: '#4B0082', marginLeft: '2%' }} /> */}
                     <div className='basket-text'>Sepetim (5 Ürün)</div>
                     <div className="clear-cart" onClick={onClearCart}>
-                        <div onClick={onClearCart}>
+                        <div>
                             <DeleteIcon /> {/* Çöp kutusu ikonu */}
                             <span>Sepeti Boşalt</span>
                         </div>

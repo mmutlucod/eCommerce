@@ -1,7 +1,7 @@
 // Cart.js
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateItemQuantity, removeItem } from '../redux/cartSlice';
+import { updateItemQuantity, removeItem, clearCart } from '../redux/cartSlice';
 import Navbar from './UserNavbar';
 import EmptyCart from './EmptyCart';
 import FullCart from './FullCart';
@@ -17,6 +17,9 @@ function Cart() {
     const handleRemoveItem = (productId) => {
         dispatch(removeItem(productId));
     };
+    const handleClearItems = () => {
+        dispatch(clearCart());
+    }
 
     const getProductCount = () => {
         return cartItems.reduce((total, item) => total + item.quantity, 0);
@@ -44,6 +47,7 @@ function Cart() {
                 count={getProductCount()}
                 onUpdate={handleUpdateQuantity}
                 onRemove={handleRemoveItem}
+                onClearCart={handleClearItems}
             />
         </>
     );
