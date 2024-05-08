@@ -116,6 +116,6 @@ router.get('/products/:productSlug', authOptionalMiddleware, userController.getP
 router.get('/category/:categorySlug', authOptionalMiddleware, userController.getProductsByCategorySlug);
 router.get('/brand/:brandSlug', authOptionalMiddleware, userController.getProductsByBrandSlug);
 
-
+router.get('/productPhoto/:productId', authOptionalMiddleware, userController.getPhotos);
 
 module.exports = router;

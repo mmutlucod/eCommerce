@@ -10,7 +10,7 @@
     position: fixed;
     margin-left: 75%;
     margin-top: 2.5%;
-    top: 10%;
+    /* top:7%; */
     width: 20%; /* Sabit bir genişlik */
     height: auto;
     padding: 20px;
@@ -19,6 +19,12 @@
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     z-index: 1000;
+}
+.top-normal {
+    top: 9%;
+}
+.top-small {
+    top: 0%;
 }
 .order-summary h3 {
     font-weight: 600;

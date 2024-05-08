@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/FullCart.css';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import DeleteIcon from '@mui/icons-material/Delete'; // Çöp kutusu ikonu için MUI kütüphanesinden DeleteIcon'u içe aktar
-import Footer from '../components/UserFooter'
+import Footer from '../components/UserFooter';
+
 function CartIcon({ itemCount }) {
     return (
         <div className="cart-icon">
@@ -15,7 +16,13 @@ function CartIcon({ itemCount }) {
 
 function groupItemsBySeller(items) {
     return items.reduce((acc, item) => {
-        const sellerUsername = item.sellerProduct.seller.username;
+        console.log(item)
+        // Önce item.sellerProduct ve item.sellerProduct.seller'in varlığını kontrol edin
+        if (!item || !item.sellerName) {
+            console.error('Seller veya Seller Product eksik:', item);
+            return acc; // Eksik veri varsa, bu item'i atlayın
+        }
+        const sellerUsername = item.username;
         if (!acc[sellerUsername]) {
             acc[sellerUsername] = [];
         }
@@ -25,9 +32,10 @@ function groupItemsBySeller(items) {
 }
 
 function CartItem({ item, onUpdate, onRemove }) {
+    console.log(item);
     return (
         <div className="item-body">
-            <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
+            <img src={`http://localhost:5000/img/${item.productPhoto}` ? `http://localhost:5000/img/${item.productPhoto}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
             <div className="item-details">
                 <p style={{ minWidth: '40%', maxWidth: '40%', fontSize: '14px', marginLeft: '2%', marginTop: '0.32%' }}> <Link className='markaLink' to={'/marka/' + item.sellerProduct.product.Brand.slug}>{item.sellerProduct.product.Brand.brand_name}</Link>{' ' + item.sellerProduct.product.name}</p>
                 <div className="item-controls">
@@ -36,8 +44,8 @@ function CartItem({ item, onUpdate, onRemove }) {
                         <span>{item.quantity}</span>
                         <button onClick={() => onUpdate(item.id, item.quantity + 1)}>+</button>
                     </div>
-                    <div className="price">{item.sellerProduct.price * item.quantity}₺</div>
-                    <DeleteIcon className='remove-button'></DeleteIcon>
+                    <div className="price">{item.price * item.quantity}₺</div>
+                    <div className='remove-button'>Sil</div>
                 </div>
             </div>
         </div>
@@ -45,6 +53,23 @@ function CartItem({ item, onUpdate, onRemove }) {
 }
 
 function FullCart({ cartItems, total, onUpdate, onRemove, onClearCart }) {
+    const [topClass, setTopClass] = useState('top-normal'); // Başlangıç sınıfı
+
+    const handleScroll = () => {
+        if (window.scrollY > 45) {
+            setTopClass('top-small');
+        } else {
+            setTopClass('top-normal');
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
+
     const itemsBySeller = groupItemsBySeller(cartItems);
     return (
         <>
@@ -60,29 +85,25 @@ function FullCart({ cartItems, total, onUpdate, onRemove, onClearCart }) {
                     </div>
                 </div>
 
-
                 {Object.entries(itemsBySeller).map(([seller, items]) => (
                     <div className="cart-item" key={seller}>
                         <div className="cart-header">
-                            <div>Satıcı:  <Link to={'/satici/' + seller} className='seller-link'>{seller}</Link>
-                            </div>
+                            <div>Satıcı:  <Link to={'/satici/' + seller} className='seller-link'>{seller}</Link></div>
                         </div>
                         {items.map(item => (
                             <CartItem key={item.id} item={item} onUpdate={onUpdate} onRemove={onRemove} />
                         ))}
                     </div>
                 ))}
-                <div className="order-summary">
+                <div className={`order-summary ${topClass}`}>
                     <h3>Sipariş Özeti</h3>
                     <p>Ürünün Toplamı <span>{total} ₺</span></p>
                     <p>Kargo Toplamı <span>+34,99 ₺</span></p>
                     <p style={{ color: '#4B0082' }}>Kargo Bedava(Satıcı Karşılar) <span style={{ color: '#4B0082' }}>-34,99 ₺</span></p>
-                    <div></div>
                     <p>Toplam Tutar <span>{total} ₺</span></p>
                     <Link to="/checkout" className="checkout-buttons">Sepeti Onayla</Link>
                 </div>
-
-            </div >
+            </div>
             <Footer />
         </>
     );

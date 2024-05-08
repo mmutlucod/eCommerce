@@ -16,6 +16,8 @@ import ImageSlider from '../components/ImageSlider';
 import MenuBar from '../components/MenuBar';
 import { images } from '../App';
 import ImageCarousel from '../components/ImageCarousel'
+import { useDispatch } from 'react-redux'; // useDispatch hook'unu import ediyoruz
+import { addItem } from '../redux/cartSlice'; // addItem action'ını import ediyoruz
 
 const CustomCard = styled(Card)(({ theme }) => ({
   flex: '1 0 calc(25% - 16px)', // Hesaplama her kart için %25 genişlik ve aralarında 8px boşluk sağlar
@@ -70,7 +72,7 @@ const ProductCards = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+  const dispatch = useDispatch();
   const navigate = useNavigate(); // useNavigate hook'unu kullanmak için
 
   useEffect(() => {
@@ -93,6 +95,45 @@ const ProductCards = () => {
     navigate(`/urun/${productId}`); // Ürün detay sayfasına yönlendirme
   };
 
+  const fetchProductImages = (productId) => async (dispatch) => {
+    try {
+      // API çağrısı
+      const response = await api.get(`/user/productPhoto/${productId}`);
+      // Yanıttan gelen veri, response.data içinde doğrudan kullanılabilir
+      const images = response.data;
+      // Başarılı işlem dispatch'i
+      dispatch({
+        type: 'FETCH_PRODUCT_IMAGES_SUCCESS',
+        payload: images
+      });
+    } catch (error) {
+      // Hata durumunda hata bilgisini dispatch et
+      dispatch({
+        type: 'FETCH_PRODUCT_IMAGES_FAILURE',
+        payload: error.response ? error.response.data : error.message
+      });
+    }
+  };
+
+
+  const handleAddToCart = (product) => {
+    dispatch(fetchProductImages(product.product_id)).then(images => {
+      // Fetch işlemi başarılı olduktan sonra ürünü sepete ekleyin
+      // Resimlerden ilki alınıyor
+      dispatch(addItem({
+        id: product.seller_product_id,
+        name: product.product.name,
+        price: product.price,
+        quantity: 1,
+        brandName: product.product.Brand.brand_name,
+        maxBuy: product.product.max_buy,
+        productPhoto: images,
+        sellerName: product.seller.username
+      }));
+    });
+  };
+
+
   if (loading) return <div>Yükleniyor...</div>;
   if (error) return <div>Hata: {error}</div>;
 
@@ -103,7 +144,7 @@ const ProductCards = () => {
       <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
         {products.map((product) => (
 
-          <CustomCard key={product.product_id} onClick={() => handleCardClick(product.product.slug)}>
+          <CustomCard key={product.product_id} >
             {/* {console.log(product.product.slug)} */}
             {product.fastDelivery && <CustomBadge color="error" badgeContent="Fast Delivery" />}
             <ImageCarousel images={product.product.productImages.map(img => img.image_path)} />
@@ -127,7 +168,7 @@ const ProductCards = () => {
               </CustomTypography>
             </CustomCardContent>
             <CardActions>
-              <CustomButton size="medium" fullWidth>
+              <CustomButton size="medium" fullWidth onClick={() => handleAddToCart(product)}>
                 Sepete Ekle
               </CustomButton>
             </CardActions>

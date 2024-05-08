@@ -993,29 +993,28 @@ const getProductComments = async (req, res) => {
 
     const productComments = await ProductComment.findAll({
       where: {
-        product_id: productId, // "seller_product_id" yerine doğrudan "product_id" kullanılır
         is_deleted: 0 // Silinmemiş yorumları filtrele
       },
       include: [
         {
           model: ApprovalStatus, // Bu modelin ProductComment ile ilişkilendirilmiş olması gerekiyor
-          attributes: ['status_name']
         },
         {
           model: User, // Kullanıcı modeli, ProductComment ile ilişkilendirilmiş olmalı
-          attributes: ['name', 'surname']
         },
-        // Aşağıdaki ilişkilendirme varsayımsaldır ve gerçek model yapınıza bağlıdır
-        // Eğer Product modeli doğrudan ProductComment ile ilişkilendirilmişse:
         {
-          model: Product,
-          include: [
-            {
-              model: Brand, // Brand modeli, Product ile ilişkilendirilmiş olmalı
-              attributes: ['brand_name']
-            }
-          ],
-          attributes: ['product_name', 'description']
+          model: sellerProduct,
+          include: [{
+            model: Product,
+            where: {
+              product_id: productId
+            },
+            include: [
+              {
+                model: Brand, // Brand modeli, Product ile ilişkilendirilmiş olmalı
+              }
+            ],
+          }]
         }
       ],
       order: [['comment_date', 'DESC']] // createdAt yerine modelde tanımlı olan comment_date kullanılır
@@ -1026,7 +1025,7 @@ const getProductComments = async (req, res) => {
       // Eğer is_public false ise, kullanıcı adını ve soyadını formatla
       // Bu formatlama fonksiyonunun tanımı burada verilmemiştir
       if (comment.is_public === 0) {
-        comment.user.name = "Anonymous";
+        comment.user.name = "";
         comment.user.surname = "";
       }
       return {
@@ -1041,7 +1040,7 @@ const getProductComments = async (req, res) => {
       };
     });
 
-    return res.status(200).json(formattedComments);
+    return res.status(200).json(productComments);
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
@@ -2073,7 +2072,15 @@ const searchProducts = async (req, res) => {
   }
 }
 
-
+const getPhotos = async (req, res) => {
+  const { productId } = req.params;
+  try {
+    const images = await productImage.findOne({ where: { product_id: productId } });
+    return res.status(200).json(images);
+  } catch (error) {
+    return res.status(500).json({ message: "Server error", error: error });
+  }
+}
 
 
 
@@ -2104,5 +2111,5 @@ module.exports = {
   createReturnRequest, getUserReturnRequests, cancelReturnRequest,
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug,
-  getCategories, getSubCategoriesById, searchProducts
+  getCategories, getSubCategoriesById, searchProducts, getPhotos
 };
