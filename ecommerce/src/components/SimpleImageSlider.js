@@ -15,29 +15,32 @@ const SimpleImageSlider = ({ images }) => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length); // Önceki resme geç
   };
 
-  // Resim URL'lerini API'dan gelen yapıya göre düzenleyin
-  const imageUrl = `http://localhost:5000/img/${images[currentIndex]}`;
+  const imageUrl = `http://localhost:5000/img/${images[currentIndex]}`; // Resim URL'lerini API'dan gelen yapıya göre düzenleyin
 
   return (
-    <Box sx={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <Box sx={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', marginX: 8 }}>
       <IconButton
         onClick={handlePrev}
         color="primary"
         sx={{
           position: 'absolute',
-          left: theme.spacing(2),
+          left: 0, // Iconları konteyner dışına çıkarmak için
+          transform: 'translateX(-100%)', // Iconları tamamen dışarı çıkar
           zIndex: 1
         }}
       >
         <ChevronLeftIcon />
       </IconButton>
-      <img src={imageUrl} alt={`Slide ${currentIndex + 1}`} style={{ width: '100%', maxHeight: '500px', objectFit: 'contain' }} />
+      <Box sx={{ width: '100%', overflow: 'hidden', display: 'flex', justifyContent: 'center' }}>
+        <img src={imageUrl} alt={`Slide ${currentIndex + 1}`} style={{ width: '100%', maxHeight: '500px', objectFit: 'contain' }} />
+      </Box>
       <IconButton
         onClick={handleNext}
         color="primary"
         sx={{
           position: 'absolute',
-          right: theme.spacing(2),
+          right: 0, // Iconları konteyner dışına çıkarmak için
+          transform: 'translateX(100%)', // Iconları tamamen dışarı çıkar
           zIndex: 1
         }}
       >
