@@ -10,6 +10,7 @@ const Order = sequelize.define('order', {
         primaryKey: true
     },
     user_id: Sequelize.INTEGER,
+    address_id: Sequelize.INTEGER,
     order_date: Sequelize.DATE,
     total_price: Sequelize.DOUBLE,
     shipping_code: Sequelize.STRING,

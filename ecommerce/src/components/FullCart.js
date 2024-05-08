@@ -17,7 +17,6 @@ function CartIcon({ itemCount }) {
 function groupItemsBySeller(items) {
     return items.reduce((acc, item) => {
         console.log(item)
-        // Önce item.sellerProduct ve item.sellerProduct.seller'in varlığını kontrol edin
         if (!item || !item.sellerName) {
             console.error('Seller veya Seller Product eksik:', item);
             return acc; // Eksik veri varsa, bu item'i atlayın
@@ -35,9 +34,9 @@ function CartItem({ item, onUpdate, onRemove }) {
     console.log(item);
     return (
         <div className="item-body">
-            <img src={`http://localhost:5000/img/${item.productPhoto}` ? `http://localhost:5000/img/${item.productPhoto}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
+            <img src={`http://localhost:5000/img/${item.productPhoto}` ? `http://localhost:5000/img/${item.productPhoto}` : 'http://localhost:5000/img/empty.jpg'} alt={item.productName} />
             <div className="item-details">
-                <p style={{ minWidth: '40%', maxWidth: '40%', fontSize: '14px', marginLeft: '2%', marginTop: '0.32%' }}> <Link className='markaLink' to={'/marka/' + item.sellerProduct.product.Brand.slug}>{item.sellerProduct.product.Brand.brand_name}</Link>{' ' + item.sellerProduct.product.name}</p>
+                <p style={{ minWidth: '40%', maxWidth: '40%', fontSize: '14px', marginLeft: '2%', marginTop: '0.32%' }}> <Link className='markaLink' to={'/marka/' + item.brandSlug}>{item.brandName}</Link>{' ' + item.productName}</p>
                 <div className="item-controls">
                     <div className="quantity-selector">
                         <button onClick={() => onUpdate(item.id, item.quantity - 1)}>-</button>

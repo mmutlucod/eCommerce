@@ -97,17 +97,14 @@ const ProductCards = () => {
 
   const fetchProductImages = (productId) => async (dispatch) => {
     try {
-      // API çağrısı
       const response = await api.get(`/user/productPhoto/${productId}`);
-      // Yanıttan gelen veri, response.data içinde doğrudan kullanılabilir
       const images = response.data;
-      // Başarılı işlem dispatch'i
+      const firstImage = images.length > 0 ? images[0] : null;  // İlk resim ya da yoksa null
       dispatch({
         type: 'FETCH_PRODUCT_IMAGES_SUCCESS',
-        payload: images
+        payload: firstImage  // Sadece ilk resmi yollayın
       });
     } catch (error) {
-      // Hata durumunda hata bilgisini dispatch et
       dispatch({
         type: 'FETCH_PRODUCT_IMAGES_FAILURE',
         payload: error.response ? error.response.data : error.message
@@ -116,22 +113,23 @@ const ProductCards = () => {
   };
 
 
+
   const handleAddToCart = (product) => {
     dispatch(fetchProductImages(product.product_id)).then(images => {
-      // Fetch işlemi başarılı olduktan sonra ürünü sepete ekleyin
-      // Resimlerden ilki alınıyor
       dispatch(addItem({
         id: product.seller_product_id,
-        name: product.product.name,
+        productName: product.product.name,
         price: product.price,
         quantity: 1,
         brandName: product.product.Brand.brand_name,
         maxBuy: product.product.max_buy,
-        productPhoto: images,
-        sellerName: product.seller.username
+        productPhoto: images ? images[0] : null,
+        sellerName: product.seller.username,
+        brandSlug: product.product.Brand.slug
       }));
     });
   };
+
 
 
   if (loading) return <div>Yükleniyor...</div>;
