@@ -29,6 +29,7 @@ import UserFavorites from './user/Favorites';
 import ProductCart from './user/ProductCart';
 import UserCart from './components/Cart';
 import UserProductPage from './user/ProductPage';
+import MultiStepForm from './user/PaymentPage';
 
 
 export const images = [
@@ -74,6 +75,7 @@ function App() {
             <Route path="/user/favorites" element={< UserFavorites />} />
             <Route path="/sepetim" element={< UserCart />} />
             <Route path="/urun/:productSlug" element={< UserProductPage />} />
+            <Route path="/sepetim/odeme" element={< MultiStepForm />} />
           </Routes>
         </Router>
 
