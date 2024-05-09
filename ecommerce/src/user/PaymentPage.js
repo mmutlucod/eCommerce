@@ -1,86 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { Container, Button, Card, CardContent, Typography, Grid } from '@mui/material';
-import api from '../api/api';
+import React from 'react';
+import { Container, Paper, Grid, Button, Typography, TextField, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel } from '@mui/material';
 
-const MultiStepForm = () => {
-    const [step, setStep] = useState(1);
-    const [addresses, setAddresses] = useState([]);
-    const [selectedAddress, setSelectedAddress] = useState('');
+function PaymentPage() {
+  return (
+    <Container maxWidth="lg">
+      <Grid container spacing={4}>
+        <Grid item xs={12} md={7}>
+          <Paper style={{ padding: 20 }}>
+            <Typography variant="h6">Adres Bilgileri</Typography>
+            <TextField
+              label="Adres"
+              fullWidth
+              variant="outlined"
+              margin="normal"
+            />
+            <Button variant="contained" color="primary" style={{ marginBottom: 20 }}>Yeni Adres Ekle</Button>
+            <Typography variant="h6">Teslimat Adresi</Typography>
+            <FormControlLabel
+              control={<Checkbox checked={true} />}
+              label="Faturamı aynı adrese gönder"
+              style={{ marginBottom: 20 }}
+            />
+          </Paper>
+        </Grid>
+        <Grid item xs={12} md={5}>
+          <Paper style={{ padding: 20 }}>
+            <Typography variant="h6">Ödeme Seçenekleri</Typography>
+            <FormControl variant="outlined" fullWidth margin="normal">
+              <InputLabel>Ödeme Yöntemi</InputLabel>
+              <Select defaultValue="">
+                <MenuItem value="banka">Banka/Kredi Kartı</MenuItem>
+                <MenuItem value="kredi">Kredi</MenuItem>
+              </Select>
+            </FormControl>
+            <Typography variant="h6" style={{ marginTop: 20 }}>Sipariş Özeti</Typography>
+            <Typography>
+              Ürünlerin Toplamı: 4,854.44 TL
+            </Typography>
+            <Typography>
+              Kargo: 34.99 TL
+            </Typography>
+            <Typography>
+              İndirim: -34.99 TL
+            </Typography>
+            <Typography variant="subtitle1" style={{ marginTop: 10 }}>
+              Toplam: 4,802.02 TL
+            </Typography>
+            <Button variant="contained" color="primary" style={{ marginTop: 20 }}>Kaydet ve Devam Et</Button>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
+  );
+}
 
-    useEffect(() => {
-        const fetchAddresses = async () => {
-            try {
-                const response = await api.get('/user/addresses');
-                console.log('API Response:', response.data);  // Veriyi konsola basarak kontrol edin
-                // API'nin döndürdüğü veri yapısına bağlı olarak uygun düzeltmeyi yapın
-                // Örneğin, response.data bir nesne ise ve adresler 'addresses' anahtarında ise:
-                if (Array.isArray(response.data)) {
-                    setAddresses(response.data);
-                } else if (response.data.addresses && Array.isArray(response.data.addresses)) {
-                    setAddresses(response.data.addresses);
-                } else {
-                    // Eğer dizi dışında bir yapıdaysa, boş bir dizi ayarlayarak hata almamayı sağlayabilirsiniz.
-                    setAddresses([]);
-                }
-            } catch (error) {
-                console.error('Adresler yüklenirken bir hata oluştu:', error);
-                setAddresses([]);  // Hata durumunda adres listesini boşalt
-            }
-        };
-        fetchAddresses();
-    }, []);
-
-    const selectAddress = (address) => {
-        console.log('Seçilen Adres:', address);
-        setSelectedAddress(address);
-        nextStep();
-    };
-
-    const nextStep = () => {
-        console.log('İleriye gidiliyor, şu anki adım:', step);
-        setStep(step + 1);
-    };
-
-    const prevStep = () => {
-        console.log('Geri gidiliyor, şu anki adım:', step);
-        setStep(step - 1);
-    };
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        console.log('Form gönderildi, seçilen adres:', selectedAddress);
-    };
-
-    return (
-        <Container component="main" maxWidth="md" sx={{ mt: 4 }}>
-            {step === 1 && (
-                <Grid container spacing={2}>
-                    {addresses.map((address, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={index}>
-                            <Card variant="outlined" sx={{ cursor: 'pointer' }} onClick={() => selectAddress(address)}>
-                                <CardContent>
-                                    <Typography variant="h6" component="div">{address}</Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            )}
-            {step === 2 && (
-                <Card>
-                    <CardContent>
-                        <Typography variant="h5" component="div">Ödeme Bilgileri</Typography>
-                        <form onSubmit={handleSubmit}>
-                            <Button onClick={prevStep} sx={{ mt: 2 }}>Geri</Button>
-                            <Button type="submit" variant="contained" sx={{ mt: 2 }}>
-                                Siparişi Tamamla
-                            </Button>
-                        </form>
-                    </CardContent>
-                </Card>
-            )}
-        </Container>
-    );
-};
-
-export default MultiStepForm;
+export default PaymentPage;
