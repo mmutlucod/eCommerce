@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tab, Tabs, Box, AppBar, Typography, TextField, Button } from '@mui/material';
 import api from '../api/api';
 import ReviewsTab from '../components/ReviewsTabs'; 
+import QuestionsTab from '../components/QuestionsTabs'; 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -79,9 +80,9 @@ function ProductTabs({ product }) {
           aria-label="product details tabs"
           textColor="primary"
           indicatorColor="primary"
-        >
+        >{reviews}
           <Tab label="Ürün Açıklaması" />
-          <Tab label={`Değerlendirmeler (${reviews.length})`} />
+          <Tab label={`Değerlendirmeler `} />
           <Tab label="Soru & Cevap" />
         </Tabs>
       </AppBar>
@@ -92,22 +93,7 @@ function ProductTabs({ product }) {
       <ReviewsTab productId={product.product_id} />
       </TabPanel>
       <TabPanel value={tabValue} index={2}>
-        <Box>
-          {questions.map(question => (
-            <Box key={question.id} sx={{ mt: 2 }}>
-              <Typography>{question.content} - Asked by {question.user}</Typography>
-            </Box>
-          ))}
-          <TextField
-            fullWidth
-            label="Yeni Soru Yaz"
-            value={newQuestion}
-            onChange={e => setNewQuestion(e.target.value)}
-            multiline
-            rows={2}
-          />
-          <Button onClick={handleAddQuestion} sx={{ mt: 2 }}>Soru Ekle</Button>
-        </Box>
+      <QuestionsTab productId={product.product_id} />
       </TabPanel>
     </Box>
   );
