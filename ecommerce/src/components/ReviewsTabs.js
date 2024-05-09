@@ -1,18 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Rating, Button, TextField, Grid, Paper } from '@mui/material';
+import { Box, Typography, Rating, Grid, Paper, List, Card, CardHeader, Avatar, CardContent, IconButton, Link, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import api from '../api/api';
 
 function ReviewsTab({ productId }) {
   const [reviews, setReviews] = useState([]);
   const [ratingSummary, setRatingSummary] = useState({});
-  const [filter, setFilter] = useState('');
+  const [selectedRating, setSelectedRating] = useState('');
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const response = await api.get(`user/product-comments/${productId}`);
-        setReviews(response.data.reviews);
-        setRatingSummary(response.data.ratingSummary);
+        console.log('API Response:', response.data);
+        if (response.data) {
+          setReviews(response.data.map(item => ({
+            id: item.comment_id,
+            userId: item.user_id,
+            title: item.comment,
+            content: item.comment,
+            rating: item.rating,
+            date: item.comment_date,
+            user: item.user,
+          })));
+
+          const summary = {};
+          response.data.forEach(item => {
+            summary[item.rating] = (summary[item.rating] || 0) + 1;
+          });
+          setRatingSummary(summary);
+        }
       } catch (error) {
         console.error('Error fetching reviews:', error);
       }
@@ -21,39 +38,76 @@ function ReviewsTab({ productId }) {
     fetchReviews();
   }, [productId]);
 
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
+  const handleRatingChange = (event) => {
+    setSelectedRating(event.target.value);
   };
 
+  const filteredReviews = reviews.filter(review => review.rating.toString().includes(selectedRating));
+
   return (
-    <Box>
-      <Typography variant="h4">Değerlendirmeler</Typography>
+    <Box sx={{ p: 2 }}>
+      <Typography variant="h5">Customer Reviews</Typography>
       <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
-          {Object.entries(ratingSummary).map(([stars, count]) => (
-            <Box key={stars} sx={{ display: 'flex', alignItems: 'center' }}>
-              <Rating value={parseInt(stars)} readOnly />
-              <Typography sx={{ ml: 1 }}>{count} ({((count / reviews.length) * 100).toFixed(1)}%)</Typography>
-            </Box>
-          ))}
+        <Grid item xs={4}>
+          <Paper elevation={3} sx={{ p: 2 }}>
+            <Typography variant="h6">Genel Puan</Typography>
+            {Object.keys(ratingSummary).sort((a, b) => b - a).map((key) => (
+              <Box key={key} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                <Rating value={parseInt(key)} readOnly />
+                <Typography sx={{ ml: 1 }}>{ratingSummary[key]} değerlendirme</Typography>
+              </Box>
+            ))}
+          </Paper>
         </Grid>
-        <Grid item xs={12} md={8}>
-          <TextField
-            fullWidth
-            label="Yorumları Filtrele"
-            value={filter}
-            onChange={handleFilterChange}
-            variant="outlined"
-          />
-          {reviews.filter(review => review.rating === parseInt(filter)).map(review => (
-            <Paper key={review.id} sx={{ p: 2, my: 2 }}>
-              <Typography variant="h6">{review.user}</Typography>
-              <Typography variant="body2">{new Date(review.date).toLocaleDateString()}</Typography>
-              <Rating value={review.rating} readOnly />
-              <Typography>{review.content}</Typography>
-              <Typography sx={{ mt: 1, color: 'green' }}>Bu değerlendirme faydalı mı? {review.helpfulCount}</Typography>
-            </Paper>
-          ))}
+        <Grid item xs={8}>
+          <FormControl fullWidth>
+            <InputLabel id="rating-select-label">Filtrele</InputLabel>
+            <Select
+              labelId="rating-select-label"
+              id="rating-select"
+              value={selectedRating}
+              label="Filter by Rating"
+              onChange={handleRatingChange}
+            >
+              <MenuItem value="">
+                <em>seçili değil</em>
+              </MenuItem>
+              {[1, 2, 3, 4, 5].map(rating => (
+                <MenuItem key={rating} value={rating}>{rating}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <List sx={{ width: '100%', bgcolor: 'background.paper', mt: 2 }}>
+            {filteredReviews.map((review) => (
+              <Card key={review.id} variant="outlined" sx={{ mb: 2, bgcolor: 'grey.200' }}>
+                <CardHeader
+                  avatar={
+                    <Avatar sx={{ bgcolor: 'secondary.main' }}>
+                      {review.user.name[0]}{review.user.surname[0]}
+                    </Avatar>
+                  }
+                  action={
+                    <IconButton aria-label="settings">
+                      <MoreVertIcon />
+                    </IconButton>
+                  }
+                  title={`${review.user.name} ${review.user.surname}`}
+                  subheader={review.date}
+                  titleTypographyProps={{ variant: 'subtitle2' }}
+                  subheaderTypographyProps={{ variant: 'caption' }}
+                />
+                <CardContent>
+                  <Typography variant="body2" color="text.secondary">
+                    {review.content}
+                  </Typography>
+                  <Rating value={review.rating} readOnly sx={{ mt: 1 }} />
+                  <Link href="#" underline="always" sx={{ display: 'block', mt: 1, fontSize: '0.75rem' }}>
+                    Bildir
+                  </Link>
+                </CardContent>
+              </Card>
+            ))}
+          </List>
         </Grid>
       </Grid>
     </Box>
