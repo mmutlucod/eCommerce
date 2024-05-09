@@ -47,12 +47,12 @@ export default function UserNavbar() {
     return (
         <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
             <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box sx={{ backgroundColor: 'yellow', borderRadius: '10px 0 0 10px', display: 'flex', alignItems: 'center', py: '6px', px: '16px' }}>
+                <Box sx={{ backgroundColor: 'yellow', borderRadius: '4px 0 0 4px', display: 'flex', alignItems: 'center', py: '6px', px: '16px' }}>
                     <Typography variant="h6" noWrap sx={{ fontWeight: 'bold', color: '#4B0082' }}>
                         noVa
                     </Typography>
                 </Box>
-                <Box sx={{ flexGrow: 1, backgroundColor: 'white', borderRadius: '0 4px 4px 0', display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
+                <Box sx={{ flexGrow: 1, backgroundColor: 'white', borderRadius: '0 4px 0 0', display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
                     <InputBase
                         placeholder="Ürün, kategori, marka ara"
                         inputProps={{ 'aria-label': 'search' }}

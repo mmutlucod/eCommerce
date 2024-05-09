@@ -40,7 +40,7 @@ const ProductPage = () => {
       } catch (err) {
         setError('Ürün bilgileri yüklenirken bir hata oluştu: ' + err.message);
       }
-      
+
       try {
         const sellersResponse = await api.get(`user/products/${productSlug}`);
         setSellers(sellersResponse.data.sellers);
@@ -67,7 +67,7 @@ const ProductPage = () => {
               )}
             </Grid>
             <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <Typography variant="subtitle1" sx={{ display: 'flex', gap: 1, mb: 1 }}>
+              <Typography variant="subtitle1" sx={{ display: 'flex', gap: 1, mb: 1 }}>
                 <Typography color="text.secondary">{product?.product.Brand.brand_name} </Typography>
                 <Typography color="text.secondary">{product?.product?.name} </Typography>
                 <Typography color="text.secondary">{product?.product?.category.category_name}</Typography>
@@ -75,10 +75,16 @@ const ProductPage = () => {
               <Typography variant="h6" sx={{ color: 'secondary.main', fontWeight: 'bold', mb: 2 }}>
                 {`${product?.price.toFixed(2)} ₺`}
               </Typography>
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Rating value={parseFloat(product?.commentAvg) || 0} readOnly precision={0.1} />
-                <Typography variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>({product?.ratingCount || 0} reviews)</Typography>
-              </Box>
+              {
+                product?.commentCount > 0 && (
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Rating value={parseFloat(product?.commentAvg) || 0} readOnly precision={0.1} />
+                    <Typography variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
+                      ({product.commentCount} reviews)
+                    </Typography>
+                  </Box>
+                )
+              }
               <Button variant="contained" color="secondary" sx={{ width: '100%', mt: 3, py: 1, color: 'white' }}>Sepete Ekle</Button>
               {product?.seller && (
                 <Card sx={{ mt: 2 }}>
@@ -89,14 +95,14 @@ const ProductPage = () => {
                 </Card>
               )}
             </Grid>
-           
-           
+
+
           </Grid>
-   
+
         </Paper>
-        {product && <ProductTabs product={product.product} />} 
+        {product && <ProductTabs product={product.product} />}
       </Grid>
-      
+
       <Footer />
     </ThemeProvider>
   );

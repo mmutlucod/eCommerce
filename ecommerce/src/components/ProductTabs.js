@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Tab, Tabs, Box, AppBar, Typography, TextField, Button } from '@mui/material';
 import api from '../api/api';
-import ReviewsTab from '../components/ReviewsTabs'; 
-import QuestionsTab from '../components/QuestionsTabs'; 
+import ReviewsTab from '../components/ReviewsTabs';
+import QuestionsTab from '../components/QuestionsTabs';
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
   return (
@@ -90,10 +90,10 @@ function ProductTabs({ product }) {
         <Typography>{product.description}</Typography>
       </TabPanel>
       <TabPanel value={tabValue} index={1}>
-      <ReviewsTab productId={product.product_id} />
+        <ReviewsTab productId={product.product_id} />
       </TabPanel>
       <TabPanel value={tabValue} index={2}>
-      <QuestionsTab productId={product.product_id} />
+        <QuestionsTab productId={product.product_id} />
       </TabPanel>
     </Box>
   );
