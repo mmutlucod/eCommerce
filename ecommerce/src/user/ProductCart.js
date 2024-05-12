@@ -153,7 +153,7 @@ const ProductCards = () => {
           <CustomCard key={product.product_id} >
             {/* {console.log(product.product.slug)} */}
             {product.fastDelivery && <CustomBadge color="error" badgeContent="Fast Delivery" />}
-            <ImageCarousel images={product.product.productImages.map(img => img.image_path)} />
+            <ImageCarousel images={product.product.productImages.map(img => img === null ? 'empty.jpg' : img.image_path)} />
             <CustomCardContent>
               <Box display="flex" justifyContent="start" alignItems="center">
                 <CustomTypography variant="subtitle1" noWrap>

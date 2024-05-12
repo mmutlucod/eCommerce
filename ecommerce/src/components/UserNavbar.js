@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Button, Badge } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -7,8 +7,8 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchModal from './SearchModal';
-import CartDropdown from './CartDropdown';  // CartDropdown komponentini import etmeyi unutmayın
-import api from '../api/api'
+import CartDropdown from './CartDropdown';
+import api from '../api/api';
 
 export default function UserNavbar() {
     const navigate = useNavigate();
@@ -16,9 +16,8 @@ export default function UserNavbar() {
     const [isSearchModalOpen, setSearchModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [cartDropdownOpen, setCartDropdownOpen] = useState(false);  // Sepet dropdown için state
+    const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
     const [cartItemCount, setCartItemCount] = useState(0);
-
     const [cartItems, setCartItems] = useState([]);
 
     useEffect(() => {
@@ -36,23 +35,46 @@ export default function UserNavbar() {
 
     const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
 
+    useEffect(() => {
+        const handleResize = () => {
+            // Eğer ekran boyutu 1024px altına düşerse ve modal açıksa kapat
+            if (window.innerWidth < 1532 && isSearchModalOpen) {
+                setSearchModalOpen(false);
+            }
+        };
 
-    const handleOpenSearchModal = () => setSearchModalOpen(true);
-    const handleCloseSearchModal = () => setSearchModalOpen(false);
-    const handleSearchChange = (event) => {
-        setSearchQuery(event.target.value);
-        setDropdownOpen(true);
+        window.addEventListener('resize', handleResize);
+
+        // Cleanup function
+        return () => window.removeEventListener('resize', handleResize);
+    }, [isSearchModalOpen]); // Bu hook isSearchModalOpen state'ine bağlı
+
+    const handleOpenSearchModal = () => {
+        if (window.innerWidth >= 1532) {
+            setSearchModalOpen(true);
+        }
     };
 
+    const handleCloseSearchModal = () => setSearchModalOpen(false);
+
+    const handleSearchChange = (event) => {
+        const query = event.target.value;
+        setSearchQuery(query);
+        if (query.length > 0 && window.innerWidth >= 1532) {
+            setSearchModalOpen(true);
+        } else {
+            setSearchModalOpen(false);
+        }
+    };
     return (
         <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
             <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box sx={{ backgroundColor: 'yellow', borderRadius: '10px 0 0 10px', display: 'flex', alignItems: 'center', py: '6px', px: '16px' }}>
+                <Box sx={{ backgroundColor: 'yellow', borderRadius: '4px 0 0 4px', display: 'flex', alignItems: 'center', py: '6px', px: '16px' }}>
                     <Typography variant="h6" noWrap sx={{ fontWeight: 'bold', color: '#4B0082' }}>
                         noVa
                     </Typography>
                 </Box>
-                <Box sx={{ flexGrow: 1, backgroundColor: 'white', borderRadius: '0 4px 4px 0', display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
+                <Box sx={{ flexGrow: 1, backgroundColor: 'white', borderRadius: '0 4px 0 0', display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
                     <InputBase
                         placeholder="Ürün, kategori, marka ara"
                         inputProps={{ 'aria-label': 'search' }}
@@ -68,6 +90,7 @@ export default function UserNavbar() {
                         }}
                         value={searchQuery}
                         onChange={handleSearchChange}
+
                     />
                     <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: 'gray' }} onClick={handleOpenSearchModal}>
                         <SearchIcon />
@@ -119,6 +142,6 @@ export default function UserNavbar() {
             </Toolbar>
             <SearchModal query={searchQuery} open={dropdownOpen} />
             <SearchModal open={isSearchModalOpen} onClose={handleCloseSearchModal} />
-        </AppBar>
+        </AppBar >
     );
 }
