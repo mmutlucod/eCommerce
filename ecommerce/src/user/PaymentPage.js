@@ -1,57 +1,102 @@
-import React from 'react';
-import { Container, Paper, Grid, Button, Typography, TextField, FormControl, InputLabel, Select, MenuItem, Checkbox, FormControlLabel } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import api from '../api/api';
+import { Container, Stepper, Step, StepLabel, Button, Typography, Card, CardContent, Radio, FormControlLabel, Grid } from '@mui/material';
+import UserNavbar from '../components/UserNavbar';
+import UserFooter from '../components/UserFooter';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-function PaymentPage() {
+// Özel tema oluşturma
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#4B0082',  // Mor renk
+    },
+    secondary: {
+      main: '#ffc400',  // Sarı renk
+    },
+  },
+});
+
+const steps = ['Adresler', 'Ödeme'];
+
+const PaymentPage = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState('');
+
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      try {
+        const response = await api.get('user/addresses');
+        if (response.data && Array.isArray(response.data.addresses)) {
+          setAddresses(response.data.addresses);
+          if (response.data.addresses.length > 0) {
+            setSelectedAddress(response.data.addresses[0].address_id.toString());  // Varsayılan olarak ilk adresin ID'sini seç
+          }
+        } else {
+          console.error('Received data is not an array:', response.data);
+          setAddresses([]);
+        }
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+      }
+    };
+    fetchAddresses();
+  }, []);
+
+  const handleNext = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  };
+
+  const handleRadioChange = (event) => {
+    setSelectedAddress(event.target.value);
+  };
+
   return (
-    <Container maxWidth="lg">
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={7}>
-          <Paper style={{ padding: 20 }}>
-            <Typography variant="h6">Adres Bilgileri</Typography>
-            <TextField
-              label="Adres"
-              fullWidth
-              variant="outlined"
-              margin="normal"
-            />
-            <Button variant="contained" color="primary" style={{ marginBottom: 20 }}>Yeni Adres Ekle</Button>
-            <Typography variant="h6">Teslimat Adresi</Typography>
-            <FormControlLabel
-              control={<Checkbox checked={true} />}
-              label="Faturamı aynı adrese gönder"
-              style={{ marginBottom: 20 }}
-            />
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={5}>
-          <Paper style={{ padding: 20 }}>
-            <Typography variant="h6">Ödeme Seçenekleri</Typography>
-            <FormControl variant="outlined" fullWidth margin="normal">
-              <InputLabel>Ödeme Yöntemi</InputLabel>
-              <Select defaultValue="">
-                <MenuItem value="banka">Banka/Kredi Kartı</MenuItem>
-                <MenuItem value="kredi">Kredi</MenuItem>
-              </Select>
-            </FormControl>
-            <Typography variant="h6" style={{ marginTop: 20 }}>Sipariş Özeti</Typography>
-            <Typography>
-              Ürünlerin Toplamı: 4,854.44 TL
-            </Typography>
-            <Typography>
-              Kargo: 34.99 TL
-            </Typography>
-            <Typography>
-              İndirim: -34.99 TL
-            </Typography>
-            <Typography variant="subtitle1" style={{ marginTop: 10 }}>
-              Toplam: 4,802.02 TL
-            </Typography>
-            <Button variant="contained" color="primary" style={{ marginTop: 20 }}>Kaydet ve Devam Et</Button>
-          </Paper>
-        </Grid>
-      </Grid>
-    </Container>
+    <ThemeProvider theme={theme}>
+      <UserNavbar />
+      <Container maxWidth="lg">
+        <Stepper activeStep={activeStep} alternativeLabel sx={{ bgcolor: '#f27a1a', color: 'white' }}>
+          {steps.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+        <div>
+          {activeStep === 0 && (
+            <Grid container spacing={2} style={{ marginTop: 20 }}>
+              {addresses.map((address) => (
+                <Grid item xs={12} sm={6} md={4} key={address.address_id}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <FormControlLabel
+                        value={address.address_id.toString()}
+                        control={<Radio
+                          checked={selectedAddress === address.address_id.toString()}
+                          onChange={handleRadioChange}
+                        />}
+                        label={<Typography variant="h6">{`${address.adres_line}, ${address.city}`}</Typography>}
+                        labelPlacement="end"
+                      />
+                      <Typography variant="body2">{`${address.street}, ${address.state}, ${address.postal_code}`}</Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </div>
+        <Button disabled={activeStep === 0} onClick={handleBack}>Geri</Button>
+        <Button variant="contained" color="primary" onClick={handleNext}>{activeStep === steps.length - 1 ? 'Bitir' : 'İleri'}</Button>
+      </Container>
+      <UserFooter />
+    </ThemeProvider>
   );
-}
+};
 
 export default PaymentPage;
