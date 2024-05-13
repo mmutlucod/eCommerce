@@ -43,8 +43,8 @@ const ExamplePopup = ({ results }) => {
             sx={{
                 position: 'absolute',
                 top: 64,
-                marginLeft: '6.89%',
-                width: '58%',
+                marginLeft: '6.93%',
+                width: '57.66%',
                 backgroundColor: 'white',
                 border: '1px solid #4B0082',
                 borderBottom: '2px',
