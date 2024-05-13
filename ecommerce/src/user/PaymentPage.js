@@ -57,45 +57,48 @@ const PaymentPage = () => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <>
       <UserNavbar />
-      <Container maxWidth="lg">
-        <Stepper activeStep={activeStep} alternativeLabel sx={{ bgcolor: '#f27a1a', color: 'white' }}>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        <div>
-          {activeStep === 0 && (
-            <Grid container spacing={2} style={{ marginTop: 20 }}>
-              {addresses.map((address) => (
-                <Grid item xs={12} sm={6} md={4} key={address.address_id}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <FormControlLabel
-                        value={address.address_id.toString()}
-                        control={<Radio
-                          checked={selectedAddress === address.address_id.toString()}
-                          onChange={handleRadioChange}
-                        />}
-                        label={<Typography variant="h6">{`${address.adres_line}, ${address.city}`}</Typography>}
-                        labelPlacement="end"
-                      />
-                      <Typography variant="body2">{`${address.street}, ${address.state}, ${address.postal_code}`}</Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          )}
-        </div>
-        <Button disabled={activeStep === 0} onClick={handleBack}>Geri</Button>
-        <Button variant="contained" color="primary" onClick={handleNext}>{activeStep === steps.length - 1 ? 'Bitir' : 'İleri'}</Button>
-      </Container>
-      <UserFooter />
-    </ThemeProvider>
+      <ThemeProvider theme={theme}>
+
+        <Container maxWidth="lg">
+          <Stepper activeStep={activeStep} alternativeLabel sx={{ bgcolor: '#f27a1a', color: 'white' }}>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+          <div>
+            {activeStep === 0 && (
+              <Grid container spacing={2} style={{ marginTop: 20 }}>
+                {addresses.map((address) => (
+                  <Grid item xs={12} sm={6} md={4} key={address.address_id}>
+                    <Card variant="outlined">
+                      <CardContent>
+                        <FormControlLabel
+                          value={address.address_id.toString()}
+                          control={<Radio
+                            checked={selectedAddress === address.address_id.toString()}
+                            onChange={handleRadioChange}
+                          />}
+                          label={<Typography variant="h6">{`${address.adres_line}, ${address.city}`}</Typography>}
+                          labelPlacement="end"
+                        />
+                        <Typography variant="body2">{`${address.street}, ${address.state}, ${address.postal_code}`}</Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </div>
+          <Button disabled={activeStep === 0} onClick={handleBack}>Geri</Button>
+          <Button variant="contained" color="primary" onClick={handleNext}>{activeStep === steps.length - 1 ? 'Bitir' : 'İleri'}</Button>
+        </Container>
+        <UserFooter />
+      </ThemeProvider>
+    </>
   );
 };
 

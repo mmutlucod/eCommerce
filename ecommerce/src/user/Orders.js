@@ -70,9 +70,9 @@ const OrdersPage = () => {
 
   return (
     <>
+      <Navbar />
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Navbar />
         <Container maxWidth="lg" sx={{ mt: 8 }}>
           <Grid container spacing={3} justifyContent="center">
             <Grid item xs={12} md={3}>

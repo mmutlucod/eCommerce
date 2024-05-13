@@ -16,12 +16,12 @@ import Navbar from '../components/UserNavbar';
 import Footer from '../components/UserFooter';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
-import { useAuth } from '../context/AuthContext'; 
+import { useAuth } from '../context/AuthContext';
 
 function AuthPage() {
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState('login');
-  const { login } = useAuth(); 
+  const { login } = useAuth();
   const [loginData, setLoginData] = useState({
     email: '',
     password: '',
@@ -65,7 +65,7 @@ function AuthPage() {
     event.preventDefault();
   };
 
- 
+
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -108,31 +108,31 @@ function AuthPage() {
             boxShadow: '0 3px 10px 0 rgba(0, 0, 0, 0.2)',
           }}
         >
-      <Tabs
-  value={tabValue}
-  onChange={handleTabChange}
-  centered
-  textColor="primary"
-  indicatorColor="primary"
-  sx={{
-    '.MuiTabs-flexContainer': {
-      backgroundColor: '#7E57C2', // Tab'ların arka plan rengi
-    },
-    '.Mui-selected': {
-      color: '#fff', // Seçili tab'ın yazı rengi
-    },
-    '.MuiTab-root': {
-      '&:hover': {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)', // Tab üzerine gelindiğindeki hover efekti
-      },
-      borderBottom: '1px solid rgba(255, 255, 255, 0.5)', // Tab alt çizgisi
-      color: 'rgba(255, 255, 255, 0.7)', // Tab'ların varsayılan yazı rengi
-    }
-  }}
->
-  <Tab label="Giriş Yap" value="login" />
-  <Tab label="Üye Ol" value="register" />
-</Tabs>
+          <Tabs
+            value={tabValue}
+            onChange={handleTabChange}
+            centered
+            textColor="primary"
+            indicatorColor="primary"
+            sx={{
+              '.MuiTabs-flexContainer': {
+                backgroundColor: '#7E57C2', // Tab'ların arka plan rengi
+              },
+              '.Mui-selected': {
+                color: '#fff', // Seçili tab'ın yazı rengi
+              },
+              '.MuiTab-root': {
+                '&:hover': {
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)', // Tab üzerine gelindiğindeki hover efekti
+                },
+                borderBottom: '1px solid rgba(255, 255, 255, 0.5)', // Tab alt çizgisi
+                color: 'rgba(255, 255, 255, 0.7)', // Tab'ların varsayılan yazı rengi
+              }
+            }}
+          >
+            <Tab label="Giriş Yap" value="login" />
+            <Tab label="Üye Ol" value="register" />
+          </Tabs>
           {tabValue === 'login' && (
             <Box
               component="form"

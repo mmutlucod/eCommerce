@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchCart } from './redux/cartSlice';
+
 import './App.css';
 import Login from './admin/login';
 import MainPage from './admin/MainPage';
@@ -32,6 +35,7 @@ import UserProductPage from './user/ProductPage';
 import MultiStepForm from './user/PaymentPage';
 
 
+
 export const images = [
   "https://n11scdn.akamaized.net/a1/org/24/04/26/50/30/87/81/38/19/97/83/96/43595415462427475004.jpg",
   "https://n11scdn.akamaized.net/a1/org/24/04/26/63/89/62/43/75/83/27/68/78/01130236963544872031.jpg",
@@ -39,7 +43,11 @@ export const images = [
 ];
 function App() {
 
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
 
   return (
     <AuthProvider>

@@ -20,7 +20,7 @@ import {
   DialogTitle,
   CssBaseline,
   ThemeProvider,
-  createTheme,TextField
+  createTheme, TextField
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Navbar from '../components/UserNavbar';
@@ -141,172 +141,172 @@ const AddressesPage = () => {
 
   return (
     <>
-    <ThemeProvider theme={theme}>
-      <CssBaseline /> 
       <Navbar />
-      <Container maxWidth="lg" sx={{ mt: 8 }}>
-        <Grid container spacing={3} justifyContent="center">
-          <Grid item xs={12} md={3}>
-            <Paper elevation={0} square>
-              <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
-            </Paper>
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h5" gutterBottom>
-                Adres Bilgilerim
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-              {console.log(addresses)}
-              {
-  addresses.length > 0 ? (
-    addresses.map((address, index) => (
-      <Card key={index} sx={{ mb: 2 }}>
-        <CardContent>
-          <Typography gutterBottom variant="h6" component="div">
-            {address.adres_line} {/* Adres başlığı */}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {address.street} {/* Sokak ve numara */}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {address.neighborhood} {/* Mahalle veya semt */}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {address.city}, {address.state} {address.zipCode} {/* Şehir, eyalet ve posta kodu */}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {address.country} {/* Ülke */}
-          </Typography>
-        </CardContent>
-        <CardActions>
-        <Button size="small" color="primary" onClick={() => openEditDialog(address)}>
-  Düzenle
-</Button>
-          <Button size="small" color="secondary" onClick={() => openDeleteDialog(address.address_id)}>
-  Sil
-</Button>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container maxWidth="lg" sx={{ mt: 8 }}>
+          <Grid container spacing={3} justifyContent="center">
+            <Grid item xs={12} md={3}>
+              <Paper elevation={0} square>
+                <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
+              </Paper>
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <Paper sx={{ p: 3 }}>
+                <Typography variant="h5" gutterBottom>
+                  Adres Bilgilerim
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                {console.log(addresses)}
+                {
+                  addresses.length > 0 ? (
+                    addresses.map((address, index) => (
+                      <Card key={index} sx={{ mb: 2 }}>
+                        <CardContent>
+                          <Typography gutterBottom variant="h6" component="div">
+                            {address.adres_line} {/* Adres başlığı */}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {address.street} {/* Sokak ve numara */}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {address.neighborhood} {/* Mahalle veya semt */}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {address.city}, {address.state} {address.zipCode} {/* Şehir, eyalet ve posta kodu */}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {address.country} {/* Ülke */}
+                          </Typography>
+                        </CardContent>
+                        <CardActions>
+                          <Button size="small" color="primary" onClick={() => openEditDialog(address)}>
+                            Düzenle
+                          </Button>
+                          <Button size="small" color="secondary" onClick={() => openDeleteDialog(address.address_id)}>
+                            Sil
+                          </Button>
 
-        </CardActions>
-      </Card>
-    ))
-  ) : (
-    // Adres yoksa gösterilecek içerik
-    <Box sx={{ textAlign: 'center', my: 2 }}>
-      <Typography variant="subtitle1" gutterBottom>
-        Kayıtlı adresiniz bulunamadı
-      </Typography>
-      <IconButton color="primary" aria-label="Yeni adres ekle">
-        <AddIcon />
-      </IconButton>
-      <Typography variant="body2">
-        Siparişleriniz için kullanabileceğiniz adres eklemek için "Yeni Adres Ekle" butonuna tıklayın.
-      </Typography>
-    </Box>
-  )
-}
-              <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                Yeni Adres Ekle
-              </Button>
-            </Paper>
+                        </CardActions>
+                      </Card>
+                    ))
+                  ) : (
+                    // Adres yoksa gösterilecek içerik
+                    <Box sx={{ textAlign: 'center', my: 2 }}>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Kayıtlı adresiniz bulunamadı
+                      </Typography>
+                      <IconButton color="primary" aria-label="Yeni adres ekle">
+                        <AddIcon />
+                      </IconButton>
+                      <Typography variant="body2">
+                        Siparişleriniz için kullanabileceğiniz adres eklemek için "Yeni Adres Ekle" butonuna tıklayın.
+                      </Typography>
+                    </Box>
+                  )
+                }
+                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                  Yeni Adres Ekle
+                </Button>
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
-        <Dialog
-          open={deleteDialogOpen}
-          onClose={closeDeleteDialog}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">{"Adresi Sil"}</DialogTitle>
-          <DialogContent>
-            <DialogContentText id="alert-dialog-description">
-              Bu adresi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={closeDeleteDialog} color="primary">
-              İptal
-            </Button>
-            <Button onClick={handleDelete} color="primary" autoFocus>
-              Sil
-            </Button>
-          </DialogActions>
-        </Dialog>
-        <Dialog open={editDialogOpen} onClose={closeEditDialog}>
-  <DialogTitle>Adres Düzenle</DialogTitle>
-  <DialogContent>
-    <form onSubmit={handleEditSubmit}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Adres Satırı"
-            name="adres_line"
-            value={addressToEdit?.adres_line || ''}
-            onChange={e => setAddressToEdit({ ...addressToEdit, adres_line: e.target.value })}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            fullWidth
-            label="Sokak"
-            name="street"
-            value={addressToEdit?.street || ''}
-            onChange={e => setAddressToEdit({ ...addressToEdit, street: e.target.value })}
-          />
-        </Grid>
-      
-        {console.log(addressToEdit)}
-        <Grid item xs={12}>
-          <TextField
-            select
-            fullWidth
-            label="Şehir"
-            name="city"
-            value={addressToEdit?.city|| ''}
-
-            onChange={e => setAddressToEdit({ ...addressToEdit, city: e.target.value })}
+          <Dialog
+            open={deleteDialogOpen}
+            onClose={closeDeleteDialog}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
           >
-            {/* Şehir seçim menüsü, şehirler dizi olmalı */}
-            {cities.map((city, index) => (
-              <MenuItem key={index} value={city}>
-                {city}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="İl/İlçe"
-            name="state"
-            value={addressToEdit?.state || ''}
-            onChange={e => setAddressToEdit({ ...addressToEdit, state: e.target.value })}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            fullWidth
-            label="Posta Kodu"
-            name="zipCode"
-            value={addressToEdit?.postal_code || ''}
-            onChange={e => setAddressToEdit({ ...addressToEdit, zipCode: e.target.value })}
-          />
-        </Grid>
-    
-        
-      </Grid>
-    </form>
-  </DialogContent>
-  <DialogActions>
-    <Button onClick={closeEditDialog}>İptal</Button>
-    <Button onClick={handleEditSubmit} type="submit" variant="contained" color="primary">
-      Kaydet
-    </Button>
-  </DialogActions>
-</Dialog>
+            <DialogTitle id="alert-dialog-title">{"Adresi Sil"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Bu adresi silmek istediğinize emin misiniz? Bu işlem geri alınamaz.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={closeDeleteDialog} color="primary">
+                İptal
+              </Button>
+              <Button onClick={handleDelete} color="primary" autoFocus>
+                Sil
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <Dialog open={editDialogOpen} onClose={closeEditDialog}>
+            <DialogTitle>Adres Düzenle</DialogTitle>
+            <DialogContent>
+              <form onSubmit={handleEditSubmit}>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Adres Satırı"
+                      name="adres_line"
+                      value={addressToEdit?.adres_line || ''}
+                      onChange={e => setAddressToEdit({ ...addressToEdit, adres_line: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Sokak"
+                      name="street"
+                      value={addressToEdit?.street || ''}
+                      onChange={e => setAddressToEdit({ ...addressToEdit, street: e.target.value })}
+                    />
+                  </Grid>
 
-      </Container>
+                  {console.log(addressToEdit)}
+                  <Grid item xs={12}>
+                    <TextField
+                      select
+                      fullWidth
+                      label="Şehir"
+                      name="city"
+                      value={addressToEdit?.city || ''}
+
+                      onChange={e => setAddressToEdit({ ...addressToEdit, city: e.target.value })}
+                    >
+                      {/* Şehir seçim menüsü, şehirler dizi olmalı */}
+                      {cities.map((city, index) => (
+                        <MenuItem key={index} value={city}>
+                          {city}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="İl/İlçe"
+                      name="state"
+                      value={addressToEdit?.state || ''}
+                      onChange={e => setAddressToEdit({ ...addressToEdit, state: e.target.value })}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Posta Kodu"
+                      name="zipCode"
+                      value={addressToEdit?.postal_code || ''}
+                      onChange={e => setAddressToEdit({ ...addressToEdit, zipCode: e.target.value })}
+                    />
+                  </Grid>
+
+
+                </Grid>
+              </form>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={closeEditDialog}>İptal</Button>
+              <Button onClick={handleEditSubmit} type="submit" variant="contained" color="primary">
+                Kaydet
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+        </Container>
       </ThemeProvider>
     </>
   );

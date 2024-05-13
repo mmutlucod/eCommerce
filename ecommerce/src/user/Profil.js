@@ -9,11 +9,11 @@ import {
   Typography,
   Divider,
   Switch,
-  FormControlLabel,Container, CssBaseline,
+  FormControlLabel, Container, CssBaseline,
   ThemeProvider,
   createTheme
 } from '@mui/material';
-import Navbar from '../components/UserNavbar'; 
+import Navbar from '../components/UserNavbar';
 import { renderMenuItems } from './RenderMenuItems';
 import api from '../api/api'; // API iletişimi sağlayan modülünüz
 
@@ -90,12 +90,12 @@ const UserProfile = () => {
         email: userInfo.email,
         phone: userInfo.phone,
       };
-  
+
       // Kullanıcı şifre güncelleme alanlarını doldurmuşsa, bu veriyi de isteğe ekle
-    
+
       // Kullanıcı bilgilerini ve/veya şifreyi güncellemek için API'ye POST isteği gönder
       const response = await api.put('/user/update-account', data);
-        console.log(data)
+      console.log(data)
       // Başarılı bir güncelleme sonrası kullanıcıya bilgi ver
       if (response.status === 200) {
         alert('Profil bilgileriniz başarıyla güncellendi.');
@@ -110,71 +110,72 @@ const UserProfile = () => {
       alert('Profil güncelleme işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
     }
   };
-  
+
   return (
     <>
-    <ThemeProvider theme={theme}>
-      <CssBaseline /> 
-      <Navbar />
-      <Container maxWidth="lg" sx={{ mt: 8 }}>
-        <Grid container spacing={3} justifyContent="center">
-          <Grid item xs={12} md={3}>
-            <Paper elevation={0} square>
-              <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
-            </Paper>
-          </Grid>
-        <Box flex={1} sx={{ maxWidth: '750px', mx: 4 }}>
-          <Paper sx={{ p: 3 }}>
-            {/* Kullanıcı bilgileri formu */}
-            <Typography variant="h6" gutterBottom>
-              Kullanıcı Bilgilerim
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField label="Ad" fullWidth name="firstName" value={userInfo.name} onChange={handleChange} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField label="Soyad" fullWidth name="lastName" value={userInfo.surname} onChange={handleChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField label="E-Mail" fullWidth name="email" value={userInfo.email} onChange={handleChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField label="Cep Telefonu" fullWidth name="phone" value={userInfo.phone} onChange={handleChange} />
-              </Grid>
+
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Navbar />
+        <Container maxWidth="lg" sx={{ mt: 8 }}>
+          <Grid container spacing={3} justifyContent="center">
+            <Grid item xs={12} md={3}>
+              <Paper elevation={0} square>
+                <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
+              </Paper>
             </Grid>
+            <Box flex={1} sx={{ maxWidth: '750px', mx: 4 }}>
+              <Paper sx={{ p: 3 }}>
+                {/* Kullanıcı bilgileri formu */}
+                <Typography variant="h6" gutterBottom>
+                  Kullanıcı Bilgilerim
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={12} sm={6}>
+                    <TextField label="Ad" fullWidth name="firstName" value={userInfo.name} onChange={handleChange} />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField label="Soyad" fullWidth name="lastName" value={userInfo.surname} onChange={handleChange} />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField label="E-Mail" fullWidth name="email" value={userInfo.email} onChange={handleChange} />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField label="Cep Telefonu" fullWidth name="phone" value={userInfo.phone} onChange={handleChange} />
+                  </Grid>
+                </Grid>
 
-            {/* Şifre güncelleme formu */}
-            <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-              Şifre Güncelleme
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField label="Şu Anki Şifre" type="password" fullWidth name="currentPassword" value={userInfo.currentPassword} onChange={handleChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField label="Yeni Şifre" type="password" fullWidth name="newPassword" value={userInfo.newPassword} onChange={handleChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField label="Yeni Şifre (Tekrar)" type="password" fullWidth name="confirmPassword" value={userInfo.confirmPassword} onChange={handleChange} />
-              </Grid>
-            </Grid>
+                {/* Şifre güncelleme formu */}
+                <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+                  Şifre Güncelleme
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField label="Şu Anki Şifre" type="password" fullWidth name="currentPassword" value={userInfo.currentPassword} onChange={handleChange} />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField label="Yeni Şifre" type="password" fullWidth name="newPassword" value={userInfo.newPassword} onChange={handleChange} />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField label="Yeni Şifre (Tekrar)" type="password" fullWidth name="confirmPassword" value={userInfo.confirmPassword} onChange={handleChange} />
+                  </Grid>
+                </Grid>
 
-            {/* İki adımlı doğrulama */}
-            {/* Bu kısım API'nizde destekleniyorsa güncellenebilir */}
-            <FormControlLabel control={<Switch name="twoFactorAuth" />} label="İki adımlı doğrulama" sx={{ mt: 2 }} />
+                {/* İki adımlı doğrulama */}
+                {/* Bu kısım API'nizde destekleniyorsa güncellenebilir */}
+                <FormControlLabel control={<Switch name="twoFactorAuth" />} label="İki adımlı doğrulama" sx={{ mt: 2 }} />
 
-            <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-              <Button variant="contained" color="primary" onClick={handleUpdate}>
-                Güncelle
-              </Button>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                  <Button variant="contained" color="primary" onClick={handleUpdate}>
+                    Güncelle
+                  </Button>
+                </Box>
+              </Paper>
             </Box>
-          </Paper>
-        </Box>
-      </Grid>
-      </Container>
+          </Grid>
+        </Container>
       </ThemeProvider>
     </>
   );
