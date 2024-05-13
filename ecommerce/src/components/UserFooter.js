@@ -16,7 +16,6 @@ const Footer = () => {
   return (<>
     <Paper elevation={0} square sx={{ padding: '16px', marginBottom: '20px', overflow: 'hidden', marginTop: '200px' }}>
       <Grid container spacing={2} justifyContent="center">
-        {/* İndirim İkonu ve Metni */}
         <Grid item>
           <Box sx={{ textAlign: 'center' }}>
             <Avatar sx={{ bgcolor: '#4B0082', margin: 'auto', marginBottom: '8px' }}>
