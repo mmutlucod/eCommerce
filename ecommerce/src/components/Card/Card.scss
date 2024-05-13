@@ -389,7 +389,7 @@
 .slide-fade-right-enter {
     opacity: 0;
     transform: translateX(10px) rotate(45deg);
-    pointer-events: nne;
+    pointer-events: none;
 }
 .slide-fade-right-enter-active {
     transition: all 0.25s ease-in-out;

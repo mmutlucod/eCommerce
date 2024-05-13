@@ -1,9 +1,5 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-    CSSTransition,
-    TransitionGroup,
-    SwitchTransition
-} from 'react-transition-group';
+import React, { useState, useEffect, useMemo } from 'react';
+import { CSSTransition, TransitionGroup, SwitchTransition } from 'react-transition-group';
 import './Card.scss';
 
 const CARDS = {

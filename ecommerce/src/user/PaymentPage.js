@@ -1,203 +1,261 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import api from '../api/api';
-import { Container, Stepper, Step, StepLabel, Button, Typography, Card, CardContent, Radio, FormControlLabel, Grid, Modal, Box, TextField, MenuItem, CssBaseline, StepIcon } from '@mui/material';
+import {
+    Container,
+    Stepper,
+    Step,
+    StepLabel,
+    Button,
+    Typography,
+    Card as MuiCard,
+    CardContent,
+    Radio,
+    FormControlLabel,
+    Grid,
+    Modal,
+    Box,
+    TextField,
+    MenuItem,
+    CssBaseline
+} from '@mui/material';
 import UserNavbar from '../components/UserNavbar';
 import UserFooter from '../components/UserFooter';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import Card from '../components/Card/Card'; // Card bileşeni
+import CForm from '../components/Form/Form'; // CForm bileşeni
 
 const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#9370DB', // Açık mor renk
+    palette: {
+        primary: {
+            main: '#9370DB', // Açık mor renk
+        },
+        secondary: {
+            main: '#FFA500', // Turuncu renk
+        },
     },
-    secondary: {
-      main: '#FFA500', // Turuncu renk
-    },
-  },
 });
-
 
 const steps = ['Adresler', 'Ödeme'];
 const cities = ["Ankara", "İstanbul", "İzmir", "Antalya"];
 
 const StepIconComponent = props => {
-  const { active, completed } = props;
+    const { active, completed } = props;
 
-  if (completed) {
-    return <CheckCircleIcon />;
-  }
-  return <Typography>{props.icon}</Typography>;
+    if (completed) {
+        return <CheckCircleIcon />;
+    }
+    return <Typography>{props.icon}</Typography>;
 };
 
 const PaymentPage = () => {
-  const [activeStep, setActiveStep] = useState(0);
-  const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState('');
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [newAddress, setNewAddress] = useState({ address_line: '', city: '', state: '', postal_code: '' });
+    const [activeStep, setActiveStep] = useState(0);
+    const [addresses, setAddresses] = useState([]);
+    const [selectedAddress, setSelectedAddress] = useState('');
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [newAddress, setNewAddress] = useState({ address_line: '', city: '', state: '', postal_code: '' });
 
-  useEffect(() => {
-    const fetchAddresses = async () => {
-      try {
-        const response = await api.get('user/addresses');
-        setAddresses(response.data.addresses || []);
-        if (response.data.addresses.length > 0) {
-          setSelectedAddress(response.data.addresses[0].address_id.toString());
-        }
-      } catch (error) {
-        console.error('Error fetching addresses:', error);
-      }
+    // Card form state ve handler fonksiyonları
+    const [state, setState] = useState({
+        cardNumber: '#### #### #### ####',
+        cardHolder: 'FULL NAME',
+        cardMonth: '',
+        cardYear: '',
+        cardCvv: '',
+        isCardFlipped: false
+    });
+
+    const [currentFocusedElm, setCurrentFocusedElm] = useState(null);
+
+    const updateStateValues = useCallback((keyName, value) => {
+        setState((prevState) => ({
+            ...prevState,
+            [keyName]: value || ''
+        }));
+    }, []);
+
+    // Form input referansları
+    let formFieldsRefObj = {
+        cardNumber: useRef(),
+        cardHolder: useRef(),
+        cardDate: useRef(),
+        cardCvv: useRef()
     };
-    fetchAddresses();
-  }, []);
 
-  const handleNext = () => setActiveStep(prev => prev + 1);
-  const handleBack = () => setActiveStep(prev => prev - 1);
-  const handleRadioChange = event => setSelectedAddress(event.target.value);
-  const handleModalOpen = () => setModalOpen(true);
-  const handleModalClose = () => setModalOpen(false);
-  const handleInputChange = event => setNewAddress(prev => ({ ...prev, [event.target.name]: event.target.value }));
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      await api.post('/user/create-address', newAddress);
-      setModalOpen(false);
-    } catch (error) {
-      console.error('Error adding address:', error);
-    }
-  };
+    let focusFormFieldByKey = useCallback((key) => {
+        formFieldsRefObj[key].current.focus();
+    }, []);
 
-const renderContent = () => {
-  if (activeStep === 0) {
-    return (
-      <Grid container spacing={2} sx={{marginTop:5}}>
-        <Grid item xs={12} sm={6} md={4}>
-          <Card variant="outlined" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Button variant="outlined" color="primary" startIcon={<AddIcon />} onClick={handleModalOpen} sx={{ width: '100%', padding: 4.7476 }}>
-              Adres Ekle
-            </Button>
-          </Card>
-        </Grid>
-        {addresses.map(address => (
-          <Grid item xs={12} sm={6} md={4} key={address.address_id}>
-            <Card variant="outlined">
-              <CardContent>
-                <FormControlLabel
-                  value={address.address_id.toString()}
-                  control={<Radio checked={selectedAddress === address.address_id.toString()} onChange={handleRadioChange} />}
-                  label={<Typography variant="h6">{`${address.address_line}, ${address.city}`}</Typography>}
-                  labelPlacement="end"
-                />
-                <Typography variant="body2">{`${address.street}, ${address.state}, ${address.postal_code}`}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    );
-  } else {
-    return (
-      <Typography variant="h5" sx={{ mt: 3, mb: 2 }}>Ödeme Bilgileri</Typography>
-      // Insert payment information form or component here
-    );
-  }
-};
+    // Kart element referansları
+    let cardElementsRef = {
+        cardNumber: useRef(),
+        cardHolder: useRef(),
+        cardDate: useRef()
+    };
 
-  return (
-<<<<<<< HEAD
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <UserNavbar />
-      <Container maxWidth="xl" disableGutters>
-      <Stepper activeStep={activeStep} alternativeLabel sx={{ width: '100%', bgcolor: theme.palette.primary.main }}>
+    let onCardFormInputFocus = (_event, inputName) => {
+        const refByName = cardElementsRef[inputName];
+        setCurrentFocusedElm(refByName);
+    };
 
-          {steps.map((label, index) => (
-            <Step key={label}>
-              <StepLabel StepIconComponent={StepIconComponent}>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-        {renderContent()}
-        <Button disabled={activeStep === 0} onClick={handleBack} sx={{ mt: 2, bgcolor: theme.palette.secondary.main }}>Geri</Button>
-<Button variant="contained" color="primary" onClick={handleNext} sx={{ mt: 2, bgcolor: theme.palette.secondary.main }}>{activeStep === steps.length - 1 ? 'Bitir' : 'İleri'}</Button>
+    let onCardInputBlur = useCallback(() => {
+        setCurrentFocusedElm(null);
+    }, []);
 
-      </Container>
-      <Modal open={isModalOpen} onClose={handleModalClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2 }}>
-          <Typography variant="h6" component="h2">Yeni Adres Ekle</Typography>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField fullWidth label="Adres Satırı" name="address_line" value={newAddress.address_line} onChange={handleInputChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField select fullWidth label="Şehir" name="city" value={newAddress.city} onChange={handleInputChange}>
-                  {cities.map((city, index) => <MenuItem key={index} value={city}>{city}</MenuItem>)}
-                </TextField>
-              </Grid>
-              <Grid item xs={12}>
-                <TextField fullWidth label="İlçe" name="state" value={newAddress.state} onChange={handleInputChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField fullWidth label="Posta Kodu" name="postal_code" value={newAddress.postal_code} onChange={handleInputChange} />
-              </Grid>
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained" color="primary" fullWidth>Adres Ekle</Button>
-              </Grid>
-            </Grid>
-          </form>
-          <Button onClick={handleModalClose}>Kapat</Button>
-        </Box>
-      </Modal>
-      <UserFooter />
-    </ThemeProvider>
-=======
-    <>
-      <UserNavbar />
-      <ThemeProvider theme={theme}>
+    useEffect(() => {
+        const fetchAddresses = async () => {
+            try {
+                const response = await api.get('user/addresses');
+                setAddresses(response.data.addresses || []);
+                if (response.data.addresses.length > 0) {
+                    setSelectedAddress(response.data.addresses[0].address_id.toString());
+                }
+            } catch (error) {
+                console.error('Error fetching addresses:', error);
+            }
+        };
+        fetchAddresses();
+    }, []);
 
-        <Container maxWidth="lg">
-          <Stepper activeStep={activeStep} alternativeLabel sx={{ bgcolor: '#f27a1a', color: 'white' }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-          <div>
-            {activeStep === 0 && (
-              <Grid container spacing={2} style={{ marginTop: 20 }}>
-                {addresses.map((address) => (
-                  <Grid item xs={12} sm={6} md={4} key={address.address_id}>
-                    <Card variant="outlined">
-                      <CardContent>
-                        <FormControlLabel
-                          value={address.address_id.toString()}
-                          control={<Radio
-                            checked={selectedAddress === address.address_id.toString()}
-                            onChange={handleRadioChange}
-                          />}
-                          label={<Typography variant="h6">{`${address.adres_line}, ${address.city}`}</Typography>}
-                          labelPlacement="end"
+    const handleNext = () => setActiveStep(prev => prev + 1);
+    const handleBack = () => setActiveStep(prev => prev - 1);
+    const handleRadioChange = event => setSelectedAddress(event.target.value);
+    const handleModalOpen = () => setModalOpen(true);
+    const handleModalClose = () => setModalOpen(false);
+    const handleInputChange = event => setNewAddress(prev => ({ ...prev, [event.target.name]: event.target.value }));
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            await api.post('/user/create-address', newAddress);
+            setModalOpen(false);
+            // Adresi ekledikten sonra adresleri tekrar yükleyin
+            const response = await api.get('user/addresses');
+            setAddresses(response.data.addresses || []);
+            setSelectedAddress(response.data.addresses[response.data.addresses.length - 1].address_id.toString());
+        } catch (error) {
+            console.error('Error adding address:', error);
+        }
+    };
+
+    const renderContent = () => {
+        if (activeStep === 0) {
+            return (
+                <Box sx={{ padding: 2, border: '1px solid #ddd', borderRadius: 2, marginTop: 5 }}>
+                    <Typography variant="h5" sx={{ mb: 2 }}>Adresler</Typography>
+                    <Grid container spacing={2} justifyContent="center">
+                        <Grid item xs={12} sm={6} md={4}>
+                            <MuiCard variant="outlined" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                                <Button variant="outlined" color="primary" startIcon={<AddIcon />} onClick={handleModalOpen} sx={{ width: '100%', padding: 2 }}>
+                                    Adres Ekle
+                                </Button>
+                            </MuiCard>
+                        </Grid>
+                        {addresses.map((address, index) => (
+                            <Grid item xs={12} sm={6} md={4} key={address.address_id}>
+                                <MuiCard variant="outlined" sx={{ height: '100%' }}>
+                                    <CardContent>
+                                        <FormControlLabel
+                                            value={address.address_id.toString()}
+                                            control={<Radio checked={selectedAddress === address.address_id.toString()} onChange={handleRadioChange} />}
+                                            label={<Typography variant="h6">{`${address.address_line}, ${address.city}`}</Typography>}
+                                            labelPlacement="end"
+                                        />
+                                        <Typography variant="body2">{`${address.street}, ${address.state}, ${address.postal_code}`}</Typography>
+                                    </CardContent>
+                                </MuiCard>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Box>
+            );
+        } else {
+            return (
+                <Box sx={{ padding: 2, border: '1px solid #ddd', borderRadius: 2, marginTop: 5 }}>
+                    <Typography variant="h5" sx={{ mb: 2 }}>Ödeme Bilgileri</Typography>
+                    <CForm
+                        cardMonth={state.cardMonth}
+                        cardYear={state.cardYear}
+                        onUpdateState={updateStateValues}
+                        cardNumberRef={formFieldsRefObj.cardNumber}
+                        cardHolderRef={formFieldsRefObj.cardHolder}
+                        cardDateRef={formFieldsRefObj.cardDate}
+                        onCardInputFocus={onCardFormInputFocus}
+                        onCardInputBlur={onCardInputBlur}
+                    >
+                        <Card
+                            cardNumber={state.cardNumber}
+                            cardHolder={state.cardHolder}
+                            cardMonth={state.cardMonth}
+                            cardYear={state.cardYear}
+                            cardCvv={state.cardCvv}
+                            isCardFlipped={state.isCardFlipped}
+                            currentFocusedElm={currentFocusedElm}
+                            onCardElementClick={focusFormFieldByKey}
+                            cardNumberRef={cardElementsRef.cardNumber}
+                            cardHolderRef={cardElementsRef.cardHolder}
+                            cardDateRef={cardElementsRef.cardDate}
                         />
-                        <Typography variant="body2">{`${address.street}, ${address.state}, ${address.postal_code}`}</Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>
-            )}
-          </div>
-          <Button disabled={activeStep === 0} onClick={handleBack}>Geri</Button>
-          <Button variant="contained" color="primary" onClick={handleNext}>{activeStep === steps.length - 1 ? 'Bitir' : 'İleri'}</Button>
-        </Container>
-        <UserFooter />
-      </ThemeProvider>
-    </>
->>>>>>> c6dae5bb2455a707dd5175b35873c2fe2ad077ff
-  );
+                    </CForm>
+                </Box>
+            );
+        }
+    };
+
+    return (
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <UserNavbar />
+            <Container maxWidth="lg" disableGutters sx={{ px: 4 }}>
+                <Stepper activeStep={activeStep} alternativeLabel sx={{ width: '100%', bgcolor: theme.palette.primary.main }}>
+                    {steps.map((label, index) => (
+                        <Step key={label}>
+                            <StepLabel StepIconComponent={StepIconComponent}>{label}</StepLabel>
+                        </Step>
+                    ))}
+                </Stepper>
+                {renderContent()}
+                <Grid container spacing={2} sx={{ mt: 2 }}>
+                    <Grid item>
+                        <Button disabled={activeStep === 0} onClick={handleBack} sx={{ bgcolor: theme.palette.secondary.main }}>Geri</Button>
+                    </Grid>
+                    <Grid item>
+                        <Button variant="contained" color="primary" onClick={handleNext} sx={{ bgcolor: theme.palette.secondary.main }}>
+                            {activeStep === steps.length - 1 ? 'Bitir' : 'İleri'}
+                        </Button>
+                    </Grid>
+                </Grid>
+            </Container>
+            <Modal open={isModalOpen} onClose={handleModalClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
+                <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2 }}>
+                    <Typography variant="h6" component="h2">Yeni Adres Ekle</Typography>
+                    <form onSubmit={handleSubmit}>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="Adres Satırı" name="address_line" value={newAddress.address_line} onChange={handleInputChange} />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField select fullWidth label="Şehir" name="city" value={newAddress.city} onChange={handleInputChange}>
+                                    {cities.map((city, index) => <MenuItem key={index} value={city}>{city}</MenuItem>)}
+                                </TextField>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="İlçe" name="state" value={newAddress.state} onChange={handleInputChange} />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="Posta Kodu" name="postal_code" value={newAddress.postal_code} onChange={handleInputChange} />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Button type="submit" variant="contained" color="primary" fullWidth>Adres Ekle</Button>
+                            </Grid>
+                        </Grid>
+                    </form>
+                    <Button onClick={handleModalClose}>Kapat</Button>
+                </Box>
+            </Modal>
+            <UserFooter />
+        </ThemeProvider>
+    );
 };
 
 export default PaymentPage;

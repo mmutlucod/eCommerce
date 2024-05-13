@@ -1,4 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState } from 'react';
+import TextField from '@mui/material/TextField';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Select from '@mui/material/Select';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
 
 const currentYear = new Date().getFullYear();
 const monthsArr = Array.from({ length: 12 }, (x, i) => {
@@ -23,11 +30,9 @@ export default function CForm({
 
     const handleFormChange = (event) => {
         const { name, value } = event.target;
-
         onUpdateState(name, value);
     };
 
-    // TODO: We can improve the regex check with a better approach like in the card component.
     const onCardNumberChange = (event) => {
         let { value, name } = event.target;
         let cardNumber = value;
@@ -37,12 +42,10 @@ export default function CForm({
                 .replace(/(\d{4})/, '$1 ')
                 .replace(/(\d{4}) (\d{6})/, '$1 $2 ');
         } else if (/^3(?:0[0-5]|[68]\d)\d{0,11}$/.test(value)) {
-            // diner's club, 14 digits
             cardNumber = value
                 .replace(/(\d{4})/, '$1 ')
                 .replace(/(\d{4}) (\d{6})/, '$1 $2 ');
         } else if (/^\d{0,16}$/.test(value)) {
-            // regular cc number, 16 digits
             cardNumber = value
                 .replace(/(\d{4})/, '$1 ')
                 .replace(/(\d{4}) (\d{4})/, '$1 $2 ')
@@ -61,136 +64,91 @@ export default function CForm({
         onUpdateState('isCardFlipped', false);
     };
 
-    // NOTE: Currently the cursor on the card number field gets reset if we remove a number, the code bellow was used
-    // in class components, need to transform this to work with functional components.
-    // getSnapshotBeforeUpdate() {
-    //     return this.props.cardNumberRef.current.selectionStart;
-    // }
-
-    // const componentDidUpdate = function (prevProps, prevState, cursorIdx) {
-    //     const node = cardNumberRef.current;
-    //     const { cardNumber: cardNum } = state;
-    //     const { cardNumber: prevCardNum } = prevState;
-    //     if (
-    //         cardNum.length > prevCardNum.length &&
-    //         cardNum[cursorIdx - 1] === ' '
-    //     ) {
-    //         cursorIdx += 1;
-    //     } else if (prevCardNum[cursorIdx - 1] === ' ') {
-    //         cursorIdx -= 1;
-    //     }
-    //     node.selectionStart = node.selectionEnd = cursorIdx;
-    // };
-
     return (
-        <div className="card-form">
-            <div className="card-list">{children}</div>
+        <Box className="card-form" sx={{ maxWidth: 400, margin: '0 auto' }}>
+            <div className="card-list" style={{ marginBottom: '20px' }}>{children}</div>
             <div className="card-form__inner">
-                <div className="card-input">
-                    <label htmlFor="cardNumber" className="card-input__label">
-                        Card Number
-                    </label>
-                    <input
-                        type="tel"
-                        name="cardNumber"
-                        className="card-input__input"
-                        autoComplete="off"
-                        onChange={onCardNumberChange}
-                        maxLength="19"
-                        ref={cardNumberRef}
-                        onFocus={(e) => onCardInputFocus(e, 'cardNumber')}
-                        onBlur={onCardInputBlur}
-                        value={cardNumber}
-                    />
-                </div>
-
-                <div className="card-input">
-                    <label htmlFor="cardName" className="card-input__label">
-                        Card Holder
-                    </label>
-                    <input
-                        type="text"
-                        className="card-input__input"
-                        autoComplete="off"
-                        name="cardHolder"
-                        onChange={handleFormChange}
-                        ref={cardHolderRef}
-                        onFocus={(e) => onCardInputFocus(e, 'cardHolder')}
-                        onBlur={onCardInputBlur}
-                    />
-                </div>
-
-                <div className="card-form__row">
-                    <div className="card-form__col">
-                        <div className="card-form__group">
-                            <label
-                                htmlFor="cardMonth"
-                                className="card-input__label"
-                            >
-                                Expiration Date
-                            </label>
-                            <select
-                                className="card-input__input -select"
+                <Grid container spacing={2}>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Kart Numarası"
+                            variant="standard"
+                            fullWidth
+                            name="cardNumber"
+                            onChange={onCardNumberChange}
+                            inputRef={cardNumberRef}
+                            onFocus={(e) => onCardInputFocus(e, 'cardNumber')}
+                            onBlur={onCardInputBlur}
+                            value={cardNumber}
+                            inputProps={{ maxLength: 16 }} // Max 16 karakter
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="Kart Sahibi"
+                            variant="standard"
+                            fullWidth
+                            name="cardHolder"
+                            onChange={handleFormChange}
+                            inputRef={cardHolderRef}
+                            onFocus={(e) => onCardInputFocus(e, 'cardHolder')}
+                            onBlur={onCardInputBlur}
+                        />
+                    </Grid>
+                    <Grid item xs={6}>
+                        <FormControl fullWidth variant="standard">
+                            <InputLabel>Ay</InputLabel>
+                            <Select
+                                label="Ay"
                                 value={cardMonth}
                                 name="cardMonth"
                                 onChange={handleFormChange}
-                                ref={cardDateRef}
+                                inputRef={cardDateRef}
                                 onFocus={(e) => onCardInputFocus(e, 'cardDate')}
                                 onBlur={onCardInputBlur}
                             >
-                                <option value="" disabled>
-                                    Month
-                                </option>
-
                                 {monthsArr.map((val, index) => (
-                                    <option key={index} value={val}>
+                                    <MenuItem key={index} value={val}>
                                         {val}
-                                    </option>
+                                    </MenuItem>
                                 ))}
-                            </select>
-                            <select
-                                name="cardYear"
-                                className="card-input__input -select"
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <FormControl fullWidth variant="standard">
+                            <InputLabel>Yıl</InputLabel>
+                            <Select
+                                label="Yıl"
                                 value={cardYear}
+                                name="cardYear"
                                 onChange={handleFormChange}
                                 onFocus={(e) => onCardInputFocus(e, 'cardDate')}
                                 onBlur={onCardInputBlur}
                             >
-                                <option value="" disabled>
-                                    Year
-                                </option>
-
                                 {yearsArr.map((val, index) => (
-                                    <option key={index} value={val}>
+                                    <MenuItem key={index} value={val}>
                                         {val}
-                                    </option>
+                                    </MenuItem>
                                 ))}
-                            </select>
-                        </div>
-                    </div>
-                    <div className="card-form__col -cvv">
-                        <div className="card-input">
-                            <label
-                                htmlFor="cardCvv"
-                                className="card-input__label"
-                            >
-                                CVV
-                            </label>
-                            <input
-                                type="tel"
-                                className="card-input__input"
-                                maxLength="4"
-                                autoComplete="off"
-                                name="cardCvv"
-                                onChange={handleFormChange}
-                                onFocus={onCvvFocus}
-                                onBlur={onCvvBlur}
-                                ref={cardCvv}
-                            />
-                        </div>
-                    </div>
-                </div>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            label="CVV"
+                            variant="standard"
+                            fullWidth
+                            name="cardCvv"
+                            onChange={handleFormChange}
+                            onFocus={onCvvFocus}
+                            onBlur={onCvvBlur}
+                            inputRef={cardCvv}
+                            inputProps={{ maxLength: 4 }} // Max 4 karakter
+                        />
+                    </Grid>
+                </Grid>
             </div>
-        </div>
+        </Box>
     );
 }
