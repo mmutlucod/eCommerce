@@ -40,7 +40,7 @@ export const clearCartAPI = createAsyncThunk(
     'cart/clearCartAPI',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await api.delete('/user/clear-basket');
+            const response = await api.post('/user/clear-cart');
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);

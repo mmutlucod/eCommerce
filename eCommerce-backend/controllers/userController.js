@@ -322,6 +322,40 @@ const getCartItems = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+const clearCart = async (req, res) => {
+  try {
+    // Kullanıcının oturum bilgilerinden email adresini al
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    // Kullanıcı bulunamazsa hata ver
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Kullanıcı bulunamadı.' });
+    }
+
+    // Kullanıcıya ait sepeti bul
+    const cart = await Cart.findOne({ where: { user_id: user.user_id } });
+
+    // Sepet bulunamazsa hata ver
+    if (!cart) {
+      return res.status(404).json({ success: false, message: 'Sepet bulunamadı.' });
+    }
+
+    // Sepete ait tüm ürünleri bul
+    const items = await CartItem.findAll({ where: { cart_id: cart.cart_id } });
+
+    // Her bir ürünü döngü ile sil
+    for (const item of items) {
+      await item.destroy();
+    }
+
+    // Başarılı sonuç dön
+    return res.status(200).json({ success: true, message: 'Sepetiniz başarıyla boşaltıldı.' });
+
+  } catch (error) {
+    // Hata durumunda hatayı dön
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
 
 
 //LİSTE İŞLEMLERİ
@@ -2138,5 +2172,5 @@ module.exports = {
   createReturnRequest, getUserReturnRequests, cancelReturnRequest,
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug,
-  getCategories, getSubCategoriesById, searchProducts, getPhotos
+  getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart
 };

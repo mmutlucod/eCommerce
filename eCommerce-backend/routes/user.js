@@ -19,6 +19,7 @@ router.get('/my-basket', authMiddleware, userController.getCartItems);
 router.post('/add-item', authMiddleware, userController.addItem);
 router.post('/increase-item', authMiddleware, userController.increaseItem);
 router.post('/delete-item', authMiddleware, userController.deleteItem);
+router.post('/clear-cart', authMiddleware, userController.clearCart);
 
 
 //LİSTE İŞLEMLERİ
