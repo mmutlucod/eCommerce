@@ -19,6 +19,9 @@ export default function UserNavbar() {
     const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
     const [cartItemCount, setCartItemCount] = useState(0);
     const [cartItems, setCartItems] = useState([]);
+    const searchInputRef = useRef(null);
+    const [searchWidth, setSearchWidth] = useState(0);
+    const [searchLeftMargin, setSearchLeftMargin] = useState(0);
 
     useEffect(() => {
         const fetchCartItems = async () => {
@@ -66,26 +69,30 @@ export default function UserNavbar() {
             setSearchModalOpen(false);
         }
     };
+
+    useEffect(() => {
+        if (searchInputRef.current) {
+            setSearchWidth(searchInputRef.current.clientWidth);
+            setSearchLeftMargin(searchInputRef.current.offsetLeft);
+        }
+    }, []);
     return (
         <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
             <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box sx={{ backgroundColor: 'yellow', borderRadius: '4px 0 0 4px', display: 'flex', alignItems: 'center', py: '6px', px: '16px' }}>
-                    <Typography variant="h6" noWrap sx={{ fontWeight: 'bold', color: '#4B0082' }}>
+                <Box sx={{ backgroundColor: 'yellow', borderRadius: '4px 0 0 4px', display: 'flex', alignItems: 'center', width: '5%', minHeight: '44px ' }}>
+                    <Typography variant="h6" noWrap sx={{ fontWeight: 'bold', color: '#4B0082', marginLeft: '18%' }}>
                         noVa
                     </Typography>
                 </Box>
-                <Box sx={{ flexGrow: 1, backgroundColor: 'white', borderRadius: '0 4px 0 0', display: 'flex', alignItems: 'center', marginLeft: '2px' }}>
+                <Box ref={searchInputRef} sx={{ minWidth: '61.85%', maxWidth: '61.85%', backgroundColor: 'white', borderRadius: '0 4px 0 0', display: 'flex', alignItems: 'center', marginLeft: 0 }}>
                     <InputBase
                         placeholder="Ürün, kategori, marka ara"
                         inputProps={{ 'aria-label': 'search' }}
                         sx={{
-                            ml: 1,
                             flex: 1,
                             height: '100%',
                             '& .MuiInputBase-input': {
-                                textAlign: 'left',
-                                width: '100%',
-                                height: '100%',
+                                marginLeft: '8px',
                             },
                         }}
                         value={searchQuery}
@@ -140,8 +147,13 @@ export default function UserNavbar() {
                     </IconButton>
                 </Box>
             </Toolbar>
-            <SearchModal query={searchQuery} open={dropdownOpen} />
-            <SearchModal open={isSearchModalOpen} onClose={handleCloseSearchModal} />
+            <SearchModal
+                query={searchQuery}
+                open={isSearchModalOpen}
+                onClose={handleCloseSearchModal}
+                width={searchWidth}
+                searchLeftMargin={searchLeftMargin}
+            />
         </AppBar >
     );
 }

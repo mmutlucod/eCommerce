@@ -4,7 +4,7 @@ import { useTheme, useMediaQuery } from '@mui/material';
 import api from '../api/api';
 import ExamplePopup from './ExamplePopup';
 
-const SearchResults = ({ query }) => {
+const SearchResults = ({ query, width, searchLeftMargin }) => {
     const [results, setResults] = useState([]);
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -31,7 +31,7 @@ const SearchResults = ({ query }) => {
         fetchResults();
     }, [query]);
 
-    return results.length > 0 ? <ExamplePopup results={results} /> : null;
+    return results.length > 0 ? <ExamplePopup width={width} searchLeftMargin={searchLeftMargin} results={results} /> : null;
 };
 
 export default SearchResults;

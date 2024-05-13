@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import {
-    Box,
-    Container,
-    TextField,
-    Button,
-    Typography,
-    Paper,
-    Grid,
-    MenuItem,
-    CssBaseline,
-    ThemeProvider,
-    createTheme, Snackbar,
-  } from '@mui/material';
-  import MuiAlert from '@mui/material/Alert';
+  Box,
+  Container,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+  Grid,
+  MenuItem,
+  CssBaseline,
+  ThemeProvider,
+  createTheme, Snackbar,
+} from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 import Navbar from '../components/UserNavbar';
 import api from '../api/api';
 import { useNavigate } from 'react-router-dom';
@@ -30,44 +30,44 @@ const cities = [
   "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"
 ];
 const theme = createTheme({
-    palette: {
-      primary: {
-        main: '#4B0082', // Koyu mor
-      },
-      secondary: {
-        main: '#ffc400', // Canlı sarı
-      },
-      background: {
-        default: '#f4f5fd', // Açık gri-mavi
+  palette: {
+    primary: {
+      main: '#4B0082', // Koyu mor
+    },
+    secondary: {
+      main: '#ffc400', // Canlı sarı
+    },
+    background: {
+      default: '#f4f5fd', // Açık gri-mavi
+    },
+  },
+  typography: {
+    fontFamily: 'Roboto, sans-serif',
+    h5: {
+      fontWeight: 600,
+      color: '#4B0082',
+      marginBottom: '20px',
+    },
+    body1: {
+      fontWeight: 400,
+    },
+  },
+  components: {
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+        margin: 'normal',
       },
     },
-    typography: {
-      fontFamily: 'Roboto, sans-serif',
-      h5: {
-        fontWeight: 600,
-        color: '#4B0082',
-        marginBottom: '20px',
-      },
-      body1: {
-        fontWeight: 400,
-      },
-    },
-    components: {
-      MuiTextField: {
-        defaultProps: {
-          variant: 'outlined',
-          margin: 'normal',
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          margin: '8px',
         },
       },
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            margin: '8px',
-          },
-        },
-      },
     },
-  });
+  },
+});
 
 const AddAddressPage = () => {
   const [addressDetails, setAddressDetails] = useState({
@@ -75,7 +75,7 @@ const AddAddressPage = () => {
     street: '',
     city: '',
     state: '',
-   
+
     postal_code: ''
   });
 
@@ -114,85 +114,85 @@ const AddAddressPage = () => {
 
   return (
     <>
-    <ThemeProvider theme={theme}>
-      <CssBaseline /> 
       <Navbar />
-      <Container maxWidth="md">
-        <Paper sx={{ p: 4, mt: 4 }}>
-          <Typography variant="h5" gutterBottom>
-            Yeni Adres Ekle
-          </Typography>
-          <form onSubmit={handleSubmit}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Adres Satırı"
-                  name="adres_line"
-                  value={addressDetails.adres_line}
-                  onChange={handleChange}
-                />
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container maxWidth="md">
+          <Paper sx={{ p: 4, mt: 4 }}>
+            <Typography variant="h5" gutterBottom>
+              Yeni Adres Ekle
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Adres Satırı"
+                    name="adres_line"
+                    value={addressDetails.adres_line}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Sokak"
+                    name="street"
+                    value={addressDetails.street}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Şehir"
+                    name="city"
+                    value={addressDetails.city}
+                    onChange={handleChange}
+                  >
+                    {cities.map((city, index) => (
+                      <MenuItem key={index} value={city}>
+                        {city}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="İl/İlçe"
+                    name="state"
+                    value={addressDetails.state}
+                    onChange={handleChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Posta Kodu"
+                    name="postal_code"
+                    value={addressDetails.postal_code}
+                    onChange={handleChange}
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button type="submit" variant="contained" color="primary">
+                    Adres Ekle
+                  </Button>
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Sokak"
-                  name="street"
-                  value={addressDetails.street}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Şehir"
-                  name="city"
-                  value={addressDetails.city}
-                  onChange={handleChange}
-                >
-                  {cities.map((city, index) => (
-                    <MenuItem key={index} value={city}>
-                      {city}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              
-                
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="İl/İlçe"
-                  name="state"
-                  value={addressDetails.state}
-                  onChange={handleChange}
-                />
-              </Grid>
-          
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  fullWidth
-                  label="Posta Kodu"
-                  name="postal_code"
-                  value={addressDetails.postal_code}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <Button type="submit" variant="contained" color="primary">
-                  Adres Ekle
-                </Button>
-              </Grid>
-            </Grid>
-          </form>
-        </Paper>
-        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-          <MuiAlert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
-            Adres başarıyla eklendi!
-          </MuiAlert>
-        </Snackbar>
-      </Container>
+            </form>
+          </Paper>
+          <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+            <MuiAlert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+              Adres başarıyla eklendi!
+            </MuiAlert>
+          </Snackbar>
+        </Container>
       </ThemeProvider>
     </>
   );

@@ -117,60 +117,63 @@ const FavoritesPage = () => {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
+    <>
       <Navbar />
-      <Container maxWidth="lg">
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={3}>
-            <List component="nav" aria-label="sidebar navigation">
-              {renderMenuItems(selectedItem, setSelectedItem)}
-            </List>
-          </Grid>
-          <Grid item xs={12} md={9}>
-            <Typography variant="h4" gutterBottom>
-              Beğendiklerim
-            </Typography>
-            {/* Burada favori ürünler listelenir */}
-            <Grid container spacing={2}>
-              {favorites.length > 0 ? (
-                favorites.map((product) => (
-                  <Grid item key={product.id} xs={12} sm={6} md={4}>
-                    <Card>
-                      <CardActionArea>
-                        <CardMedia
-                          component="img"
-                          image={product.imageUrl}
-                          alt={product.name}
-                        />
-                        <CardContent>
-                          <Typography gutterBottom variant="h5" component="h2">
-                            {product.name}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary" component="p">
-                            {product.description}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                      <CardActions>
-                        <IconButton aria-label="remove from favorites" onClick={() => handleRemoveFavorite(product.id)}>
-                          <FavoriteIcon />
-                        </IconButton>
-                        <Button size="small" color="primary">
-                          Sepete Ekle
-                        </Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                ))
-              ) : (
-                <Typography variant="subtitle1">Henüz favori ürününüz yok.</Typography>
-              )}
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+
+        <Container maxWidth="lg">
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={3}>
+              <List component="nav" aria-label="sidebar navigation">
+                {renderMenuItems(selectedItem, setSelectedItem)}
+              </List>
+            </Grid>
+            <Grid item xs={12} md={9}>
+              <Typography variant="h4" gutterBottom>
+                Beğendiklerim
+              </Typography>
+              {/* Burada favori ürünler listelenir */}
+              <Grid container spacing={2}>
+                {favorites.length > 0 ? (
+                  favorites.map((product) => (
+                    <Grid item key={product.id} xs={12} sm={6} md={4}>
+                      <Card>
+                        <CardActionArea>
+                          <CardMedia
+                            component="img"
+                            image={product.imageUrl}
+                            alt={product.name}
+                          />
+                          <CardContent>
+                            <Typography gutterBottom variant="h5" component="h2">
+                              {product.name}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary" component="p">
+                              {product.description}
+                            </Typography>
+                          </CardContent>
+                        </CardActionArea>
+                        <CardActions>
+                          <IconButton aria-label="remove from favorites" onClick={() => handleRemoveFavorite(product.id)}>
+                            <FavoriteIcon />
+                          </IconButton>
+                          <Button size="small" color="primary">
+                            Sepete Ekle
+                          </Button>
+                        </CardActions>
+                      </Card>
+                    </Grid>
+                  ))
+                ) : (
+                  <Typography variant="subtitle1">Henüz favori ürününüz yok.</Typography>
+                )}
+              </Grid>
             </Grid>
           </Grid>
-        </Grid>
-      </Container>
-    </ThemeProvider>
+        </Container>
+      </ThemeProvider>
+    </>
   );
 };
 
