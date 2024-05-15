@@ -145,7 +145,7 @@ const updateUserDetail = async (req, res) => {
   }
 }
 //SEPET İŞLEMLERİ
-const addItem = async (req, res) => {
+const updateItem = async (req, res) => {
   try {
     const { sellerProductId, quantity } = req.body;
 
@@ -166,7 +166,6 @@ const addItem = async (req, res) => {
     // İlk olarak stok adedini kontrol edin
     let maxQuantityAllowed = sp.stock;
 
-    console.log(sp.stock, sp.product.max_buy)
     // Eğer stok miktarı max_buy'dan azsa, kullanıcının ekleyebileceği maksimum miktarı buna göre ayarlayın
     if (sp.stock < sp.product.max_buy) {
       maxQuantityAllowed = sp.stock;
@@ -174,9 +173,6 @@ const addItem = async (req, res) => {
       // Eğer stok miktarı max_buy'dan fazla veya eşitse, max_buy değerini kullanın
       maxQuantityAllowed = sp.product.max_buy;
     }
-
-    // Kullanıcının sepetindeki mevcut miktarı dikkate alarak son miktarı hesaplayın
-    let finalQuantity = quantity;
 
     // Kullanıcının sepetini bul veya oluştur
     let cart = await Cart.findOne({ where: { user_id: user.user_id } });
@@ -193,42 +189,38 @@ const addItem = async (req, res) => {
     });
 
     if (cartItem) {
-      // Sepette zaten varsa, yeni miktarı hesapla
-      let potentialNewQuantity = cartItem.quantity + quantity;
-      if (potentialNewQuantity < maxQuantityAllowed) {
-        cartItem.quantity = finalQuantity;
+      // Yeni miktarı hesapla ve güncelle
+      let potentialNewQuantity = quantity;
+      if (potentialNewQuantity <= 0) {
+        // Eğer yeni miktar 0 veya daha az ise, öğeyi sepetten çıkar
+        await cartItem.destroy();
+        return res.status(200).json({ success: true, message: 'Ürün sepetten silindi.' });
+      } else if (potentialNewQuantity <= maxQuantityAllowed) {
+        cartItem.quantity = potentialNewQuantity;
         await cartItem.save();
+        return res.status(200).json({ success: true, message: 'Ürün miktarı güncellendi.' });
       } else {
-        return res.status(404).json({ success: false, message: 'Sepete eklenecek maksimum ürün sayısına ulaştınız.' });
+        return res.status(400).json({ success: false, message: 'Sepete eklenecek maksimum ürün sayısına ulaştınız.' });
       }
     } else {
       // Sepet öğesi yoksa, yeni bir tane oluştur
-      finalQuantity = cartItem.quantity;
-      if (potentialNewQuantity < maxQuantityAllowed) {
-        await CartItem.create({
-          cart_id: cart.cart_id,
-          seller_product_id: sellerProductId,
-          quantity: finalQuantity,
-        });
-      } else {
-        await CartItem.create({
-          cart_id: cart.cart_id,
-          seller_product_id: sellerProductId,
-          quantity: maxQuantityAllowed,
-        });
-        return res.status(200).json({ success: true, message: 'Maximum ürün adedi kadar sepete eklendi.' });
-      }
-
+      const finalQuantity = Math.min(quantity, maxQuantityAllowed);
+      await CartItem.create({
+        cart_id: cart.cart_id,
+        seller_product_id: sellerProductId,
+        quantity: finalQuantity,
+      });
+      return res.status(200).json({ success: true, message: 'Ürün sepete eklendi.' });
     }
-
-    return res.status(200).json({ success: true, message: "Item added to cart", cartItem });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
+
+
 const deleteItem = async (req, res) => {
   try {
-    const { productId } = req.body;
+    const { sellerProductId } = req.body;
 
     const user = await User.findOne({ where: { email: req.user.email } });
     const cart = await Cart.findOne({ where: { user_id: user.user_id } });
@@ -237,7 +229,7 @@ const deleteItem = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Sepet bulunamadı.' });
     }
 
-    const item = await CartItem.findOne({ where: { cart_id: cart.cart_id, seller_product_id: productId } });
+    const item = await CartItem.findOne({ where: { cart_id: cart.cart_id, seller_product_id: sellerProductId } });
     if (!item) {
       return res.status(404).json({ success: false, message: 'Ürün sepetinizde bulunamadı.' });
     }
@@ -250,37 +242,7 @@ const deleteItem = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-const increaseItem = async (req, res) => {
-  try {
-    const { productId } = req.body;
 
-    const user = await User.findOne({ where: { email: req.user.email } });
-    const cart = await Cart.findOne({ where: { user_id: user.user_id } });
-
-    if (!cart) {
-      return res.status(404).json({ success: false, message: 'Sepet bulunamadı.' });
-    }
-
-    const item = await CartItem.findOne({ where: { cart_id: cart.cart_id, seller_product_id: productId } });
-    if (!item) {
-      return res.status(404).json({ success: false, message: 'Ürün sepetinizde bulunamadı.' });
-    }
-
-    // Eğer miktar 1'den büyükse, miktarı bir azalt
-    if (item.quantity > 1) {
-      item.quantity -= 1;
-      await item.save();
-      return res.status(200).json({ success: true, message: 'Ürün miktarı azaltıldı.' });
-    } else {
-      // Miktar 1 ise, ürünü sepetten tamamen çıkar
-      await item.destroy();
-      return res.status(200).json({ success: true, message: 'Ürün sepetten silindi.' });
-    }
-
-  } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
-  }
-}
 const getCartItems = async (req, res) => {
   try {
     // Öncelikle kullanıcının email adresini kullanarak kullanıcıyı bulun
@@ -825,6 +787,7 @@ const cancelOrderItem = async (req, res) => {
 }
 const createOrder = async (req, res) => {
   try {
+    const { addressId } = req.body;
     // Kullanıcıyı doğrulayın
     const user = await User.findOne({ where: { email: req.user.email } });
     if (!user) {
@@ -849,6 +812,7 @@ const createOrder = async (req, res) => {
     // Yeni siparişi oluşturun
     const order = await Order.create({
       user_id: user.user_id,
+      address_id: addressId,
       order_date: new Date(),
       total_price: total_price,
       order_status_id: 1
@@ -2158,7 +2122,7 @@ function formatUserName(name, isPublic) {
 
 module.exports = {
   login, register, listUsers, getUserDetails, updateUserDetail,
-  addItem, deleteItem, increaseItem, getCartItems, getProducts,
+  updateItem, deleteItem, getCartItems, getProducts,
   getLists, createList, deleteList, updateList,
   addItemToList, getItemsByListId, removeItemFromList, getPublicListItemsBySlug,
   getAddresses, createAddress, updateAddress, deleteAddress,

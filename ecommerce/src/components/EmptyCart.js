@@ -11,7 +11,7 @@ function EmptyCart() {
                 <ShoppingCartIcon style={{ fontSize: '40px', color: '#4B0082', marginLeft: '40%' }} />
                 <p>Sepetinde ürün bulunmamaktadır.</p>
             </div>
-            <Link to="/shop" className="start-shopping-button">Alışverişe Başla</Link>
+            <Link to="/" className="start-shopping-button">Alışverişe Başla</Link>
         </div>
     );
 }
