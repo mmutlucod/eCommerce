@@ -69,18 +69,19 @@ export default function CForm({
             <div className="card-list" style={{ marginBottom: '20px' }}>{children}</div>
             <div className="card-form__inner">
                 <Grid container spacing={2}>
-                    <Grid item xs={12}>
+                    <Grid  item xs={12}>
                         <TextField
                             label="Kart Numarası"
                             variant="standard"
                             fullWidth
+                           
                             name="cardNumber"
                             onChange={onCardNumberChange}
                             inputRef={cardNumberRef}
                             onFocus={(e) => onCardInputFocus(e, 'cardNumber')}
                             onBlur={onCardInputBlur}
                             value={cardNumber}
-                            inputProps={{ maxLength: 16 }} // Max 16 karakter
+                            inputProps={{ maxLength: 19 }} // Max 16 karakter
                         />
                     </Grid>
                     <Grid item xs={12}>
