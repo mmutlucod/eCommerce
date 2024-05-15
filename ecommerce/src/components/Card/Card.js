@@ -153,7 +153,7 @@ const Card = ({
                             onClick={() => onCardElementClick('cardHolder')}
                             ref={cardHolderRef}
                         >
-                            <div className="card-item__holder">Card Holder</div>
+                            <div className="card-item__holder">Kart Sahibi</div>
                             <div className="card-item__name">
                                 <TransitionGroup
                                     component="div"
@@ -164,7 +164,7 @@ const Card = ({
                                             classNames="slide-fade-up"
                                             timeout={250}
                                         >
-                                            <div>FULL NAME</div>
+                                            <div>AD SOYAD</div>
                                         </CSSTransition>
                                     ) : (
                                         cardHolder
@@ -190,7 +190,7 @@ const Card = ({
                             ref={cardDateRef}
                         >
                             <label className="card-item__dateTitle">
-                                Expires
+                               Ay/Yıl
                             </label>
                             <label className="card-item__dateItem">
                                 <SwitchTransition in-out>
@@ -200,7 +200,7 @@ const Card = ({
                                         key={cardMonth}
                                     >
                                         <span>
-                                            {!cardMonth ? 'MM' : cardMonth}{' '}
+                                            {!cardMonth ? 'AA' : cardMonth}{' '}
                                         </span>
                                     </CSSTransition>
                                 </SwitchTransition>
