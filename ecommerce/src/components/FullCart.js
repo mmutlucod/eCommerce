@@ -26,6 +26,8 @@ function FullCart() {
     const cartItems = useSelector((state) => state.cart.items);
     const dispatch = useDispatch();
     const [topClass, setTopClass] = useState('top-normal');
+    const [totalQuantity, setTotalQuantity] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0);
 
     const handleScroll = () => {
         if (window.scrollY > 45) {
@@ -43,14 +45,19 @@ function FullCart() {
     }, []);
 
     const itemsBySeller = groupItemsBySeller(cartItems);
-    const totalQuantity = cartItems.reduce((sum, item) => sum + (item ? item.quantity : 0), 0);
-    const totalPrice = cartItems.reduce((total, item) => total + (item ? item.sellerProduct.price * item.quantity : 0), 0);
+
+    // useEffect(() => {
+    //     const totalQuantity = cartItems.reduce((sum, item) => sum + (item ? item.quantity : 0), 0);
+    //     const totalPrice = cartItems.reduce((total, item) => total + (item ? item.sellerProduct.price * item.quantity : 0), 0);
+    //     setTotalQuantity(totalQuantity);
+    //     setTotalPrice(totalPrice);
+    // }, [cartItems]);
 
     return (
         <>
             <div className="full-cart-container">
                 <div className='item-count'>
-                    <div className='basket-text'>Sepetim ({totalQuantity} Ürün)</div>
+                    <div className='basket-text'>Sepetim ({5} Ürün)</div>
                     <div className="clear-cart" onClick={() => dispatch(clearCartAPI())}>
                         <div>
                             <DeleteIcon />
@@ -71,10 +78,10 @@ function FullCart() {
                 ))}
                 <div className={`order-summary ${topClass}`}>
                     <h3>Sipariş Özeti</h3>
-                    <p>Ürünün Toplamı <span>{totalPrice} ₺</span></p>
+                    <p>Ürünün Toplamı <span>{1000} ₺</span></p>
                     <p>Kargo Toplamı <span>+34,99 ₺</span></p>
                     <p style={{ color: '#4B0082' }}>Kargo Bedava(Satıcı Karşılar) <span style={{ color: '#4B0082' }}>-34,99 ₺</span></p>
-                    <p>Toplam Tutar <span>{totalPrice} ₺</span></p>
+                    <p>Toplam Tutar <span>{1000} ₺</span></p>
                     <Link to="sepetim/odeme" className="checkout-buttons">Sepeti Onayla</Link>
                 </div>
             </div>
