@@ -36,16 +36,15 @@ function FullCart() {
     };
 
     useEffect(() => {
-        const itemsBySeller = groupItemsBySeller(cartItems);
-        const totalQuantity = cartItems.reduce((sum, item) => sum + (item ? item.quantity : 0), 0);
-        const totalPrice = cartItems.reduce((total, item) => total + (item ? item.sellerProduct.price * item.quantity : 0), 0);
-
         window.addEventListener('scroll', handleScroll);
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
     }, []);
 
+    const itemsBySeller = groupItemsBySeller(cartItems);
+    const totalQuantity = cartItems.reduce((sum, item) => sum + (item ? item.quantity : 0), 0);
+    const totalPrice = cartItems.reduce((total, item) => total + (item ? item.sellerProduct.price * item.quantity : 0), 0);
 
     return (
         <>
