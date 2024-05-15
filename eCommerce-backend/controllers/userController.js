@@ -787,7 +787,7 @@ const cancelOrderItem = async (req, res) => {
 }
 const createOrder = async (req, res) => {
   try {
-    const { adressId } = req.body;
+    const { addressId } = req.body;
     // Kullanıcıyı doğrulayın
     const user = await User.findOne({ where: { email: req.user.email } });
     if (!user) {
