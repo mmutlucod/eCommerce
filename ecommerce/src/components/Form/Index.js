@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
-import CForm from './components/form';
-import Card from './components/card';
+import CForm from './Form';
+import Card from '../Card/Card';
 
 const initialState = {
     cardNumber: '#### #### #### ####',
