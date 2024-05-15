@@ -22,15 +22,31 @@ export const fetchCart = createAsyncThunk(
     }
 );
 
-// Sepeti güncelleme
-export const updateCart = createAsyncThunk(
-    'cart/updateCart',
-    async (cartData, { rejectWithValue }) => {
+// Ürün adet güncelleme
+export const updateItem = createAsyncThunk(
+    'cart/updateItem',
+    async (itemData, { rejectWithValue }) => {
         try {
-            const response = await api.post('/user/update-basket', cartData);
+            const response = await api.post('/user/update-item', itemData);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response.data);
+            console.error('API error:', error.response ? error.response.data : error.message);
+            return rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+);
+
+//Ürünü sepetten kaldırma
+export const deleteItem = createAsyncThunk(
+    'cart/deleteItem',
+    async (itemData, { rejectWithValue }) => {
+        try {
+            console.log(itemData);
+            const response = await api.post('/user/delete-item', itemData);
+            return response.data;
+        } catch (error) {
+            console.error('API error:', error.response ? error.response.data : error.message);
+            return rejectWithValue(error.response ? error.response.data : error.message);
         }
     }
 );
@@ -52,14 +68,29 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
-        addItem(state, action) {
-            // addItem reducer kodunuz
+        addItemLocally(state, action) {
+            const existingItem = state.items.find(item => item.id === action.payload.id);
+            if (existingItem) {
+                existingItem.quantity += action.payload.quantity;
+            } else {
+                state.items.push(action.payload);
+            }
+            state.totalAmount += action.payload.price * action.payload.quantity;
         },
-        removeItem(state, action) {
-            // removeItem reducer kodunuz
+        removeItemLocally(state, action) {
+            const index = state.items.findIndex(item => item.id === action.payload);
+            if (index !== -1) {
+                state.totalAmount -= state.items[index].price * state.items[index].quantity;
+                state.items.splice(index, 1);
+            }
         },
-        updateItemQuantity(state, action) {
-            // updateItemQuantity reducer kodunuz
+        updateItemQuantityLocally(state, action) {
+            const index = state.items.findIndex(item => item.id === action.payload.id);
+            if (index !== -1) {
+                state.totalAmount -= state.items[index].price * state.items[index].quantity;
+                state.items[index].quantity = action.payload.quantity;
+                state.totalAmount += state.items[index].price * state.items[index].quantity;
+            }
         },
     },
     extraReducers: (builder) => {
@@ -77,9 +108,14 @@ const cartSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload || 'Veriler yüklenemedi.';
             })
-            .addCase(updateCart.fulfilled, (state, action) => {
-                state.items = action.payload || [];
-                state.totalAmount = action.payload.reduce((total, item) => total + item.price * item.quantity, 0);
+            .addCase(updateItem.fulfilled, (state, action) => {
+                const existingItem = state.items.find(item => item.id === action.payload.id);
+                if (existingItem) {
+                    existingItem.quantity = action.payload.quantity;
+                } else {
+                    state.items.push(action.payload);
+                }
+                state.totalAmount += action.payload.price * action.payload.quantity;
             })
             .addCase(clearCartAPI.fulfilled, (state) => {
                 state.items = [];
@@ -88,5 +124,5 @@ const cartSlice = createSlice({
     }
 });
 
-export const { addItem, removeItem, updateItemQuantity } = cartSlice.actions;
+export const { addItemLocally, removeItemLocally, updateItemQuantityLocally } = cartSlice.actions;
 export default cartSlice.reducer;

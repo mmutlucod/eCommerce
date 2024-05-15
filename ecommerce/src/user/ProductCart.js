@@ -15,9 +15,9 @@ import "slick-carousel/slick/slick-theme.css";
 import ImageSlider from '../components/ImageSlider';
 import MenuBar from '../components/MenuBar';
 import { images } from '../App';
-import ImageCarousel from '../components/ImageCarousel'
+import ImageCarousel from '../components/ImageCarousel';
 import { useDispatch } from 'react-redux'; // useDispatch hook'unu import ediyoruz
-import { addItem } from '../redux/cartSlice'; // addItem action'ını import ediyoruz
+import { updateItem } from '../redux/cartSlice'; // addItem action'ını import ediyoruz
 
 const CustomCard = styled(Card)(({ theme }) => ({
   flex: '1 0 calc(25% - 16px)', // Hesaplama her kart için %25 genişlik ve aralarında 8px boşluk sağlar
@@ -35,12 +35,6 @@ const CustomCard = styled(Card)(({ theme }) => ({
   },
 }));
 
-
-// const CustomCardMedia = styled(CardMedia)({
-//   paddingTop: '56.25%',
-//   transition: 'transform 0.3s ease-in-out',
-// });
-
 const CustomCardContent = styled(CardContent)({
   textAlign: 'left',
   padding: '16px',
@@ -54,7 +48,6 @@ const CustomTypography = styled(Typography)({
 const CustomButton = styled(Button)(({ theme }) => ({
   margin: 'auto',
   display: 'block',
-
   backgroundColor: '#e67e22',
   color: 'white',
   transition: 'background-color 0.2s',
@@ -95,50 +88,22 @@ const ProductCards = () => {
     navigate(`/urun/${productId}`); // Ürün detay sayfasına yönlendirme
   };
 
-  const fetchProductImages = (productId) => async (dispatch) => {
+  const fetchProductImages = async (productId) => {
     try {
       const response = await api.get(`/user/productPhoto/${productId}`);
-      const images = response.data;
-
-      if (images != null) {
-        return dispatch({
-          type: 'FETCH_PRODUCT_IMAGES_SUCCESS',
-          payload: images.image_path
-        });
-      }
-      return dispatch({
-        type: 'FETCH_PRODUCT_IMAGES_SUCCESS',
-        payload: null
-      });
+      return response.data ? response.data.image_path : null;
     } catch (error) {
-      dispatch({
-        type: 'FETCH_PRODUCT_IMAGES_FAILURE',
-        payload: error.response ? error.response.data : error.message
-      });
-      return null; // Return null in case of error
+      console.error(error);
+      return null;
     }
   };
-
 
   const handleAddToCart = async (product) => {
-    const productPhoto = await dispatch(fetchProductImages(product.product_id));
-
-    if (productPhoto) {
-      dispatch(addItem({
-        id: product.seller_product_id,
-        productName: product.product.name,
-        price: product.price,
-        quantity: 1,
-        brandName: product.product.Brand.brand_name,
-        maxBuy: product.product.max_buy,
-        productPhoto: productPhoto.payload,
-        sellerName: product.seller.username,
-        brandSlug: product.product.Brand.slug
-      }));
-    }
+    dispatch(updateItem({
+      sellerProductId: product.seller_product_id,
+      quantity: 1
+    }));
   };
-
-
 
   if (loading) return <div>Yükleniyor...</div>;
   if (error) return <div>Hata: {error}</div>;
@@ -149,9 +114,7 @@ const ProductCards = () => {
       <MenuBar />
       <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
         {products.map((product) => (
-
-          <CustomCard key={product.product_id} >
-            {/* {console.log(product.product.slug)} */}
+          <CustomCard key={product.product_id}>
             {product.fastDelivery && <CustomBadge color="error" badgeContent="Fast Delivery" />}
             <ImageCarousel images={product.product.productImages.map(img => img === null ? 'empty.jpg' : img.image_path)} />
             <CustomCardContent>
@@ -171,7 +134,6 @@ const ProductCards = () => {
                   </CustomTypography>
                 </Box>
               )}
-
               <CustomTypography variant="h6" mt={1}>
                 {product.price ? `${product.price.toFixed(2)} ₺` : 'Price Unknown'}
               </CustomTypography>

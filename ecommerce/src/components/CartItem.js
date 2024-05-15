@@ -1,28 +1,44 @@
-// import React from 'react';
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { updateItem, deleteItem } from '../redux/cartSlice';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-// function CartItem({ item, onUpdateQuantity, onRemoveItem }) {
-//     return (
-//         <div className="cart-item">
-//             <div className="product-info">
-//                 <img src={item.image} alt={item.name} className="product-image" />
-//                 <div className="product-details">
-//                     <div className="product-name">{item.name}</div>
-//                     <div className="seller-rating">Satıcı: {item.seller} <span className="rating">{item.rating}</span></div>
-//                     <div className="shipping-info">{item.shipping}</div>
-//                     <div className="insurance-option">{item.insurance}</div>
-//                 </div>
-//             </div>
-//             <div className="product-pricing">
-//                 <div className="quantity-controls">
-//                     <button onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}>-</button>
-//                     <span>{item.quantity}</span>
-//                     <button onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}>+</button>
-//                 </div>
-//                 <div className="price">{item.price} TL</div>
-//                 <button onClick={() => onRemoveItem(item.id)} className="remove-item">Sil</button>
-//             </div>
-//         </div>
-//     );
-// }
+function CartItem({ item }) {
+    const dispatch = useDispatch();
 
-// export default CartItem;
+    const handleUpdateItem = (quantity) => {
+        dispatch(updateItem({ sellerProductId: item.sellerProduct.seller.seller_id, quantity }));
+    };
+
+    const handleDeleteItem = () => {
+        dispatch(deleteItem(item.seller_product_id));
+    };
+
+    return (
+        <div className="item-body">
+            <img src={item.productPhoto ? `http://localhost:5000/img/${item.productPhoto}` : 'http://localhost:5000/img/empty.jpg'} alt={item.productName} />
+            <div className="item-details">
+                <p style={{ minWidth: '40%', maxWidth: '40%', fontSize: '14px', marginLeft: '2%', marginTop: '0.32%' }}>
+                    <Link className='markaLink' to={'/marka/' + item.sellerProduct.product.Brand.slug}>
+                        {item.sellerProduct.product.Brand.brand_name}
+                    </Link>
+                    {' ' + item.sellerProduct.product.name}
+                </p>
+                <div className="item-controls">
+                    <div className="quantity-selector">
+                        <button onClick={() => handleUpdateItem(item.quantity - 1)}>-</button>
+                        <span>{item.quantity}</span>
+                        <button onClick={() => handleUpdateItem(item.quantity + 1)}>+</button>
+                    </div>
+                    <div className="price">{item.sellerProduct.price * item.quantity}₺</div>
+                    <div className='remove-button' onClick={handleDeleteItem}>
+                        <span>Sil</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default CartItem;
