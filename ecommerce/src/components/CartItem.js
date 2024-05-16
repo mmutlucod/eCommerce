@@ -7,12 +7,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 function CartItem({ item }) {
     const dispatch = useDispatch();
 
-    const handleUpdateItem = (quantity) => {
-        dispatch(updateItem({ sellerProductId: item.sellerProduct.seller.seller_id, quantity }));
+    const handleUpdateItem = (id, quantity) => {
+        dispatch(updateItem({ id: id, sellerProductId: item.sellerProduct.seller.seller_id, quantity }));
     };
 
     const handleDeleteItem = () => {
-        dispatch(deleteItem(item.seller_product_id));
+        dispatch(deleteItem({ cartItemId: item.id }));
     };
 
     return (
@@ -27,11 +27,11 @@ function CartItem({ item }) {
                 </p>
                 <div className="item-controls">
                     <div className="quantity-selector">
-                        <button onClick={() => handleUpdateItem(item.quantity - 1)}>-</button>
+                        <button onClick={() => handleUpdateItem(item.id, item.quantity - 1)}>-</button>
                         <span>{item.quantity}</span>
-                        <button onClick={() => handleUpdateItem(item.quantity + 1)}>+</button>
+                        <button onClick={() => handleUpdateItem(item.id, item.quantity + 1)}>+</button>
                     </div>
-                    <div className="price">{item.sellerProduct.price * item.quantity}₺</div>
+                    <div className='price'>{item.sellerProduct.price * item.quantity} ₺</div>
                     <div className='remove-button' onClick={handleDeleteItem}>
                         <span>Sil</span>
                     </div>
