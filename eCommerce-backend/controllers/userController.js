@@ -163,16 +163,9 @@ const updateItem = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    // İlk olarak stok adedini kontrol et
-    let maxQuantityAllowed = sp.stock;
-
-    // Eğer stok miktarı max_buy'dan azsa, kullanıcının ekleyebileceği maksimum miktarı buna göre ayarla
-    if (sp.stock < sp.product.max_buy) {
-      maxQuantityAllowed = sp.stock;
-    } else {
-      // Eğer stok miktarı max_buy'dan fazla veya eşitse, max_buy değerini kullan
-      maxQuantityAllowed = sp.product.max_buy;
-    }
+    // Maksimum miktarları belirle
+    const maxBuy = sp.product.max_buy;
+    const stock = sp.stock;
 
     // Kullanıcının sepetini bul veya oluştur
     let cart = await Cart.findOne({ where: { user_id: user.user_id } });
@@ -197,23 +190,35 @@ const updateItem = async (req, res) => {
         return res.status(200).json({ success: true, message: 'Ürün sepetinizde zaten bulunmamaktadır.' });
       }
     } else {
+      // Sepet öğesi zaten varsa, miktarı güncelle
       if (cartItem) {
-        // Yeni miktarı hesapla ve güncelle
         let potentialNewQuantity = quantity;
-        if (potentialNewQuantity <= maxQuantityAllowed) {
-          cartItem.quantity = potentialNewQuantity;
-          await cartItem.save();
-          return res.status(200).json({ success: true, message: 'Ürün miktarı güncellendi.' });
-        } else {
-          return res.status(400).json({ success: false, message: 'Sepete eklenecek maksimum ürün sayısına ulaştınız.' });
+
+        if (potentialNewQuantity > maxBuy) {
+          return res.status(400).json({ success: false, message: `Maksimum satın alma miktarına (${maxBuy}) ulaştınız.` });
         }
+
+        if (potentialNewQuantity > stock) {
+          return res.status(400).json({ success: false, message: `Stokta yeterli ürün bulunmamaktadır. Maksimum eklenebilir miktar: ${stock - cartItem.quantity}` });
+        }
+
+        cartItem.quantity = potentialNewQuantity;
+        await cartItem.save();
+        return res.status(200).json({ success: true, message: 'Ürün miktarı güncellendi.' });
       } else {
         // Sepet öğesi yoksa, yeni bir tane oluştur
-        const finalQuantity = Math.min(quantity, maxQuantityAllowed);
+        if (quantity > maxBuy) {
+          return res.status(400).json({ success: false, message: `Maksimum satın alma miktarına (${maxBuy}) ulaştınız.` });
+        }
+
+        if (quantity > stock) {
+          return res.status(400).json({ success: false, message: `Stokta yeterli ürün bulunmamaktadır. Maksimum eklenebilir miktar: ${stock}` });
+        }
+
         await CartItem.create({
           cart_id: cart.cart_id,
           seller_product_id: sellerProductId,
-          quantity: finalQuantity,
+          quantity: quantity,
         });
         return res.status(200).json({ success: true, message: 'Ürün sepete eklendi.' });
       }

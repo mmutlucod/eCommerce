@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import SearchModal from './SearchModal';
 import CartDropdown from './CartDropdown';
 import api from '../api/api';
+import { Link } from 'react-router-dom';
 
 export default function UserNavbar() {
     const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function UserNavbar() {
     const searchInputRef = useRef(null);
     const [searchWidth, setSearchWidth] = useState(0);
     const [searchLeftMargin, setSearchLeftMargin] = useState(0);
+    const [totalQuantity, seTtotalQuantity] = useState(0);
 
     useEffect(() => {
         const fetchCartItems = async () => {
@@ -34,9 +36,9 @@ export default function UserNavbar() {
         };
 
         fetchCartItems();
+
     }, []);
 
-    const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
 
     useEffect(() => {
         const handleResize = () => {
@@ -51,6 +53,13 @@ export default function UserNavbar() {
         // Cleanup function
         return () => window.removeEventListener('resize', handleResize);
     }, [isSearchModalOpen]); // Bu hook isSearchModalOpen state'ine bağlı
+
+
+    useEffect(() => {
+        const totalquantity = cartItems.reduce((total, item) => total + item.quantity, 0);
+
+        seTtotalQuantity(totalquantity);
+    }, []);
 
     const handleOpenSearchModal = () => {
         if (window.innerWidth >= 1532) {
@@ -134,15 +143,18 @@ export default function UserNavbar() {
                             </Typography>
                         </>
                     )}
+
                     <IconButton
                         color="inherit"
                         onMouseEnter={() => setCartDropdownOpen(true)}
                         onMouseLeave={() => setCartDropdownOpen(false)}
                         aria-label="show cart items"
                     >
-                        <Badge badgeContent={totalQuantity} color="secondary">
-                            <ShoppingCartIcon />
-                        </Badge>
+                        <Link to='/sepetim' style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <Badge badgeContent={totalQuantity} color="secondary">
+                                <ShoppingCartIcon />
+                            </Badge>
+                        </Link>
                         {cartDropdownOpen && <CartDropdown />}
                     </IconButton>
                 </Box>

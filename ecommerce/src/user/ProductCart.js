@@ -22,7 +22,6 @@ import { updateItem } from '../redux/cartSlice'; // addItem action'ını import 
 const CustomCard = styled(Card)(({ theme }) => ({
   flex: '1 0 calc(25% - 16px)', // Hesaplama her kart için %25 genişlik ve aralarında 8px boşluk sağlar
   maxWidth: 250, // Maksimum genişlik
-  minHeight: 380,
   margin: '20px 8px', // Dikey marjin ve yatay padding
   transition: '0.3s',
   boxShadow: '0 8px 40px -12px rgba(0,0,0,0.1)',
@@ -37,12 +36,26 @@ const CustomCard = styled(Card)(({ theme }) => ({
 
 const CustomCardContent = styled(CardContent)({
   textAlign: 'left',
-  padding: '16px',
+  padding: '15px',
+  height: '110px', // Sabit yükseklik ayarlandı
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-between',
 });
 
 const CustomTypography = styled(Typography)({
   color: '#2c3e50',
   fontWeight: 'bold',
+  fontSize: '14px',
+  textOverflow: 'clip',
+  marginRight: '4px'
+});
+
+const CommentTypography = styled(Typography)({
+  color: '#2c3e50',
+  fontWeight: 'bold',
+  fontSize: '14px',
+  textOverflow: 'clip',
 });
 
 const CustomButton = styled(Button)(({ theme }) => ({
@@ -56,9 +69,11 @@ const CustomButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+
 const ProductNameTypography = styled(Typography)(({ theme }) => ({
   color: theme.palette.text.secondary, // Bu kısım metnin rengini ayarlar
-  marginLeft: theme.spacing(1), // Marka ve model arasındaki boşluk için
+  marginLeft: '6px', // Marka ve model arasındaki boşluk için
+  fontSize: '14px',
 }));
 
 const ProductCards = () => {
@@ -116,7 +131,7 @@ const ProductCards = () => {
         {products.map((product) => (
           <CustomCard key={product.product_id}>
             {product.fastDelivery && <CustomBadge color="error" badgeContent="Fast Delivery" />}
-            <ImageCarousel images={product.product.productImages.map(img => img === null ? 'empty.jpg' : img.image_path)} />
+            <ImageCarousel images={product.product.productImages.map(img => img.image_path)} />
             <CustomCardContent>
               <Box display="flex" justifyContent="start" alignItems="center">
                 <CustomTypography variant="subtitle1" noWrap>
@@ -129,9 +144,9 @@ const ProductCards = () => {
               {product.commentCount > 0 && (
                 <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
                   <Rating name="half-rating-read" value={parseFloat(product.commentAvg) || 0} precision={0.5} readOnly />
-                  <CustomTypography variant="m" marginRight={'100%'}>
+                  <CommentTypography variant="m" marginRight={'100%'} marginLeft={'1.3px'}>
                     {`(${product.commentCount})`}
-                  </CustomTypography>
+                  </CommentTypography>
                 </Box>
               )}
               <CustomTypography variant="h6" mt={1}>

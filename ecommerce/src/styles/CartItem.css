@@ -1,0 +1,51 @@
+.item-body {
+    position: relative;
+}
+
+.maxQuantityMessage {
+    color: red;
+    font-size: 14px;
+}
+
+.maxQuantityNote {
+    color: gray;
+    font-size: 12px;
+    text-align: center;
+    margin-top: 5px;
+}
+
+.quantityWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.maxQuantity {
+    color: red;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.notification {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background-color: #f44336; /* Kırmızı arka plan */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 14px;
+    z-index: 1000;
+    animation: fadeIn 0.5s, fadeOut 0.5s 2.5s; /* 2.5 saniye sonra kaybolma animasyonu başlar */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(10px); }
+}

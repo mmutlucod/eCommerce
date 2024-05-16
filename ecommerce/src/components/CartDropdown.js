@@ -22,7 +22,6 @@ const CartDropdown = () => {
     }, []);
     const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
     const totalPrice = cartItems.reduce((total, item) => total + (item.quantity * item.sellerProduct.price), 0);
-    console.log(cartItems)
 
     return (
         <div className="cart-dropdown">

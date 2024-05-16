@@ -5,38 +5,46 @@ import "slick-carousel/slick/slick-theme.css";
 import styled from 'styled-components';
 
 const Container = styled.div`
-  width: 80%; // Carousel'in genişliğini ayarla
-  margin: auto; // Merkeze al
+  width: 80%;
+  margin: auto;
 `;
 
 const Image = styled.img`
-margin: 0 auto;
+  margin: 0 auto;
   max-width: 200px;
-  max-height: 180px; // Sabit yükseklik ayarladım
-  
+  max-height: 140px;
+  padding: 15px;
 `;
 
 const ImageCarousel = ({ images }) => {
+    const defaultImage = 'empty.jpg'; // Varsayılan resim
+
     const settings = {
-        dots: true, // Nokta göstergelerini aktif et
-        infinite: false, // Sonsuz döngü
-        speed: 500, // Geçiş hızı
-        slidesToShow: 1, // Bir seferde kaç slayt gösterileceği
-        slidesToScroll: 1, // Bir seferde kaç slayt geçileceği
-        autoplay: false, // Otomatik oynatma
-        autoplaySpeed: 3000, // Otomatik oynatma hızı
-        cssEase: "linear", // Animasyon türü
-        adaptiveHeight: false, // Slaytların yüksekliğine göre yüksekliği ayarlamayı kapat
+        dots: false,
+        infinite: false,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        autoplay: false,
+        autoplaySpeed: 3000,
+        cssEase: "linear",
+        adaptiveHeight: false,
     };
 
     return (
         <Container>
             <Slider {...settings}>
-                {images.map((img, index) => (
-                    <div key={index}>
-                        <Image src={`http://localhost:5000/img/${img}`} alt={`Slide ${index}`} />
+                {images && images.length > 0 ? (
+                    images.map((img, index) => (
+                        <div key={index}>
+                            <Image src={`http://localhost:5000/img/${img || defaultImage}`} alt={`Slide ${index}`} />
+                        </div>
+                    ))
+                ) : (
+                    <div>
+                        <Image src={`http://localhost:5000/img/${defaultImage}`} alt="Default Slide" />
                     </div>
-                ))}
+                )}
             </Slider>
         </Container>
     );
