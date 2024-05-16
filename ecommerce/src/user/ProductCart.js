@@ -84,19 +84,7 @@ const ProductCards = () => {
     fetchProducts();
   }, []);
 
-  const handleCardClick = (productId) => {
-    navigate(`/urun/${productId}`); // Ürün detay sayfasına yönlendirme
-  };
-
-  const fetchProductImages = async (productId) => {
-    try {
-      const response = await api.get(`/user/productPhoto/${productId}`);
-      return response.data ? response.data.image_path : null;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
-  };
+  
 
   const handleAddToCart = async (product) => {
     dispatch(updateItem({

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Confetti from 'react-confetti';
 import api from '../api/api';
 import {
     Container,
@@ -18,7 +20,8 @@ import {
     MenuItem,
     CssBaseline,
     Checkbox,
-    Alert
+    Alert,
+    AlertTitle
 } from '@mui/material';
 import UserNavbar from '../components/UserNavbar';
 import UserFooter from '../components/UserFooter';
@@ -65,6 +68,10 @@ const PaymentPage = () => {
     const [infoOpen, setInfoOpen] = useState(false);
     const [formValid, setFormValid] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const [orderSuccess, setOrderSuccess] = useState(false);
+    const [showConfetti, setShowConfetti] = useState(false);
+
+    const navigate = useNavigate();
 
     const [state, setState] = useState({
         cardNumber: '',
@@ -165,15 +172,21 @@ const PaymentPage = () => {
         }
 
         try {
-            console.log(selectedAddress)
             const orderData = {
-                address_id: 1,
-                
+                addressId: selectedAddress,
                 // Diğer sipariş detayları burada
             };
 
             await api.post('/user/create-order', orderData);
+            setOrderSuccess(true);
+            setShowConfetti(true);
+
             setAlertMessage('Siparişiniz başarıyla oluşturuldu!');
+
+            setTimeout(() => {
+                setShowConfetti(false);
+                navigate('/user/orders');
+            }, 5000);
         } catch (error) {
             console.error('Error creating order:', error);
             setAlertMessage('Sipariş oluşturulurken bir hata oluştu.');
@@ -210,7 +223,11 @@ const PaymentPage = () => {
                             cardDateRef={cardElementsRef.cardDate}
                         />
                     </CForm>
-                    {alertMessage && <Alert severity="error">{alertMessage}</Alert>}
+                    {alertMessage && (
+                        <Box sx={{ mt: 2 }}>
+                            <Alert severity={orderSuccess ? 'success' : 'error'}>{alertMessage}</Alert>
+                        </Box>
+                    )}
                 </Box>
             </Grid>
             <Grid item xs={12} md={4}>
@@ -406,6 +423,16 @@ const PaymentPage = () => {
                     <Button onClick={handleInfoClose} sx={{ mt: 2 }}>Kapat</Button>
                 </Box>
             </Modal>
+            {showConfetti && <Confetti width={window.innerWidth} height={window.innerHeight} />}
+            {orderSuccess && (
+                <Modal open={orderSuccess} onClose={() => setOrderSuccess(false)} aria-labelledby="success-modal-title" aria-describedby="success-modal-description">
+                    <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, textAlign: 'center' }}>
+                        <Alert severity="success">
+                            <AlertTitle>Siparişiniz başarıyla oluşturuldu!</AlertTitle>
+                        </Alert>
+                    </Box>
+                </Modal>
+            )}
             <UserFooter />
         </ThemeProvider>
     );
