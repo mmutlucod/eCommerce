@@ -36,7 +36,21 @@ export const updateItem = createAsyncThunk(
     }
 );
 
-//Ürünü sepetten kaldırma
+// Ürün ekleme
+export const addItem = createAsyncThunk(
+    'cart/addItem',
+    async (itemData, { rejectWithValue }) => {
+        try {
+            const response = await api.post('/user/add-item', itemData);
+            return itemData;
+        } catch (error) {
+            console.error('API error:', error.response ? error.response.data : error.message);
+            return rejectWithValue(error.response ? error.response.data : error.message);
+        }
+    }
+);
+
+// Ürünü sepetten kaldırma
 export const deleteItem = createAsyncThunk(
     'cart/deleteItem',
     async (itemData, { rejectWithValue }) => {
@@ -86,10 +100,6 @@ const cartSlice = createSlice({
                 const { id, quantity, sellerProduct, price } = action.payload;
                 const existingItemIndex = state.items.findIndex(item => item.id === id);
 
-                console.log('Action Payload:', action.payload);
-                console.log('Price:', price);
-                console.log('Quantity:', quantity);
-
                 if (quantity === 0) {
                     // Eğer güncellenen miktar sıfırsa, ürünü sepette bulunan ürünler arasından kaldır
                     if (existingItemIndex !== -1) {
@@ -122,6 +132,26 @@ const cartSlice = createSlice({
                     }
                 }
             })
+            .addCase(addItem.fulfilled, (state, action) => {
+                const { sellerProductId, quantity, sellerProduct, price } = action.payload;
+                const existingItemIndex = state.items.findIndex(item => item.sellerProductId === sellerProductId);
+
+                if (existingItemIndex !== -1) {
+                    const existingItem = state.items[existingItemIndex];
+
+                    if (existingItem) {
+                        state.totalAmount -= existingItem.sellerProduct.price * existingItem.quantity;
+                        state.totalQuantity -= existingItem.quantity;
+                        existingItem.quantity += quantity;
+                        state.totalAmount += existingItem.sellerProduct.price * existingItem.quantity;
+                        state.totalQuantity += existingItem.quantity;
+                    }
+                } else {
+                    state.items.push({ ...action.payload, sellerProduct: { price } });
+                    state.totalAmount += price * quantity;
+                    state.totalQuantity += quantity;
+                }
+            })
             .addCase(deleteItem.fulfilled, (state, action) => {
                 const { cartItemId } = action.payload;
                 const updatedItems = state.items.filter(item => item.id !== cartItemId);
@@ -145,5 +175,3 @@ const cartSlice = createSlice({
 
 export const { addItemLocally, removeItemLocally, updateItemQuantityLocally } = cartSlice.actions;
 export default cartSlice.reducer;
-
-
