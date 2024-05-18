@@ -165,7 +165,7 @@ const UserProfile = () => {
 
                 {/* İki adımlı doğrulama */}
                 {/* Bu kısım API'nizde destekleniyorsa güncellenebilir */}
-                <FormControlLabel control={<Switch name="twoFactorAuth" />} label="İki adımlı doğrulama" sx={{ mt: 2 }} />
+                {/* <FormControlLabel control={<Switch name="twoFactorAuth" />} label="İki adımlı doğrulama" sx={{ mt: 2 }} /> */}
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
                   <Button variant="contained" color="primary" onClick={handleUpdate}>

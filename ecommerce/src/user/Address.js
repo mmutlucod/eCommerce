@@ -27,6 +27,7 @@ import Navbar from '../components/UserNavbar';
 import api from '../api/api';
 import { renderMenuItems } from './RenderMenuItems';
 import EditIcon from '@mui/icons-material/Edit';
+import { Link } from 'react-router-dom';
 // Temayı özelleştir
 const theme = createTheme({
   palette: {
@@ -205,9 +206,11 @@ const AddressesPage = () => {
                     </Box>
                   )
                 }
-                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                  Yeni Adres Ekle
-                </Button>
+                <Link to={'/adres-ekle'}>
+                  <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                    Yeni Adres Ekle
+                  </Button>
+                </Link>
               </Paper>
             </Grid>
           </Grid>

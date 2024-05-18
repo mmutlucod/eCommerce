@@ -44,8 +44,8 @@ const ExamplePopup = ({ results, width, searchLeftMargin }) => {
                 position: 'absolute',
                 top: 62.6,
                 marginLeft: `${searchLeftMargin}px`,
-                minWidth: `${width - 0.6}px`, // Dinamik minWidth değeri
-                maxWidth: `${width - 0.6}px`,
+                minWidth: `${width}px`, // Dinamik minWidth değeri
+                maxWidth: `${width}px`,
                 backgroundColor: 'white',
                 border: '0.2px solid #4B0082',
                 borderBottom: '2px',
