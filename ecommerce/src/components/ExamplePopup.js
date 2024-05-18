@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Typography, Card, CardMedia, Portal } from '@mui/material';
+import { Box, Typography, Card, CardMedia } from '@mui/material';
 import ReactDOM from 'react-dom';
 
 const ExamplePopup = ({ results, width, searchLeftMargin }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const popupRef = useRef(null); // Popup DOM elemanı için bir ref oluşturuluyor
+    const popupRef = useRef(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -24,8 +24,7 @@ const ExamplePopup = ({ results, width, searchLeftMargin }) => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (popupRef.current && !popupRef.current.contains(event.target)) {
-                event.target.value = '';
-                setIsOpen(false); // Dışarıya tıklandığında popup'ı kapat
+                setIsOpen(false);
             }
         };
 
@@ -44,7 +43,7 @@ const ExamplePopup = ({ results, width, searchLeftMargin }) => {
                 position: 'absolute',
                 top: 62.6,
                 marginLeft: `${searchLeftMargin}px`,
-                minWidth: `${width}px`, // Dinamik minWidth değeri
+                minWidth: `${width}px`,
                 maxWidth: `${width}px`,
                 backgroundColor: 'white',
                 border: '0.2px solid #4B0082',
@@ -60,8 +59,7 @@ const ExamplePopup = ({ results, width, searchLeftMargin }) => {
             }}
         >
             {results.map((result, index) => (
-
-                <Card Card key={index} sx={{ borderRadius: 0, flexDirection: 'column', display: 'flex', mb: 1, cursor: 'pointer', width: '120px', height: '200px', marginLeft: '18px' }} onClick={() => window.location.href = `/urun/${result.product.slug}`}>
+                <Card key={index} sx={{ borderRadius: 0, flexDirection: 'column', display: 'flex', mb: 1, cursor: 'pointer', width: '120px', height: '200px', marginLeft: '18px' }} onClick={() => window.location.href = `/urun/${result.product.slug}`}>
                     <CardMedia
                         component="img"
                         sx={{ objectFit: 'contain', width: '120px', height: '100px' }}
@@ -80,12 +78,11 @@ const ExamplePopup = ({ results, width, searchLeftMargin }) => {
                         mr: '3px'
                     }}>
                         {result.price.toFixed(2) + '₺'}
-                    </Typography>                </Card>
-            ))
-            }
-        </Box >
+                    </Typography>
+                </Card>
+            ))}
+        </Box>
     ), document.body);
 };
 
-
-export default ExamplePopup
+export default ExamplePopup;

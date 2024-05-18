@@ -22,6 +22,9 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CloseIcon from '@mui/icons-material/Close';
 import Navbar from '../components/UserNavbar';
 import api from '../api/api';
+import { Link } from 'react-router-dom';
+import { addItem } from '../redux/cartSlice'; // cartSlice dosyanızın doğru yolunu kullanın
+import { useDispatch } from 'react-redux';
 
 const ProductCard = ({ product, onRemove }) => (
   <Card sx={{ maxWidth: 345, m: 2 }}>
@@ -56,6 +59,7 @@ const ProductCard = ({ product, onRemove }) => (
     </CardActions>
   </Card>
 );
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -85,9 +89,11 @@ const theme = createTheme({
     },
   },
 });
+
 const FavoritesPage = () => {
   const [selectedItem, setSelectedItem] = useState('favorites'); // Yan menüde seçili öğe
   const [favorites, setFavorites] = useState([]); // Favori ürünler listesi
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // API'den favori ürünleri çekme işlemi
@@ -107,13 +113,25 @@ const FavoritesPage = () => {
   const handleRemoveFavorite = async (productId) => {
     // API üzerinden favori ürün kaldırma işlemi
     try {
-      const response = await api.delete(`/user/favorites/${productId}`);
+      const response = await api.post('/user/deleteFavoriteItem', { productId: productId });
       if (response.status === 200) {
-        setFavorites(favorites.filter(item => item.id !== productId));
+        // Favoriler listesinden ürünü çıkar
+        setFavorites(prevFavorites => prevFavorites.filter(item => item.product.product_id !== productId));
       }
     } catch (error) {
       console.error('Ürün favorilerden kaldırılırken hata oluştu:', error);
     }
+  };
+
+  const handleAddToCart = (product) => {
+    const itemData = {
+      sellerProductId: product.sellerProducts[0].seller_product_id, // Ürünün benzersiz kimliği
+      quantity: 1, // Eklenecek miktar
+      sellerProduct: product.sellerProducts[0], // Ürün verisi
+      price: product.sellerProducts[0].price // Ürün fiyatı
+    };
+
+    dispatch(addItem(itemData));
   };
 
   return (
@@ -136,35 +154,46 @@ const FavoritesPage = () => {
               {/* Burada favori ürünler listelenir */}
               <Grid container spacing={2}>
                 {favorites.length > 0 ? (
-                  favorites.map((product) => (
-                    <Grid item key={product.id} xs={12} sm={6} md={4}>
-                      <Card>
-                        <CardActionArea>
-                          <CardMedia
-                            component="img"
-                            image={product.imageUrl}
-                            alt={product.name}
-                          />
-                          <CardContent>
-                            <Typography gutterBottom variant="h5" component="h2">
-                              {product.name}
-                            </Typography>
-                            <Typography variant="body2" color="textSecondary" component="p">
-                              {product.description}
-                            </Typography>
-                          </CardContent>
-                        </CardActionArea>
-                        <CardActions>
-                          <IconButton aria-label="remove from favorites" onClick={() => handleRemoveFavorite(product.id)}>
-                            <FavoriteIcon />
-                          </IconButton>
-                          <Button size="small" color="primary">
-                            Sepete Ekle
-                          </Button>
-                        </CardActions>
-                      </Card>
-                    </Grid>
-                  ))
+                  favorites.map((product) => {
+                    const productImage = product.product.productImages && product.product.productImages.length > 0
+                      ? `http://localhost:5000/img/${product.product.productImages[0].image_path}`
+                      : 'http://localhost:5000/img/empty.jpg';
+
+                    return (
+                      <Grid item key={product.id} xs={12} sm={6} md={4}>
+                        <Card>
+                          <Typography gutterBottom component="h4" sx={{ marginY: '12px' }}>
+                            {product.product.name}
+                          </Typography>
+                          <CardActionArea>
+                            <Link to={'/urun/' + product.product.slug}>
+                              <CardMedia
+                                sx={{ objectFit: 'contain' }}
+                                component="img"
+                                height="140"
+                                image={productImage}
+                                alt={product.product.name}
+                              />
+                            </Link>
+                            <CardContent>
+                              <Typography variant="body2" color="textSecondary" component="p">
+                                {/* {product.product.description} */}
+                              </Typography>
+                            </CardContent>
+                          </CardActionArea>
+                          <CardActions>
+                            <IconButton aria-label="remove from favorites" onClick={() => handleRemoveFavorite(product.product.product_id)}>
+                              <FavoriteIcon sx={{ color: 'red' }} />
+                            </IconButton>
+                            <Box sx={{ flexGrow: 1 }} />
+                            <Button size="small" color="primary" onClick={() => handleAddToCart(product.product)}>
+                              Sepete Ekle
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    );
+                  })
                 ) : (
                   <Typography variant="subtitle1">Henüz favori ürününüz yok.</Typography>
                 )}
