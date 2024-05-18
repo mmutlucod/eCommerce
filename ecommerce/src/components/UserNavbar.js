@@ -39,14 +39,14 @@ export default function UserNavbar() {
 
     useEffect(() => {
         fetchCartItems();
-        const interval = setInterval(fetchCartItems, 100); // Her 60 saniyede bir sepet öğelerini günceller
+        const interval = setInterval(fetchCartItems, 60000); // Her 60 saniyede bir sepet öğelerini günceller
 
         return () => clearInterval(interval); // Component unmount edildiğinde interval'i temizler
     }, []);
 
     useEffect(() => {
         const handleResize = () => {
-            // Eğer ekran boyutu 1024px altına düşerse ve modal açıksa kapat
+            // Eğer ekran boyutu 1532px altına düşerse ve modal açıksa kapat
             if (window.innerWidth < 1532 && isSearchModalOpen) {
                 setSearchModalOpen(false);
             }
@@ -76,6 +76,13 @@ export default function UserNavbar() {
         }
     };
 
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+        if (searchQuery.trim()) {
+            navigate(`/arama/${searchQuery.trim()}`);
+        }
+    };
+
     useEffect(() => {
         if (searchInputRef.current) {
             setSearchWidth(searchInputRef.current.clientWidth);
@@ -84,7 +91,7 @@ export default function UserNavbar() {
     }, []);
 
     return (
-        <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px', paddingLeft: '0' }}>
+        <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
             <Toolbar sx={{ justifyContent: 'space-evenly', alignItems: 'center' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
                     <Link to={'/'} style={{ textDecoration: 'none' }}>
@@ -94,58 +101,49 @@ export default function UserNavbar() {
                             </Typography>
                         </Box>
                     </Link>
-                    <Box ref={searchInputRef} sx={{ minWidth: '90%', maxWidth: '90%', backgroundColor: 'white', borderRadius: '0 5px 0px 0', display: 'flex', alignItems: 'center' }}>
-                        <InputBase
-                            placeholder="Ürün, kategori, marka ara"
-                            inputProps={{ 'aria-label': 'search' }}
-                            sx={{
-                                flex: 1,
-                                height: '100%',
-                                '& .MuiInputBase-input': {
-                                    marginLeft: '8px',
-                                },
-                            }}
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                        />
-                        <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: 'gray' }} onClick={handleOpenSearchModal}>
-                            <SearchIcon />
-                        </IconButton>
+                    <Box ref={searchInputRef} sx={{ flex: 1, backgroundColor: 'white', borderRadius: '0 5px 0px 0', display: 'flex', alignItems: 'center' }}>
+                        <form onSubmit={handleSearchSubmit} style={{ display: 'flex', width: '100%', alignItems: 'center' }}>
+                            <InputBase
+                                placeholder="Ürün, kategori, marka ara"
+                                inputProps={{ 'aria-label': 'search' }}
+                                sx={{
+                                    flex: 1,
+                                    height: '100%',
+                                    '& .MuiInputBase-input': {
+                                        marginLeft: '8px',
+                                        padding: '10px 0', // Padding eklenerek yazının yukarıya kayması önlenir
+                                    },
+                                }}
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                            />
+                            <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: 'gray' }}>
+                                <SearchIcon />
+                            </IconButton>
+                        </form>
                     </Box>
                 </Box>
                 <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            padding: '8px 16px',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                        }}
-                        onClick={() => navigate('/adres-ekle')}
-                    >
-                        <IconButton color="inherit">
-                            <LocationOnIcon />
-                        </IconButton>
-                        <Typography variant="body2" noWrap sx={{}}>
-                            Teslimat Adresi Ekle
-                        </Typography>
-                    </Box>
-                    <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 1 }} />
-                    <IconButton color="inherit" onClick={() => navigate('/profilim')}>
+                    <IconButton color="inherit" onClick={() => navigate('/user/address-add')}>
+                        <LocationOnIcon />
+                    </IconButton>
+                    <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+                        Teslimat Adresi Ekle
+                    </Typography>
+                    <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
+                    <IconButton color="inherit" onClick={() => navigate('/user/profile')}>
                         <PersonOutlineIcon />
                     </IconButton>
                     {token ? (
                         <>
-                            <Typography variant="body2" noWrap sx={{ cursor: 'pointer' }} onClick={() => navigate('/profilim')}>
+                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
                                 Profilim
                             </Typography>
                             {/* <Button color="inherit" onClick={logout}>
                                 Çıkış Yap
                             </Button> */}
                         </>
-
                     ) : (
                         <>
                             <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/auth')}>
@@ -178,6 +176,6 @@ export default function UserNavbar() {
                 width={searchWidth}
                 searchLeftMargin={searchLeftMargin}
             />
-        </AppBar >
+        </AppBar>
     );
 }
