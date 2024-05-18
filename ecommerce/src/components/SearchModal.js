@@ -15,7 +15,7 @@ const SearchResults = ({ query, width, searchLeftMargin }) => {
                 try {
                     const response = await api.get(`/user/urunAra?search=${query}`);
                     if (response.data && Array.isArray(response.data)) {
-                        setResults(response.data);
+                        setResults(response.data.slice(0, 6)); // Sadece ilk 6 sonucu al
                     } else {
                         setResults([]);
                     }

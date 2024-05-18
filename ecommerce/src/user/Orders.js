@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import {
   Box,
   Grid,
@@ -14,12 +13,12 @@ import {
   Container,
   CssBaseline,
   ThemeProvider,
-  createTheme
+  createTheme,
+  Collapse
 } from '@mui/material';
 import Navbar from '../components/UserNavbar';
 import { renderMenuItems } from './RenderMenuItems';
 import api from '../api/api';
-
 
 const theme = createTheme({
   palette: {
@@ -50,9 +49,11 @@ const theme = createTheme({
     },
   },
 });
+
 const OrdersPage = () => {
   const [selectedItem, setSelectedItem] = useState('orders'); // Başlangıç değeri olarak 'orders'
   const [orders, setOrders] = useState([]); // Sipariş listesi için state
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState({}); // Seçili siparişin detayları için state
 
   useEffect(() => {
     // API'den sipariş verilerini al
@@ -65,6 +66,29 @@ const OrdersPage = () => {
       setOrders(response.data);
     } catch (error) {
       console.error('Siparişler alınırken hata oluştu:', error);
+    }
+  };
+
+  const fetchOrderItems = async (orderId) => {
+    try {
+      const response = await api.get(`/user/orderItems?orderId=${orderId}`);
+      setSelectedOrderDetails((prevDetails) => ({
+        ...prevDetails,
+        [orderId]: response.data
+      }));
+    } catch (error) {
+      console.error('Sipariş kalemleri alınırken hata oluştu:', error);
+    }
+  };
+
+  const toggleOrderDetails = (orderId) => {
+    if (selectedOrderDetails[orderId]) {
+      setSelectedOrderDetails((prevDetails) => ({
+        ...prevDetails,
+        [orderId]: null
+      }));
+    } else {
+      fetchOrderItems(orderId);
     }
   };
 
@@ -93,15 +117,15 @@ const OrdersPage = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={3}>
                             <Typography color="textSecondary">Sipariş Tarihi</Typography>
-                            <Typography variant="body2">{order.date}</Typography>
+                            <Typography variant="body2">{order.order_date}</Typography>
                           </Grid>
                           <Grid item xs={12} sm={5}>
                             <Typography color="textSecondary">Sipariş Özeti</Typography>
                             <Typography variant="body2">{order.summary}</Typography>
                           </Grid>
                           <Grid item xs={12} sm={2}>
-                            <Typography color="textSecondary">Alıcı</Typography>
-                            <Typography variant="body2">{order.customerName}</Typography>
+                            <Typography color="textSecondary">Durum</Typography>
+                            <Typography variant="body2">{order.orderStatus.status_name}</Typography>
                           </Grid>
                           <Grid item xs={12} sm={2}>
                             <Typography color="textSecondary">Tutar</Typography>
@@ -110,10 +134,28 @@ const OrdersPage = () => {
                         </Grid>
                       </CardContent>
                       <CardActions>
-                        <Button size="small" color="primary">
+                        <Button size="small" color="primary" onClick={() => toggleOrderDetails(order.id)}>
                           Sipariş Detayı
                         </Button>
                       </CardActions>
+                      <Collapse in={!!selectedOrderDetails[order.id]} timeout="auto" unmountOnExit>
+                        <CardContent>
+                          {selectedOrderDetails[order.id] ? (
+                            <List>
+                              {selectedOrderDetails[order.id].map((item, idx) => (
+                                <Box key={idx} sx={{ mb: 2 }}>
+                                  <Typography variant="body2">{`Ürün Adı: ${item.product.name}`}</Typography>
+                                  <Typography variant="body2">{`Adet: ${item.quantity}`}</Typography>
+                                  <Typography variant="body2">{`Fiyat: ${item.price} TL`}</Typography>
+                                  <Typography variant="body2">{`Toplam: ${item.total} TL`}</Typography>
+                                </Box>
+                              ))}
+                            </List>
+                          ) : (
+                            <Typography>Kalemler yükleniyor...</Typography>
+                          )}
+                        </CardContent>
+                      </Collapse>
                     </Card>
                   ))
                 ) : (

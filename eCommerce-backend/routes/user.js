@@ -113,6 +113,8 @@ router.get('/urunAra', authOptionalMiddleware, userController.searchProducts);
 router.get('/products', authOptionalMiddleware, userController.getProducts);
 router.get('/product/:productSlug', authOptionalMiddleware, userController.getProductsBySlug);
 router.get('/products/:productSlug', authOptionalMiddleware, userController.getProductsBySellerSlug);
+router.get('/seller-products/:sellerSlug', authOptionalMiddleware, userController.getProductsBySeller);
+router.get('/sellerInfo/:sellerSlug', authOptionalMiddleware, userController.getSellerInfo);
 router.get('/category/:categorySlug', authOptionalMiddleware, userController.getProductsByCategorySlug);
 router.get('/brand/:brandSlug', authOptionalMiddleware, userController.getProductsByBrandSlug);
 

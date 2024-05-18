@@ -757,7 +757,14 @@ const getorders = async (req, res) => {
     const orders = await Order.findAll(
       {
         where: { user_id: user.user_id },
-        include: [{ model: orderStatus }]
+        include: [
+          {
+            model: orderStatus
+          },
+          {
+            model: User
+          }
+        ]
       });
 
     return res.status(200).json(orders);
@@ -973,6 +980,12 @@ const getFavorites = async (req, res) => {
           include: [
             {
               model: Brand
+            },
+            {
+              model: productImage
+            },
+            {
+              model: sellerProduct
             }
           ]
         },
@@ -1003,17 +1016,31 @@ const addFavoriteItem = async (req, res) => {
 const deleteFavoriteItem = async (req, res) => {
   try {
     const { productId } = req.body;
+
     const user = await User.findOne({ where: { email: req.user.email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
 
-    await UserFavoriteProduct.destroy({
-      user_id: user.user_id,
-      product_id: productId
-    })
+    const favorite = await UserFavoriteProduct.findOne({
+      where: {
+        user_id: user.user_id,
+        product_id: productId
+      }
+    });
 
+    if (!favorite) {
+      return res.status(404).json({ success: false, message: 'Favorite item not found' });
+    }
+
+    await favorite.destroy();
+
+    return res.status(200).json({ success: true, message: 'Product removed from favorites' });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 // ÜRÜN DEĞERLENDİRME İŞLEMLERİ 
 
 // (kullanıcının yorumları)
@@ -2001,6 +2028,114 @@ const getProductsByCategorySlug = async (req, res) => {
   }
 }
 
+//Satıcıya göre ürünleri çekme
+const getProductsBySeller = async (req, res) => {
+  const { sellerSlug } = req.params;
+
+  try {
+    let user = null;
+    let favoriteProductsIds = [];
+
+    if (req.user) {
+      user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
+      }
+    }
+
+    const seller = await Seller.findOne({ where: { slug: sellerSlug } });
+    if (!seller) {
+      return res.status(404).json({ success: false, message: 'Satıcı bulunamadı' });
+    }
+
+    let products = await sellerProduct.findAll({
+      where: { seller_id: seller.seller_id, is_active: 1 },
+      include: [{
+        model: Product,
+        include: [{ model: Brand }, { model: Category }]
+      }],
+      order: [['price', 'ASC']]
+    });
+
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.product.product_id;
+      if (product.stock > 0 && (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price)) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    for (let product of uniqueLowestPriceProducts) {
+      const ratingsData = await ProductComment.findAll({
+        where: {
+          '$sellerProduct.product_id$': product.product.product_id
+        },
+        include: [{
+          model: sellerProduct,
+          attributes: [],
+          include: [{
+            model: Product,
+            attributes: []
+          }]
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+        ],
+        group: ['sellerProduct.product_id'],
+        raw: true
+      });
+
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
+    }
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite,
+        stockStatus,
+        commentAvg: product.dataValues.commentAvg,
+        commentCount: product.dataValues.commentCount
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+
+
+const getSellerInfo = async (req, res) => {
+
+  try {
+    const { sellerSlug } = req.params;
+
+    const seller = await Seller.findOne({ where: { slug: sellerSlug } });
+
+    if (!seller) {
+      return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+    }
+
+    return res.status(200).json(seller);
+  }
+  catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+
+
+
+}
+
+
 // Markaya göre ürün çekme
 const getProductsByBrandSlug = async (req, res) => {
   const { brandSlug } = req.params;
@@ -2221,6 +2356,7 @@ module.exports = {
   toggleFollowSeller, checkFollowStatus, getFollowedSellers,
   createReturnRequest, getUserReturnRequests, cancelReturnRequest,
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
-  getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug,
-  getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart
+  getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug, getProductsBySeller,
+  getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart,
+  getSellerInfo
 };
