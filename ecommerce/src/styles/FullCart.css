@@ -10,14 +10,13 @@
     position: fixed;
     margin-left: 75%;
     margin-top: 2.5%;
-    /* top:7%; */
     width: 20%; /* Sabit bir genişlik */
     height: auto;
     padding: 20px;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
     z-index: 1000;
 }
 .top-normal {
@@ -89,17 +88,17 @@
     flex-direction: column;
     background-color: #fff;
     border: 1px solid #ccc;
-    border-radius: 8px; /* Köşeleri daha fazla ovalleştirir */
+    border-radius: 4px; /* Köşeleri daha fazla ovalleştirir */
     margin: 10px 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Hafif bir gölge ekler */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25); /* Hafif bir gölge ekler */
 }
 .item-body img {
     width: 90px;
     height: 90px;
     margin-left: 9px;
     margin-right: 10px;
-    border-radius: 4px;
-    object-fit: contain; /* Resmi orantılı bir şekilde küçült */
+    border-radius: 2px;
+    object-fit: fill; /* Resmi orantılı bir şekilde küçült */
 }
 .seller-link {
     text-decoration: none;
@@ -172,7 +171,7 @@
     display: flex;
     align-items: center;
     background-color: #f0f0f0;
-    border-radius: 20px; /* Miktar seçici köşeleri daha oval */
+    border-radius: 8px; /* Miktar seçici köşeleri daha oval */
     padding: 5px;
     /* margin-right: 25%; */
 }
@@ -200,7 +199,7 @@
     color: #f44336;
     border: none;
     padding: 5px 10px;
-    border-radius: 4px; /* Sil butonunun köşeleri oval */
+    border-radius: 3px; /* Sil butonunun köşeleri oval */
     cursor: pointer;
 }
 .checkout-buttons {

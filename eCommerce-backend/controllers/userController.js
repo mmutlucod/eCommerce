@@ -145,6 +145,80 @@ const updateUserDetail = async (req, res) => {
   }
 }
 //SEPET İŞLEMLERİ
+
+const addItem = async (req, res) => {
+  try {
+    const { sellerProductId, quantity } = req.body;
+
+    // Kullanıcıyı doğrula
+    const user = await User.findOne({ where: { email: req.user.email } });
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Satıcı ürününü ve ilişkili ürün bilgilerini kontrol et
+    const sp = await sellerProduct.findByPk(sellerProductId, {
+      include: [Product]
+    });
+    if (!sp) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Maksimum miktarları belirle
+    const maxBuy = sp.product.max_buy;
+    const stock = sp.stock;
+
+    // Kullanıcının sepetini bul veya oluştur
+    let cart = await Cart.findOne({ where: { user_id: user.user_id } });
+    if (!cart) {
+      cart = await Cart.create({ user_id: user.user_id });
+    }
+
+    // Sepet öğesini bul veya oluştur
+    let cartItem = await CartItem.findOne({
+      where: {
+        cart_id: cart.cart_id,
+        seller_product_id: sellerProductId,
+      },
+    });
+
+    // Sepet öğesi zaten varsa, miktarı artır
+    if (cartItem) {
+      let potentialNewQuantity = cartItem.quantity + quantity;
+
+      if (potentialNewQuantity > maxBuy) {
+        return res.status(400).json({ success: false, message: `Maksimum satın alma miktarına (${maxBuy}) ulaştınız.` });
+      }
+
+      if (potentialNewQuantity > stock) {
+        return res.status(400).json({ success: false, message: `Stokta yeterli ürün bulunmamaktadır. Maksimum eklenebilir miktar: ${stock - cartItem.quantity}` });
+      }
+
+      cartItem.quantity = potentialNewQuantity;
+      await cartItem.save();
+      return res.status(200).json({ success: true, message: 'Ürün miktarı güncellendi.' });
+    } else {
+      // Sepet öğesi yoksa, yeni bir tane oluştur
+      if (quantity > maxBuy) {
+        return res.status(400).json({ success: false, message: `Maksimum satın alma miktarına (${maxBuy}) ulaştınız.` });
+      }
+
+      if (quantity > stock) {
+        return res.status(400).json({ success: false, message: `Stokta yeterli ürün bulunmamaktadır. Maksimum eklenebilir miktar: ${stock}` });
+      }
+
+      await CartItem.create({
+        cart_id: cart.cart_id,
+        seller_product_id: sellerProductId,
+        quantity: quantity,
+      });
+      return res.status(200).json({ success: true, message: 'Ürün sepete eklendi.' });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 const updateItem = async (req, res) => {
   try {
     const { sellerProductId, quantity } = req.body;
@@ -163,16 +237,9 @@ const updateItem = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    // İlk olarak stok adedini kontrol et
-    let maxQuantityAllowed = sp.stock;
-
-    // Eğer stok miktarı max_buy'dan azsa, kullanıcının ekleyebileceği maksimum miktarı buna göre ayarla
-    if (sp.stock < sp.product.max_buy) {
-      maxQuantityAllowed = sp.stock;
-    } else {
-      // Eğer stok miktarı max_buy'dan fazla veya eşitse, max_buy değerini kullan
-      maxQuantityAllowed = sp.product.max_buy;
-    }
+    // Maksimum miktarları belirle
+    const maxBuy = sp.product.max_buy;
+    const stock = sp.stock;
 
     // Kullanıcının sepetini bul veya oluştur
     let cart = await Cart.findOne({ where: { user_id: user.user_id } });
@@ -197,23 +264,35 @@ const updateItem = async (req, res) => {
         return res.status(200).json({ success: true, message: 'Ürün sepetinizde zaten bulunmamaktadır.' });
       }
     } else {
+      // Sepet öğesi zaten varsa, miktarı güncelle
       if (cartItem) {
-        // Yeni miktarı hesapla ve güncelle
         let potentialNewQuantity = quantity;
-        if (potentialNewQuantity <= maxQuantityAllowed) {
-          cartItem.quantity = potentialNewQuantity;
-          await cartItem.save();
-          return res.status(200).json({ success: true, message: 'Ürün miktarı güncellendi.' });
-        } else {
-          return res.status(400).json({ success: false, message: 'Sepete eklenecek maksimum ürün sayısına ulaştınız.' });
+
+        if (potentialNewQuantity > maxBuy) {
+          return res.status(400).json({ success: false, message: `Maksimum satın alma miktarına (${maxBuy}) ulaştınız.` });
         }
+
+        if (potentialNewQuantity > stock) {
+          return res.status(400).json({ success: false, message: `Stokta yeterli ürün bulunmamaktadır. Maksimum eklenebilir miktar: ${stock - cartItem.quantity}` });
+        }
+
+        cartItem.quantity = potentialNewQuantity;
+        await cartItem.save();
+        return res.status(200).json({ success: true, message: 'Ürün miktarı güncellendi.' });
       } else {
         // Sepet öğesi yoksa, yeni bir tane oluştur
-        const finalQuantity = Math.min(quantity, maxQuantityAllowed);
+        if (quantity > maxBuy) {
+          return res.status(400).json({ success: false, message: `Maksimum satın alma miktarına (${maxBuy}) ulaştınız.` });
+        }
+
+        if (quantity > stock) {
+          return res.status(400).json({ success: false, message: `Stokta yeterli ürün bulunmamaktadır. Maksimum eklenebilir miktar: ${stock}` });
+        }
+
         await CartItem.create({
           cart_id: cart.cart_id,
           seller_product_id: sellerProductId,
-          quantity: finalQuantity,
+          quantity: quantity,
         });
         return res.status(200).json({ success: true, message: 'Ürün sepete eklendi.' });
       }
@@ -2129,7 +2208,7 @@ function formatUserName(name, isPublic) {
 
 module.exports = {
   login, register, listUsers, getUserDetails, updateUserDetail,
-  updateItem, deleteItem, getCartItems, getProducts,
+  addItem, updateItem, deleteItem, getCartItems, getProducts,
   getLists, createList, deleteList, updateList,
   addItemToList, getItemsByListId, removeItemFromList, getPublicListItemsBySlug,
   getAddresses, createAddress, updateAddress, deleteAddress,
