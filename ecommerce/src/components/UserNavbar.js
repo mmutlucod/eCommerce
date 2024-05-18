@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchModal from './SearchModal';
 import CartDropdown from './CartDropdown';
@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom';
 
 export default function UserNavbar() {
     const navigate = useNavigate();
+    const location = useLocation(); // Mevcut yol bilgisini almak için
     const { token, logout } = useAuth();
     const [isSearchModalOpen, setSearchModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -25,20 +26,23 @@ export default function UserNavbar() {
     const [searchLeftMargin, setSearchLeftMargin] = useState(0);
     const [totalQuantity, seTtotalQuantity] = useState(0);
 
+    const fetchCartItems = async () => {
+        try {
+            const response = await api.get('/user/my-basket');
+            setCartItems(response.data);
+            const totalquantity = response.data.reduce((total, item) => total + item.quantity, 0);
+            seTtotalQuantity(totalquantity);
+        } catch (error) {
+            console.error('Error fetching cart data:', error);
+        }
+    };
+
     useEffect(() => {
-        const fetchCartItems = async () => {
-            try {
-                const response = await api.get('/user/my-basket');
-                setCartItems(response.data);
-            } catch (error) {
-                console.error('Error fetching cart data:', error);
-            }
-        };
-
         fetchCartItems();
+        const interval = setInterval(fetchCartItems, 100); // Her 60 saniyede bir sepet öğelerini günceller
 
+        return () => clearInterval(interval); // Component unmount edildiğinde interval'i temizler
     }, []);
-
 
     useEffect(() => {
         const handleResize = () => {
@@ -53,13 +57,6 @@ export default function UserNavbar() {
         // Cleanup function
         return () => window.removeEventListener('resize', handleResize);
     }, [isSearchModalOpen]); // Bu hook isSearchModalOpen state'ine bağlı
-
-
-    useEffect(() => {
-        const totalquantity = cartItems.reduce((total, item) => total + item.quantity, 0);
-
-        seTtotalQuantity(totalquantity);
-    }, []);
 
     const handleOpenSearchModal = () => {
         if (window.innerWidth >= 1532) {
@@ -85,32 +82,36 @@ export default function UserNavbar() {
             setSearchLeftMargin(searchInputRef.current.offsetLeft);
         }
     }, []);
+
     return (
         <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
-            <Toolbar sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box sx={{ backgroundColor: 'yellow', borderRadius: '4px 0 0 4px', display: 'flex', alignItems: 'center', width: '5%', minHeight: '44px ' }}>
-                    <Typography variant="h6" noWrap sx={{ fontWeight: 'bold', color: '#4B0082', marginLeft: '18%' }}>
-                        noVa
-                    </Typography>
-                </Box>
-                <Box ref={searchInputRef} sx={{ minWidth: '61.85%', maxWidth: '61.85%', backgroundColor: 'white', borderRadius: '0 4px 0 0', display: 'flex', alignItems: 'center', marginLeft: 0 }}>
-                    <InputBase
-                        placeholder="Ürün, kategori, marka ara"
-                        inputProps={{ 'aria-label': 'search' }}
-                        sx={{
-                            flex: 1,
-                            height: '100%',
-                            '& .MuiInputBase-input': {
-                                marginLeft: '8px',
-                            },
-                        }}
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-
-                    />
-                    <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: 'gray' }} onClick={handleOpenSearchModal}>
-                        <SearchIcon />
-                    </IconButton>
+            <Toolbar sx={{ justifyContent: 'space-evenly', alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                    <Link to={'/'} style={{ textDecoration: 'none' }}>
+                        <Box sx={{ backgroundColor: 'yellow', borderRadius: '4px 0 0 4px', display: 'flex', alignItems: 'center', minHeight: '44px' }}>
+                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#4B0082', marginLeft: '5%', paddingX: '15px' }}>
+                                noVa
+                            </Typography>
+                        </Box>
+                    </Link>
+                    <Box ref={searchInputRef} sx={{ flex: 1, backgroundColor: 'white', borderRadius: '0 5px 0px 0', display: 'flex', alignItems: 'center' }}>
+                        <InputBase
+                            placeholder="Ürün, kategori, marka ara"
+                            inputProps={{ 'aria-label': 'search' }}
+                            sx={{
+                                flex: 1,
+                                height: '100%',
+                                '& .MuiInputBase-input': {
+                                    marginLeft: '8px',
+                                },
+                            }}
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                        />
+                        <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: 'gray' }} onClick={handleOpenSearchModal}>
+                            <SearchIcon />
+                        </IconButton>
+                    </Box>
                 </Box>
                 <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
@@ -129,9 +130,9 @@ export default function UserNavbar() {
                             <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
                                 Profilim
                             </Typography>
-                            <Button color="inherit" onClick={logout}>
+                            {/* <Button color="inherit" onClick={logout}>
                                 Çıkış Yap
-                            </Button>
+                            </Button> */}
                         </>
                     ) : (
                         <>
@@ -143,7 +144,6 @@ export default function UserNavbar() {
                             </Typography>
                         </>
                     )}
-
                     <IconButton
                         color="inherit"
                         onMouseEnter={() => setCartDropdownOpen(true)}
@@ -152,10 +152,10 @@ export default function UserNavbar() {
                     >
                         <Link to='/sepetim' style={{ textDecoration: 'none', color: 'inherit' }}>
                             <Badge badgeContent={totalQuantity} color="secondary">
-                                <ShoppingCartIcon />
+                                <ShoppingCartIcon sx={{ marginLeft: '10px' }} />
                             </Badge>
                         </Link>
-                        {cartDropdownOpen && <CartDropdown />}
+                        {cartDropdownOpen && cartItems.length > 0 && location.pathname !== '/sepetim' && <CartDropdown />}
                     </IconButton>
                 </Box>
             </Toolbar>
@@ -166,6 +166,6 @@ export default function UserNavbar() {
                 width={searchWidth}
                 searchLeftMargin={searchLeftMargin}
             />
-        </AppBar >
+        </AppBar>
     );
 }
