@@ -86,4 +86,6 @@ const ExamplePopup = ({ results, width, searchLeftMargin }) => {
         </Box >
     ), document.body);
 };
+
+
 export default ExamplePopup
