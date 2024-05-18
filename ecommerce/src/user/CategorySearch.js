@@ -64,14 +64,14 @@ const FilterBox = styled(Box)(({ theme }) => ({
   border: '1px solid #d1c4e9', // Giriş alanlarının çevresi mor renkte
 }));
 
-const SearchPage = () => {
+const CategorySearch = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
-  const { brandSlug } = useParams();
+  const { categorySlug } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -79,13 +79,13 @@ const SearchPage = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        if (!brandSlug) {
-          setError('Brand not specified');
+        if (!categorySlug) {
+          setError('Category not specified');
           setLoading(false);
           return;
         }
 
-        const response = await api.get(`user/brand/${brandSlug}`);
+        const response = await api.get(`user/category/${categorySlug}`);
         setAllProducts(response.data);
         setProducts(response.data);
       } catch (err) {
@@ -96,7 +96,7 @@ const SearchPage = () => {
     };
 
     fetchProducts();
-  }, [brandSlug]);
+  }, [categorySlug]);
 
   const handleAddToCart = async (product) => {
     dispatch(updateItem({
@@ -121,7 +121,7 @@ const SearchPage = () => {
       <UserNavbar />
       <Box mt={2} p={2}>
         <CustomPaper elevation={3}>
-          <Typography variant="h5">Markalar İçin Gelen Sonuçlar</Typography>
+          <Typography variant="h5">Kategoriler İçin Gelen Sonuçlar</Typography>
         </CustomPaper>
       </Box>
       <Grid container spacing={2} mt={3}>
@@ -228,4 +228,4 @@ const SearchPage = () => {
   );
 };
 
-export default SearchPage;
+export default CategorySearch;
