@@ -73,8 +73,6 @@ function App() {
             <Route path="/seller/dashboard" element={<SellerMainPage />} />
             <Route path="/seller/seller-add" element={<SellerAdd />} />
             <Route path="/seller/product" element={<SellerProduct />} />
-
-
             <Route path="/user/mainpage" element={< UserMainPage />} />
             <Route path="/user/login" element={< UserRegister />} />
             <Route path="/user/auth" element={< UserRegister />} />
@@ -89,7 +87,7 @@ function App() {
             <Route path="marka/:brandSlug" element={<UserSearchPage />} />
             <Route path="kategori/:categorySlug" element={<UserCategorySearch />} />
             <Route path="/arama/:query" element={<UserSearchProducts />} />
-            <Route path="/satici/:" element={<UserSellerPage />} />
+            <Route path="/satici/:sellerSlug" element={<UserSellerPage />} />
           </Routes>
         </Router>
 
