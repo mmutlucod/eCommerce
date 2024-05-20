@@ -92,18 +92,24 @@ const QuestionsPage = () => {
                                                 <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
                                                     Sorulduğu Tarih: {new Date(question.date_asked).toLocaleDateString()}
                                                 </Typography>
-                                                {question.answer ? (
-                                                    <Paper elevation={2} sx={{ mt: 2, p: 2, backgroundColor: '#e0f7fa' }}>
-                                                        <Typography variant="body1" >
-                                                            Cevap: {question.answer}
+                                                {question.approval_status_id === 1 ? (
+                                                    question.answer ? (
+                                                        <Paper elevation={2} sx={{ mt: 2, p: 2, backgroundColor: '#e0f7fa' }}>
+                                                            <Typography variant="body1">
+                                                                Cevap: {question.answer}
+                                                            </Typography>
+                                                            <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                                                                Cevaplandığı Tarih: {new Date(question.date_answered).toLocaleDateString()}
+                                                            </Typography>
+                                                        </Paper>
+                                                    ) : (
+                                                        <Typography variant="body2" sx={{ mt: 2, color: 'gray' }}>
+                                                            Sorunuz cevap bekliyor...
                                                         </Typography>
-                                                        <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-                                                            Cevaplandığı Tarih: {new Date(question.date_answered).toLocaleDateString()}
-                                                        </Typography>
-                                                    </Paper>
+                                                    )
                                                 ) : (
-                                                    <Typography variant="body2" sx={{ mt: 2, color: 'gray' }}>
-                                                        Cevap bekleniyor...
+                                                    <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+                                                        Moderatör onayı bekliyor...
                                                     </Typography>
                                                 )}
                                             </Paper>
