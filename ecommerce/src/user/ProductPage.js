@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams,Link } from 'react-router-dom';
-import { Box, Grid, Typography, Button, Rating, Paper, Card, CardContent } from '@mui/material';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { Box, Grid, Typography, Button, Rating, Paper } from '@mui/material';
 import NavBar from '../components/UserNavbar';
 import Footer from '../components/UserFooter';
 import SimpleImageSlider from '../components/SimpleImageSlider';
@@ -8,6 +8,10 @@ import api from '../api/api';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import '../styles/ProductPage.css';
 import ProductTabs from '../components/ProductTabs';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateItem, addItem } from '../redux/cartSlice';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 const theme = createTheme({
   palette: {
@@ -23,6 +27,10 @@ const theme = createTheme({
   },
 });
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const ProductPage = () => {
   const { productSlug } = useParams();
   const [product, setProduct] = useState(null);
@@ -30,6 +38,10 @@ const ProductPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [caption, setCaption] = useState('');
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const dispatch = useDispatch();
+  const cartItems = useSelector(state => state.cart.items);
 
   useEffect(() => {
     const fetchProductAndSellers = async () => {
@@ -55,6 +67,44 @@ const ProductPage = () => {
     fetchProductAndSellers();
   }, [productSlug]);
 
+  const handleAddToCart = useCallback((product) => {
+    if (!cartItems || !product) {
+      console.warn('Cart items or product not yet loaded. Please wait a moment.');
+      return;
+    }
+
+    const existingItem = cartItems.find(item => item.sellerProductId === product.product.seller_product_id);
+    const newQuantity = existingItem ? existingItem.quantity + 1 : 1;
+
+    if (newQuantity > product.product.max_buy) {
+      setAlertMessage(`Sepete maksimum ${product.product.max_buy} adet ürün ekleyebilirsiniz.`);
+      setAlertOpen(true);
+      return;
+    } else if (newQuantity > product.stock) {
+      setAlertMessage(`Yeterli stok yok. Maksimum alım limiti: ${product.stock}`);
+      setAlertOpen(true);
+      return;
+    }
+
+    if (existingItem) {
+      dispatch(updateItem({
+        sellerProductId: product.product.seller_product_id,
+        quantity: newQuantity,
+        price: product.product.price
+      }));
+    } else {
+      dispatch(addItem({
+        sellerProductId: product.product.seller_product_id,
+        quantity: 1,
+        price: product.product.price
+      }));
+    }
+  }, [cartItems, dispatch, product]);
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
+  };
+
   return (
     <>
       <NavBar />
@@ -62,7 +112,6 @@ const ProductPage = () => {
         <Grid container spacing={2} sx={{ maxWidth: 1200, mx: 'auto', my: 5 }}>
           <Paper elevation={3} sx={{ width: '100%', display: 'flex', flexDirection: 'column', p: 3 }}>
             <Grid container spacing={2} justifyContent="center">
-              {console.log(product)}
               <Grid item xs={12} md={6} className="image-carousel" sx={{ position: 'relative' }}>
                 {product && (
                   <SimpleImageSlider images={product.product.productImages.map(img => img.image_path)} showNavs={true} />
@@ -70,44 +119,42 @@ const ProductPage = () => {
               </Grid>
               <Grid item xs={12} md={6} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Typography variant="subtitle1" sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                  <Typography color="text.secondary">{product?.product.Brand.brand_name} </Typography>
+                  <Link to={'/marka/' + product?.product.Brand.slug} style={{ textDecoration: 'none' }}>
+                    <Typography fontWeight={'bold'} color="#ff6600">{product?.product.Brand.brand_name} </Typography>
+                  </Link>
                   <Typography color="text.secondary">{product?.product?.name} </Typography>
-                  <Typography color="text.secondary">{product?.product?.category.category_name}</Typography>
                 </Typography>
-                <Typography variant="h6" sx={{ color: 'secondary.main', fontWeight: 'bold', mb: 2 }}>
-                  {`${product?.price.toFixed(2)} ₺`}
+                <Typography variant="subtitle1" sx={{ display: 'flex', gap: 1, mt: -1 }}>
+                  <Typography color="text.secondary">Satıcı: </Typography>
+                  <Link to={'/satici/' + product?.seller.slug} style={{ textDecoration: 'none' }}>
+                    <Typography fontWeight={'bold'} color="#4B0082">{product?.seller.username} </Typography>
+                  </Link>
                 </Typography>
                 {
                   product?.commentCount > 0 && (
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 5, }}>
                       <Rating value={parseFloat(product?.commentAvg) || 0} readOnly precision={0.1} />
                       <Typography variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
-                        ({product.commentCount} reviews)
+                        ({product.commentCount} değerlendirme)
                       </Typography>
                     </Box>
                   )
                 }
-                <Button variant="contained" color="secondary" sx={{ width: '100%', mt: 3, py: 1, color: 'white' }}>Sepete Ekle</Button>
-                {product?.seller && (
-                  <Card sx={{ mt: 2, width: '100%', backgroundColor: '#f5f5f5' }}> {/* Gri arka plan rengi */}
-                    <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                          Satıcı: <Link to={`/seller/${product.seller.username}`} style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#003399', textDecoration: 'none' }}>{product.seller.username}</Link>
-                        </Typography>
-                        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          Puan: <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#4CAF50' }}>9.7</span>
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                )}
-              </Grid >
-            </Grid >
-          </Paper >
+                <Typography variant="h6" sx={{ color: 'secondary.main', fontWeight: 'bold', mb: 2 }}>
+                  {`${product?.price.toFixed(2)} ₺`}
+                </Typography>
+                <Button variant="contained" color="secondary" sx={{ width: '100%', mt: 3, py: 1, color: 'white' }} onClick={() => handleAddToCart(product?.product)}>Sepete Ekle</Button>
+              </Grid>
+            </Grid>
+          </Paper>
           {product && <ProductTabs product={product.product} />}
         </Grid>
         <Footer />
+        <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert}>
+          <Alert onClose={handleCloseAlert} severity="warning">
+            {alertMessage}
+          </Alert>
+        </Snackbar>
       </ThemeProvider>
     </>
   );

@@ -98,11 +98,6 @@ function ReviewsTab({ productId }) {
                         {review.user.name[0]}{review.user.surname[0]}
                       </Avatar>
                     }
-                    action={
-                      <IconButton aria-label="settings">
-                        <MoreVertIcon />
-                      </IconButton>
-                    }
                     title={`${review.user.name} ${review.user.surname}`}
                     subheader={review.date}
                     titleTypographyProps={{ variant: 'subtitle2' }}
