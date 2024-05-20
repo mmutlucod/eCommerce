@@ -125,14 +125,14 @@ export default function UserNavbar() {
                 </Box>
                 <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
-                    <IconButton color="inherit" onClick={() => navigate('/user/address-add')}>
+                    <IconButton color="inherit" onClick={() => navigate('/adres-ekle')}>
                         <LocationOnIcon />
                     </IconButton>
                     <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
                         Teslimat Adresi Ekle
                     </Typography>
                     <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
-                    <IconButton color="inherit" onClick={() => navigate('/user/profile')}>
+                    <IconButton color="inherit" onClick={() => navigate('/profilim')}>
                         <PersonOutlineIcon />
                     </IconButton>
                     {token ? (
@@ -146,10 +146,10 @@ export default function UserNavbar() {
                         </>
                     ) : (
                         <>
-                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/auth')}>
+                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/kayit-ol')}>
                                 Üye Ol
                             </Typography>
-                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/user/auth')}>
+                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/giris-yap')}>
                                 Giriş Yap
                             </Typography>
                         </>
