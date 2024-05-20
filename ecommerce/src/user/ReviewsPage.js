@@ -96,7 +96,7 @@ const ReviewsPage = () => {
                                                         <Rating value={review.rating} readOnly />
                                                     </Box>
                                                     <Typography variant="body2" color="textSecondary" component="p" sx={{ mt: 1 }}>
-                                                        Tarih: {review.comment_date}
+                                                        Tarih: {new Date(review.comment_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                                                     </Typography>
                                                 </CardContent>
                                             </Card>

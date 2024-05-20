@@ -90,7 +90,7 @@ const QuestionsPage = () => {
                                                     Soru: {question.question}
                                                 </Typography>
                                                 <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                                                    Sorulduğu Tarih: {new Date(question.date_asked).toLocaleDateString()}
+                                                    Sorulduğu Tarih: {new Date(question.date_asked).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                                                 </Typography>
                                                 {question.approval_status_id === 1 ? (
                                                     question.answer ? (
@@ -99,7 +99,7 @@ const QuestionsPage = () => {
                                                                 Cevap: {question.answer}
                                                             </Typography>
                                                             <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-                                                                Cevaplandığı Tarih: {new Date(question.date_answered).toLocaleDateString()}
+                                                                Cevaplandığı Tarih: {new Date(question.date_answered).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                                                             </Typography>
                                                         </Paper>
                                                     ) : (
