@@ -35,6 +35,8 @@ import UserProductPage from './user/ProductPage';
 import MultiStepForm from './user/PaymentPage';
 import UserSearchPage from './user/SearchPage';
 import UserCategorySearch from './user/CategorySearch';
+import ReviewsPage from './user/ReviewsPage'
+import QuestionsPage from './user/QuestionPage';
 
 export const images = [
   "https://n11scdn.akamaized.net/a1/org/24/04/26/50/30/87/81/38/19/97/83/96/43595415462427475004.jpg",
@@ -82,6 +84,8 @@ function App() {
             <Route path="/adres-ekle" element={< UserAddressAdd />} />
             <Route path="/favorilerim" element={< UserFavorites />} />
             <Route path="/sepetim" element={< UserCart />} />
+            <Route path="/degerlendirmelerim" element={< ReviewsPage />} />
+            <Route path="/sorularim" element={< QuestionsPage />} />
             <Route path="/urun/:productSlug" element={< UserProductPage />} />
             <Route path="/sepetim/odeme" element={< MultiStepForm />} />
             <Route path="marka/:brandSlug" element={<UserSearchPage />} />

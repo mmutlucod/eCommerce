@@ -15,6 +15,7 @@ import {
   CssBaseline,
   Container,
   List,
+  Paper
 } from '@mui/material';
 import { renderMenuItems } from './RenderMenuItems';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -139,18 +140,14 @@ const FavoritesPage = () => {
       <Navbar />
       <ThemeProvider theme={theme}>
         <CssBaseline />
-
-        <Container maxWidth="lg">
-          <Grid container spacing={2}>
+        <Container maxWidth="lg" sx={{ mt: 8 }}>
+          <Grid container spacing={3} justifyContent="center">
             <Grid item xs={12} md={3}>
-              <List component="nav" aria-label="sidebar navigation">
-                {renderMenuItems(selectedItem, setSelectedItem)}
-              </List>
+              <Paper elevation={0} square>
+                <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
+              </Paper>
             </Grid>
             <Grid item xs={12} md={9}>
-              <Typography variant="h4" gutterBottom>
-                Beğendiklerim
-              </Typography>
               {/* Burada favori ürünler listelenir */}
               <Grid container spacing={2}>
                 {favorites.length > 0 ? (
@@ -195,7 +192,7 @@ const FavoritesPage = () => {
                     );
                   })
                 ) : (
-                  <Typography variant="subtitle1">Henüz favori ürününüz yok.</Typography>
+                  <Typography marginLeft={'40%'} marginTop={'15px'} variant="h6">Henüz favori ürününüz yok.</Typography>
                 )}
               </Grid>
             </Grid>

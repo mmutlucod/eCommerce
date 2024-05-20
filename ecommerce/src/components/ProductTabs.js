@@ -70,7 +70,7 @@ function ProductTabs({ product }) {
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
   };
-
+  console.log(product);
   return (
     <Box sx={{ width: '100%' }}>
       <AppBar position="static" sx={{ backgroundColor: '#e0e0e0' }}>

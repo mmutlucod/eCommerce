@@ -1060,7 +1060,6 @@ const getProductCommentsByUser = async (req, res) => {
       include: [
         {
           model: ApprovalStatus,
-          attributes: ['status_name']
         },
         {
           model: User,
@@ -1068,14 +1067,18 @@ const getProductCommentsByUser = async (req, res) => {
         },
         // sellerProduct modelini doğrudan Product modeli ile değiştir
         {
-          model: Product,
+          model: sellerProduct,
           include: [
             {
-              model: Brand,
-              attributes: ['brand_name']
+              model: Product,
+              include: [
+                {
+                  model: Brand,
+                }
+              ]
             }
           ],
-          attributes: ['product_name', 'description']
+
         }
       ],
       order: [['comment_date', 'DESC']] // Yorumları yorum tarihine göre sırala
@@ -1115,6 +1118,7 @@ const getProductComments = async (req, res) => {
         },
         {
           model: sellerProduct,
+          required: true,
           include: [{
             model: Product,
             where: {
@@ -1131,25 +1135,6 @@ const getProductComments = async (req, res) => {
       order: [['comment_date', 'DESC']] // createdAt yerine modelde tanımlı olan comment_date kullanılır
     });
 
-    // Kullanıcı adlarını ve yorumları formatlayarak güncelle
-    const formattedComments = productComments.map(comment => {
-      // Eğer is_public false ise, kullanıcı adını ve soyadını formatla
-      // Bu formatlama fonksiyonunun tanımı burada verilmemiştir
-      if (comment.is_public === 0) {
-        comment.user.name = "";
-        comment.user.surname = "";
-      }
-      return {
-        commentId: comment.comment_id,
-        comment: comment.comment,
-        rating: comment.rating,
-        isPublic: comment.is_public,
-        approvalStatus: comment.ApprovalStatus?.status_name,
-        userName: `${comment.user.name} ${comment.user.surname}`,
-        productName: comment.Product?.product_name,
-        brandName: comment.Product?.Brand?.brand_name,
-      };
-    });
 
     return res.status(200).json(productComments);
 
@@ -2030,7 +2015,7 @@ const getProductsByCategorySlug = async (req, res) => {
 
 //Satıcıya göre ürünleri çekme
 const getProductsBySeller = async (req, res) => {
-  const { sellerSlug } = req.params;
+  const { productId } = req.params;
 
   try {
     let user = null;
@@ -2112,8 +2097,97 @@ const getProductsBySeller = async (req, res) => {
   }
 }
 
+//Ürüne göre diğer satıcılara ait ürünleri çekme
+const getSellerProductByProductId = async (req, res) => {
+  const { productId } = req.params;
 
+  try {
+    let user = null;
+    let favoriteProductsIds = [];
 
+    if (req.user) {
+      user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
+      }
+    }
+
+    const seller = await Seller.findOne({ where: { slug: sellerSlug } });
+    if (!seller) {
+      return res.status(404).json({ success: false, message: 'Satıcı bulunamadı' });
+    }
+
+    let products = await sellerProduct.findAll({
+      where: {
+        seller_id: seller.seller_id,
+        is_active: 1
+      },
+      include: [{
+        model: Product,
+        include: [{ model: Brand }, { model: Category }],
+        where: {
+          product_id: productId // productId ile filtreleme
+        }
+      }],
+      order: [['price', 'ASC']]
+    });
+
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const id = product.product.product_id;
+      if (product.stock > 0 && (!uniqueProductsMap.has(id) || product.price < uniqueProductsMap.get(id).price)) {
+        uniqueProductsMap.set(id, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    for (let product of uniqueLowestPriceProducts) {
+      const ratingsData = await ProductComment.findAll({
+        where: {
+          '$sellerProduct.product_id$': product.product.product_id
+        },
+        include: [{
+          model: sellerProduct,
+          attributes: [],
+          include: [{
+            model: Product,
+            attributes: []
+          }]
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+        ],
+        group: ['sellerProduct.product_id'],
+        raw: true
+      });
+
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
+    }
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite,
+        stockStatus,
+        commentAvg: product.dataValues.commentAvg,
+        commentCount: product.dataValues.commentCount
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
+
+//Satıcı bilgileri
 const getSellerInfo = async (req, res) => {
 
   try {
@@ -2357,6 +2431,6 @@ module.exports = {
   createReturnRequest, getUserReturnRequests, cancelReturnRequest,
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug, getProductsBySeller,
-  getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart,
+  getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart, getSellerProductByProductId,
   getSellerInfo
 };
