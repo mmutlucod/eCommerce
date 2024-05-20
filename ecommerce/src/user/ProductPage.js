@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Box, Grid, Typography, Button, Rating, Paper, Card, CardContent } from '@mui/material';
 import NavBar from '../components/UserNavbar';
 import Footer from '../components/UserFooter';
@@ -8,7 +8,6 @@ import api from '../api/api';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import '../styles/ProductPage.css';
 import ProductTabs from '../components/ProductTabs';
-import { Link } from 'react-router-dom';
 
 const theme = createTheme({
   palette: {
@@ -98,13 +97,27 @@ const ProductPage = () => {
                   {`${product?.price.toFixed(2)} ₺`}
                 </Typography>
                 <Button variant="contained" color="secondary" sx={{ width: '100%', mt: 3, py: 1, color: 'white' }}>Sepete Ekle</Button>
-              </Grid>
-            </Grid>
-          </Paper>
+                {product?.seller && (
+                  <Card sx={{ mt: 2, width: '100%', backgroundColor: '#f5f5f5' }}> {/* Gri arka plan rengi */}
+                    <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1 }}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                          Satıcı: <Link to={`/seller/${product.seller.username}`} style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#003399', textDecoration: 'none' }}>{product.seller.username}</Link>
+                        </Typography>
+                        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          Puan: <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#4CAF50' }}>9.7</span>
+                        </Typography>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                )}
+              </Grid >
+            </Grid >
+          </Paper >
           {product && <ProductTabs product={product.product} />}
-        </Grid>
+        </Grid >
         <Footer />
-      </ThemeProvider>
+      </ThemeProvider >
     </>
   );
 }
