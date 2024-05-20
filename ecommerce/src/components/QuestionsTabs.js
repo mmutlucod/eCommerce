@@ -15,13 +15,14 @@ function QuestionsTab({ productId }) {
   const [isPublic, setIsPublic] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Snackbar türü için state
 
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         const response = await api.get(`user/products/${productId}/answered-questions`);
         if (response.data && response.data.length > 0) {
-          setQuestions(response.data.map(question => ({
+          setQuestions(response.data.filter(question => question.answer).map(question => ({
             ...question,
             dateAsked: question.date_asked,
             dateAnswered: question.date_answered,
@@ -46,8 +47,15 @@ function QuestionsTab({ productId }) {
   };
 
   const handleOpenModal = () => {
-    setOpenModal(true);
-    setShowCriteria(false);
+    const hasPendingQuestion = questions.some(question => question.userId === userId && !question.answerContent);
+    if (hasPendingQuestion) {
+      setSnackbarMessage('Sorunuz henüz yanıtlanmadı. Lütfen yanıtlanmasını bekleyin.');
+      setSnackbarSeverity('error');
+      setSnackbarOpen(true);
+    } else {
+      setOpenModal(true);
+      setShowCriteria(false);
+    }
   };
 
   const handleCloseModal = () => {
@@ -75,16 +83,20 @@ function QuestionsTab({ productId }) {
       };
 
       const response = await api.post('user/create-product-question', payload);
-      if (response.status === 200) {
-        setQuestions([...questions, { ...response.data, questionContent: newQuestion }]);
+      console.log('API Response:', response);
+      if (response.status === 200 || response.status === 201) {
         setNewQuestion('');
-        handleCloseModal();
-        setSnackbarMessage('Soru başarıyla gönderildi!');
+        setSnackbarMessage('Sorunuz başarıyla gönderildi. Sorularınız sayfasından süreci takip edebilirsiniz.');
+        setSnackbarSeverity('success');
         setSnackbarOpen(true);
+        handleCloseModal();
+      } else {
+        throw new Error(`Soru gönderilirken bir hata oluştu. Durum kodu: ${response.status}`);
       }
     } catch (error) {
       console.error('Soru gönderilirken hata oluştu:', error);
-      setSnackbarMessage('Soru gönderilirken bir hata oluştu.');
+      setSnackbarMessage(`Soru gönderilirken bir hata oluştu: ${error.message}`);
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
@@ -193,8 +205,8 @@ function QuestionsTab({ productId }) {
         </DialogContent>
       </Dialog>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+      <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%', backgroundColor: 'pistachio', color: 'black' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
