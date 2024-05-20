@@ -57,7 +57,7 @@ function App() {
         <Router>
           <Routes>
             {/* ADMIN */}
-            <Route path="/" element={<Navigate to="/user/mainpage/" />} />
+            <Route path="/" element={<Navigate to="/anasayfa" />} />
             <Route path="/admin" element={<Login />} />
             <Route path="/admin/dashboard" element={<MainPage />} />
             <Route path="/admin/users" element={<Users />} />
@@ -73,14 +73,14 @@ function App() {
             <Route path="/seller/dashboard" element={<SellerMainPage />} />
             <Route path="/seller/seller-add" element={<SellerAdd />} />
             <Route path="/seller/product" element={<SellerProduct />} />
-            <Route path="/user/mainpage" element={< UserMainPage />} />
-            <Route path="/user/login" element={< UserRegister />} />
-            <Route path="/user/auth" element={< UserRegister />} />
-            <Route path="/user/profile" element={< UserProfil />} />
-            <Route path="/user/orders" element={< UserOrders />} />
-            <Route path="/user/address-info" element={< UserAddress />} />
-            <Route path="/user/address-add" element={< UserAddressAdd />} />
-            <Route path="/user/favorites" element={< UserFavorites />} />
+            <Route path="/anasayfa" element={< UserMainPage />} />
+            <Route path="/giris-yap" element={< UserRegister />} />
+            <Route path="/kayit-ol" element={< UserRegister />} />
+            <Route path="/profilim" element={< UserProfil />} />
+            <Route path="/siparislerim" element={< UserOrders />} />
+            <Route path="/adreslerim" element={< UserAddress />} />
+            <Route path="/adres-ekle" element={< UserAddressAdd />} />
+            <Route path="/favorilerim" element={< UserFavorites />} />
             <Route path="/sepetim" element={< UserCart />} />
             <Route path="/urun/:productSlug" element={< UserProductPage />} />
             <Route path="/sepetim/odeme" element={< MultiStepForm />} />

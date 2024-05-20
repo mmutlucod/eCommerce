@@ -92,7 +92,7 @@ const ProductPage = () => {
                   <Card sx={{ mt: 2, width: '100%', backgroundColor: '#f5f5f5' }}> {/* Gri arka plan rengi */}
                     <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1 }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
+                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
                           Satıcı: <Link to={`/seller/${product.seller.username}`} style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#003399', textDecoration: 'none' }}>{product.seller.username}</Link>
                         </Typography>
                         <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
@@ -102,9 +102,9 @@ const ProductPage = () => {
                     </CardContent>
                   </Card>
                 )}
-              </Grid>
-            </Grid>
-          </Paper>
+              </Grid >
+            </Grid >
+          </Paper >
           {product && <ProductTabs product={product.product} />}
         </Grid>
         <Footer />
