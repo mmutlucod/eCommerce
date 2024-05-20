@@ -20,7 +20,7 @@ function LoginForm() {
 
       // Burada kullanıcı rolüne göre yönlendirme yap
       if (data.role === 'user') {
-        navigate('/user/mainpage'); // Eğer rol user ise, kullanıcıyı /user/mainpage'e yönlendir
+        navigate('/anasayfa'); // Eğer rol user ise, kullanıcıyı /user/mainpage'e yönlendir
       } else {
         // Diğer roller için farklı yönlendirmeler burada yapılabilir
       }

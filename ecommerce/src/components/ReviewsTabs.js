@@ -99,7 +99,7 @@ function ReviewsTab({ productId }) {
                       </Avatar>
                     }
                     title={`${review.user.name} ${review.user.surname}`}
-                    subheader={review.date}
+                    subheader={new Date(review.date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                     titleTypographyProps={{ variant: 'subtitle2' }}
                     subheaderTypographyProps={{ variant: 'caption' }}
                   />

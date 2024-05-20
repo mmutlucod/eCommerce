@@ -117,7 +117,7 @@ const OrdersPage = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={3}>
                             <Typography color="textSecondary">Sipariş Tarihi</Typography>
-                            <Typography variant="body2">{order.order_date}</Typography>
+                            <Typography variant="body2">{new Date(order.order_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</Typography>
                           </Grid>
                           <Grid item xs={12} sm={5}>
                             <Typography color="textSecondary">Sipariş Özeti</Typography>
