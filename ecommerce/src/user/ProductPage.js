@@ -97,20 +97,6 @@ const ProductPage = () => {
                   {`${product?.price.toFixed(2)} ₺`}
                 </Typography>
                 <Button variant="contained" color="secondary" sx={{ width: '100%', mt: 3, py: 1, color: 'white' }}>Sepete Ekle</Button>
-                {product?.seller && (
-                  <Card sx={{ mt: 2, width: '100%', backgroundColor: '#f5f5f5' }}> {/* Gri arka plan rengi */}
-                    <CardContent sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 1 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Typography variant="body2" sx={{ fontSize: '0.8rem' }}>
-                          Satıcı: <Link to={`/seller/${product.seller.username}`} style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#003399', textDecoration: 'none' }}>{product.seller.username}</Link>
-                        </Typography>
-                        <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                          Puan: <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#4CAF50' }}>9.7</span>
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                )}
               </Grid >
             </Grid >
           </Paper >
