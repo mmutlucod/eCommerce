@@ -67,7 +67,6 @@ const ProductNameTypography = styled(Typography)(({ theme }) => ({
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
-
 const ProductCards = ({ products = [] }) => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -127,7 +126,13 @@ const ProductCards = ({ products = [] }) => {
         {products.map((product) => (
           <CustomCard key={product.product_id}>
             {product.fastDelivery && <Badge color="error" badgeContent="Fast Delivery" />}
-            <Link to={'/urun/' + product.product.slug} ><ImageCarousel images={product.product.productImages.map(img => img.image_path)} /></Link>
+            <Link to={'/urun/' + product.product.slug} >
+              {product.product.productImages ? (
+                <ImageCarousel images={product.product.productImages.map(img => img.image_path)} />
+              ) : (
+                <Typography>No images available</Typography>
+              )}
+            </Link>
             <CustomCardContent>
               <Box display="flex" justifyContent="start" alignItems="center">
                 <Link style={{ textDecoration: 'none', overflow: 'hidden' }} to={'/marka/' + product.product.Brand.slug}>
@@ -164,5 +169,6 @@ const ProductCards = ({ products = [] }) => {
     </>
   );
 };
+
 
 export default ProductCards;
