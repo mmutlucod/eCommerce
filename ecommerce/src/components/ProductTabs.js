@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Tab, Tabs, Box, AppBar, Typography, Paper, Button } from '@mui/material';
+import { Box, Typography, Paper, Button, Avatar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link, AppBar, Tabs, Tab } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import StarIcon from '@mui/icons-material/Star';
 import api from '../api/api';
 import ReviewsTab from '../components/ReviewsTabs';
 import QuestionsTab from '../components/QuestionsTabs';
@@ -25,6 +27,7 @@ function TabPanel(props) {
 
 function OtherSellersTab({ productId }) {
   const [sellers, setSellers] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchSellers = async () => {
@@ -39,28 +42,65 @@ function OtherSellersTab({ productId }) {
     fetchSellers();
   }, [productId]);
 
+  const handleSellerClick = (sellerSlug) => {
+    navigate(`/satici/${sellerSlug}`);
+  };
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography variant="h6">Diğer Satıcılar - Tümü ({sellers.length})</Typography>
-      {sellers.map((seller, index) => (
-        <Paper key={index} sx={{ p: 2, mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#4CAF50' }}>
-              {seller.rating}
-            </Typography>
-            <Typography variant="subtitle2">{seller.name}</Typography>
-            <Typography variant="body2">{seller.estimatedDelivery}</Typography>
-          </Box>
-          <Box sx={{ textAlign: 'right' }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              {seller.price} TL
-            </Typography>
-            <Button variant="contained" color="secondary">
-              Sepete Ekle
-            </Button>
-          </Box>
-        </Paper>
-      ))}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Satıcı</TableCell>
+              <TableCell>Fiyat</TableCell>
+              <TableCell>Kargoya Veriliş Tarihi</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {sellers.map((seller, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Avatar alt={seller.seller.username} src="/static/images/avatar/1.jpg" sx={{ width: 56, height: 56, mr: 2 }} />
+                    <Box>
+                      <Link
+                        component="button"
+                        variant="h6"
+                        onClick={() => handleSellerClick(seller.seller.slug)}
+                        sx={{ fontWeight: 'bold', color: '#0070C0', textDecoration: 'none' }}
+                      >
+                        {seller.seller.username}
+                      </Link>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <StarIcon sx={{ color: '#FFD700', fontSize: 16 }} />
+                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#4CAF50', ml: 0.5 }}>
+                          {seller.commentAvg}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                    {seller.price} TL
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <Typography variant="body2" sx={{ textAlign: 'center' }}>Tahmini Teslimat: {seller.createdAt ? new Date(seller.createdAt).toLocaleDateString() : "Bilinmiyor"}</Typography>
+                </TableCell>
+                <TableCell>
+                  <Button variant="contained" color="secondary" sx={{ color: 'white' }}>
+                    Sepete Ekle
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   );
 }

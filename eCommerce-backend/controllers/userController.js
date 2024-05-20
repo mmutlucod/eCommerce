@@ -2133,16 +2133,21 @@ const getSellerProductByProductId = async (req, res) => {
       where: {
         is_active: 1
       },
-      include: [{
-        model: Product,
-        include: [{ model: Brand }, { model: Category }],
-        where: {
-          product_id: productId // productId ile filtreleme
+      include: [
+        {
+          model: Product,
+          include: [{ model: Brand }, { model: Category }],
+          where: {
+            product_id: productId // productId ile filtreleme
+          }
+        },
+        {
+          model: Seller, // Satıcı bilgilerini çekmek için eklenen model
+          attributes: ['seller_id', 'username'] // Çekilecek satıcı bilgileri
         }
-      }],
+      ],
       order: [['price', 'ASC']]
     });
-
     const uniqueProductsMap = new Map();
     products.forEach(product => {
       const id = product.product.product_id;
