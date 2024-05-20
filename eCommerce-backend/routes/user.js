@@ -21,6 +21,7 @@ router.post('/update-item', authMiddleware, userController.updateItem);
 router.post('/delete-item', authMiddleware, userController.deleteItem);
 router.post('/clear-cart', authMiddleware, userController.clearCart);
 
+///////////////////////////////////////////////////////////////////////////////////////
 //LİSTE İŞLEMLERİ
 
 router.get('/lists', authMiddleware, userController.getLists);
@@ -36,6 +37,8 @@ router.get('/publicList/:slug', userController.getPublicListItemsBySlug);
 router.get('/lists/:listId/items', authMiddleware, userController.getItemsByListId);
 router.post('/add-Item-to-List', authMiddleware, userController.addItemToList);
 router.post('/remove-Item-to-List', authMiddleware, userController.removeItemFromList);
+
+///////////////////////////////////////////////////////////////////////////////////////
 
 //ADRES İŞLEMLERİ
 

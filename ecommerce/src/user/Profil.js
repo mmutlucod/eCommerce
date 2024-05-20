@@ -83,7 +83,6 @@ const UserProfile = () => {
   // Güncelle butonunun onClick handler'ı
   const handleUpdate = async () => {
     try {
-      // API isteği için gerekli veriyi hazırla
       const data = {
         name: userInfo.name,
         surname: userInfo.surname,
@@ -91,18 +90,25 @@ const UserProfile = () => {
         phone: userInfo.phone,
       };
 
-      // Kullanıcı şifre güncelleme alanlarını doldurmuşsa, bu veriyi de isteğe ekle
+      if (userInfo.currentPassword && userInfo.newPassword && userInfo.confirmPassword) {
+        data.currentPassword = userInfo.currentPassword;
+        data.newPassword = userInfo.newPassword;
+        data.confirmPassword = userInfo.confirmPassword;
+      }
 
-      // Kullanıcı bilgilerini ve/veya şifreyi güncellemek için API'ye POST isteği gönder
       const response = await api.put('/user/update-account', data);
-      console.log(data)
-      // Başarılı bir güncelleme sonrası kullanıcıya bilgi ver
+
       if (response.status === 200) {
+        // Profil güncellemesi başarılı, yeni token varsa onu saklayın
+        const newToken = response.data.token; // Örneğin backend yeni token döndürüyorsa
+        if (newToken) {
+          // Token'ı güncelleyin
+          localStorage.setItem('token', newToken);
+          // Veya cookie güncellemesi
+          // document.cookie = `authToken=${newToken}; path=/;`;
+        }
         alert('Profil bilgileriniz başarıyla güncellendi.');
-        // Gerekirse ek işlemler yapılabilir (örneğin, sayfayı yenilemek, başka bir sayfaya yönlendirmek vs.)
       } else {
-        console.log(response.status)
-        // API'den beklenmeyen bir yanıt geldiyse, kullanıcıyı bilgilendir
         alert('Güncelleme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.');
       }
     } catch (error) {
@@ -110,6 +116,7 @@ const UserProfile = () => {
       alert('Profil güncelleme işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
     }
   };
+
 
   return (
     <>
