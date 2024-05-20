@@ -185,7 +185,7 @@ const PaymentPage = () => {
 
             setTimeout(() => {
                 setShowConfetti(false);
-                navigate('/user/orders');
+                navigate('/siparislerim');
             }, 5000);
         } catch (error) {
             console.error('Error creating order:', error);

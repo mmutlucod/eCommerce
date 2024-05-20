@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, TextField, Button, List, ListItem, Paper,
-  Dialog, DialogContent, DialogTitle, Link, Checkbox, FormControlLabel
+  Dialog, DialogContent, DialogTitle, Link, Checkbox, FormControlLabel, Snackbar, Alert
 } from '@mui/material';
 import api from '../api/api';
 
@@ -13,6 +13,8 @@ function QuestionsTab({ productId }) {
   const [sellerId, setSellerId] = useState(null); // sellerId için state
   const [userId, setUserId] = useState(null); // userId için state
   const [isPublic, setIsPublic] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -77,10 +79,21 @@ function QuestionsTab({ productId }) {
         setQuestions([...questions, { ...response.data, questionContent: newQuestion }]);
         setNewQuestion('');
         handleCloseModal();
+        setSnackbarMessage('Soru başarıyla gönderildi!');
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error('Soru gönderilirken hata oluştu:', error);
+      setSnackbarMessage('Soru gönderilirken bir hata oluştu.');
+      setSnackbarOpen(true);
     }
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   return (
@@ -103,82 +116,88 @@ function QuestionsTab({ productId }) {
       >
         Soru Sor
       </Button>
-    
-      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md">
-  <DialogTitle>Soru Sor</DialogTitle>
-  <DialogContent>
-    <Link href="#" onClick={toggleCriteria} sx={{ mb: 2, display: 'block' }}>Soru Sorma Kriterleri</Link>
-    {showCriteria && (
-      <div style={{ fontSize: '0.8rem' }}>
-        <div>Satıcılarımıza sorduğunuz sorular;</div>
-        <div>- Ürün ile alakalıysa</div>
-        <div>- Reklam içermiyorsa</div>
-        <div>- Kullanıcıların ya da satıcıların kişisel haklarına saldırıda bulunmuyorsa</div>
-        <div>- Genel ahlak kurallarına aykırı, müstehcen, siyasi veya yasal olmayan içerik bulundurmuyorsa</div>
-        <div>Satıcılarımız tarafından yanıtlanır ve yayınlanır.</div>
-      </div>
-    )}
-    <TextField
-      label="Bir soru sorun"
-      variant="outlined"
-      fullWidth
-      value={newQuestion}
-      onChange={handleQuestionChange}
-      multiline
-      rows={4}
-      sx={{
-        my: 2,
-        backgroundColor: 'white',
-        '& .MuiOutlinedInput-root': {
-          color: 'black',
-          '& fieldset': {
-            borderColor: '#4B0082',
-          },
-          '&:hover fieldset': {
-            borderColor: '#4B0082',
-          },
-          '&.Mui-focused fieldset': {
-            borderColor: '#4B0082',
-          }
-        }
-      }}
-    />
-    
-    <FormControlLabel
-      control={
-        <Checkbox
-          checked={isPublic}
-          onChange={handleIsPublicChange}
-          sx={{
-            color: '#f27a1a',
-           
-            '&.Mui-checked': {
-              color: '#f27a1a',
-            }
-          }}
-        />
-      }
-      label="yorumlarda ismim gözüksün"
-      sx={{
-        color: 'black',
-        marginBottom:5,
-       
-        fontSize: '0.875rem'
-      }}
-    />
-    <Button variant="contained" onClick={submitQuestion} sx={{
-      backgroundColor: '#4B0082',
-      color: 'white',
 
-      mt: 4,  // marginTop değerini artırdık
-      '&:hover': {
-        backgroundColor: '#4B0082'
-      }
-    }}>
-      Soruyu Gönder
-    </Button>
-  </DialogContent>
-</Dialog>
+      <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md">
+        <DialogTitle>Soru Sor</DialogTitle>
+        <DialogContent>
+          <Link href="#" onClick={toggleCriteria} sx={{ mb: 2, display: 'block' }}>Soru Sorma Kriterleri</Link>
+          {showCriteria && (
+            <div style={{ fontSize: '0.8rem' }}>
+              <div>Satıcılarımıza sorduğunuz sorular;</div>
+              <div>- Ürün ile alakalıysa</div>
+              <div>- Reklam içermiyorsa</div>
+              <div>- Kullanıcıların ya da satıcıların kişisel haklarına saldırıda bulunmuyorsa</div>
+              <div>- Genel ahlak kurallarına aykırı, müstehcen, siyasi veya yasal olmayan içerik bulundurmuyorsa</div>
+              <div>Satıcılarımız tarafından yanıtlanır ve yayınlanır.</div>
+            </div>
+          )}
+          <TextField
+            label="Bir soru sorun"
+            variant="outlined"
+            fullWidth
+            value={newQuestion}
+            onChange={handleQuestionChange}
+            multiline
+            rows={4}
+            sx={{
+              my: 2,
+              backgroundColor: 'white',
+              '& .MuiOutlinedInput-root': {
+                color: 'black',
+                '& fieldset': {
+                  borderColor: '#4B0082',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#4B0082',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#4B0082',
+                }
+              }
+            }}
+          />
+
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isPublic}
+                onChange={handleIsPublicChange}
+                sx={{
+                  color: '#f27a1a',
+
+                  '&.Mui-checked': {
+                    color: '#f27a1a',
+                  }
+                }}
+              />
+            }
+            label="yorumlarda ismim gözüksün"
+            sx={{
+              color: 'black',
+              marginBottom: 5,
+
+              fontSize: '0.875rem'
+            }}
+          />
+          <Button variant="contained" onClick={submitQuestion} sx={{
+            backgroundColor: '#4B0082',
+            color: 'white',
+
+            mt: 4,  // marginTop değerini artırdık
+            '&:hover': {
+              backgroundColor: '#4B0082'
+            }
+          }}>
+            Soruyu Gönder
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
       <List sx={{ mb: 2 }}>
         {questions.map((question, index) => (
@@ -195,7 +214,7 @@ function QuestionsTab({ productId }) {
                   <Typography variant="body1">
                     Cevap: {question.answerContent}
                   </Typography>
-                <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                  <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
                     Cevaplandığı Tarih: {new Date(question.dateAnswered).toLocaleDateString()}
                   </Typography>
                 </Paper>
