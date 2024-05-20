@@ -171,7 +171,7 @@ function QuestionsTab({ productId }) {
                 }}
               />
             }
-            label="yorumlarda ismim gözüksün"
+            label="Yorumlarda ismim görünsün."
             sx={{
               color: 'black',
               marginBottom: 5,
