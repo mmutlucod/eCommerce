@@ -60,7 +60,7 @@ function App() {
         <Router>
           <Routes>
             {/* ADMIN */}
-            <Route path="/" element={<Navigate to="/user/mainpage/" />} />
+            <Route path="/" element={<Navigate to="/anasayfa" />} />
             <Route path="/admin" element={<Login />} />
             <Route path="/admin/dashboard" element={<MainPage />} />
             <Route path="/admin/users" element={<Users />} />
