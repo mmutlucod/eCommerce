@@ -290,7 +290,15 @@ const searchAllProducts = async (req, res) => {
             where: Sequelize.where(
                 Sequelize.fn('LOWER', Sequelize.col('product_name')),
                 'LIKE', `%${search.toLowerCase()}%`
-            )
+            ),
+            include: [
+                {
+                    model: Brand,
+                },
+                {
+                    model: Category
+                }
+            ]
         });
 
         return res.status(200).json(products);
