@@ -14,7 +14,7 @@ import GooglePlayIcon from '@mui/icons-material/Android'; // Diyelim ki bu Googl
 
 const Footer = () => {
   return (<>
-    <Paper elevation={0} square sx={{ padding: '16px', marginBottom: '20px', overflow: 'hidden', marginTop: '200px' }}>
+    <Paper elevation={0} square sx={{ padding: '16px', marginBottom: '20px', overflow: 'hidden', marginTop: '50px' }}>
       <Grid container spacing={2} justifyContent="center">
         <Grid item>
           <Box sx={{ textAlign: 'center' }}>
