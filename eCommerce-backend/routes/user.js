@@ -117,7 +117,7 @@ router.get('/products', authOptionalMiddleware, userController.getProducts);
 router.get('/product/:productSlug', authOptionalMiddleware, userController.getProductsBySlug);
 router.get('/products/:productSlug', authOptionalMiddleware, userController.getProductsBySellerSlug);
 router.get('/seller-products/:sellerSlug', authOptionalMiddleware, userController.getProductsBySeller); // Satıcının ürünleri
-router.get('/sellerProducts/:productId', authOptionalMiddleware, userController.getSellerProductByProductId); // Ürünün satıcıları
+router.get('/sellerProducts/:productId/:sellerProductId', authOptionalMiddleware, userController.getSellerProductByProductId); // Ürünün satıcıları
 //Diğer satıcılar
 
 

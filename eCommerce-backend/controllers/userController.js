@@ -2113,7 +2113,7 @@ const getProductsBySeller = async (req, res) => {
 
 //Ürüne göre diğer satıcılara ait ürünleri çekme
 const getSellerProductByProductId = async (req, res) => {
-  const { productId } = req.params;
+  const { productId, sellerProductId } = req.params;
 
   try {
     let user = null;
@@ -2131,7 +2131,8 @@ const getSellerProductByProductId = async (req, res) => {
 
     let products = await sellerProduct.findAll({
       where: {
-        is_active: 1
+        is_active: 1,
+        ...(sellerProductId && { seller_product_id: { [Op.ne]: sellerProductId } })
       },
       include: [
         {

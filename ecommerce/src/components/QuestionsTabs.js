@@ -205,7 +205,7 @@ function QuestionsTab({ productId }) {
         </DialogContent>
       </Dialog>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+      <Snackbar open={snackbarOpen} autoHideDuration={1000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
         <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%', backgroundColor: 'pistachio', color: 'black' }}>
           {snackbarMessage}
         </Alert>
