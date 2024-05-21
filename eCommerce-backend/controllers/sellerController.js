@@ -287,11 +287,12 @@ const searchAllProducts = async (req, res) => {
 
         // MySQL için büyük/küçük harfe duyarlı olmayan arama
         const products = await Product.findAll({
-            where: Sequelize.where(
-                Sequelize.fn('LOWER', Sequelize.col('name')),
-                Sequelize.fn('LOWER', Sequelize.col('description')),
-                'LIKE', `%${search.toLowerCase()}%`
-            ),
+            where: {
+                [Op.or]: [
+                    Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Product.name')), 'LIKE', `%${search.toLowerCase()}%`),
+                    Sequelize.where(Sequelize.fn('LOWER', Sequelize.col('Product.description')), 'LIKE', `%${search.toLowerCase()}%`)
+                ]
+            },
             include: [
                 {
                     model: Brand
