@@ -52,9 +52,7 @@ export default function SellerNavbar() {
     { title: 'SİPARİŞ & KARGO', subItems: [
     { name: 'Sipariş Takibi', path: '/seller/order-tracking' },
     { name: 'Kargo Seçenekleri', path: '/seller/shipping-options' }] },
-    { title: 'FİNANS', subItems: ['Fatura İşlemleri', 'Ödeme Seçenekleri'] },
-    { title: 'PROMOSYONLAR', subItems: ['Fatura İşlemleri', 'Ödeme Seçenekleri'] },
-    { title: 'RAPORLAR', subItems: ['Fatura İşlemleri', 'Ödeme Seçenekleri'] },
+   
   ];
 
   const handleMenuOpen = (event, title) => {
