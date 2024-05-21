@@ -65,7 +65,6 @@ function AuthPage() {
     event.preventDefault();
   };
 
-
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -79,7 +78,6 @@ function AuthPage() {
       setError(error.response.data.message || 'Giriş yapılırken bir hata oluştu.');
     }
   };
-
 
   const handleRegisterSubmit = async (event) => {
     event.preventDefault();
@@ -101,7 +99,7 @@ function AuthPage() {
       <Box sx={{ my: 4 }}>
         <Paper
           sx={{
-            maxWidth: 400,
+            maxWidth: 600,
             mx: 'auto',
             mt: 4,
             borderRadius: 2,
@@ -112,11 +110,11 @@ function AuthPage() {
             value={tabValue}
             onChange={handleTabChange}
             centered
-            textColor="primary"
-            indicatorColor="primary"
+            textColor="secondary"
+            indicatorColor="secondary"
             sx={{
               '.MuiTabs-flexContainer': {
-                backgroundColor: '#7E57C2', // Tab'ların arka plan rengi
+                backgroundColor: '#FF7043', // Tab'ların arka plan rengi
               },
               '.Mui-selected': {
                 color: '#fff', // Seçili tab'ın yazı rengi
@@ -126,7 +124,7 @@ function AuthPage() {
                   backgroundColor: 'rgba(255, 255, 255, 0.2)', // Tab üzerine gelindiğindeki hover efekti
                 },
                 borderBottom: '1px solid rgba(255, 255, 255, 0.5)', // Tab alt çizgisi
-                color: 'rgba(255, 255, 255, 0.7)', // Tab'ların varsayılan yazı rengi
+                color: '#fff', // Tab'ların varsayılan yazı rengi
               }
             }}
           >
@@ -137,7 +135,7 @@ function AuthPage() {
             <Box
               component="form"
               onSubmit={handleLoginSubmit}
-              sx={{ p: 2 }}
+              sx={{ p: 4 }}
             >
               <TextField
                 label="E-posta"
@@ -147,7 +145,23 @@ function AuthPage() {
                 onChange={handleLoginChange}
                 fullWidth
                 required
-                sx={{ mb: 2 }}
+                sx={{
+                  mb: 2,
+                  '& .MuiInputLabel-root': {
+                    color: '#FF7043', // Label rengi
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                  },
+                }}
               />
               <TextField
                 label="Parola"
@@ -157,7 +171,23 @@ function AuthPage() {
                 onChange={handleLoginChange}
                 fullWidth
                 required
-                sx={{ mb: 2 }}
+                sx={{
+                  mb: 2,
+                  '& .MuiInputLabel-root': {
+                    color: '#FF7043', // Label rengi
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                  },
+                }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -176,6 +206,7 @@ function AuthPage() {
               <Button
                 type="submit"
                 variant="contained"
+                color="secondary"
                 fullWidth
                 sx={{ mb: 2 }}
               >
@@ -192,7 +223,7 @@ function AuthPage() {
             <Box
               component="form"
               onSubmit={handleRegisterSubmit}
-              sx={{ p: 2 }}
+              sx={{ p: 4 }}
             >
               <TextField
                 label="E-posta Adresi"
@@ -201,7 +232,23 @@ function AuthPage() {
                 onChange={handleRegisterChange}
                 fullWidth
                 required
-                sx={{ mb: 2 }}
+                sx={{
+                  mb: 2,
+                  '& .MuiInputLabel-root': {
+                    color: '#FF7043', // Label rengi
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                  },
+                }}
               />
               <TextField
                 label="Parola"
@@ -211,7 +258,23 @@ function AuthPage() {
                 onChange={handleRegisterChange}
                 fullWidth
                 required
-                sx={{ mb: 2 }}
+                sx={{
+                  mb: 2,
+                  '& .MuiInputLabel-root': {
+                    color: '#FF7043', // Label rengi
+                  },
+                  '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                    '&:hover fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                    '&.Mui-focused fieldset': {
+                      borderColor: '#FF7043',
+                    },
+                  },
+                }}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
@@ -230,7 +293,14 @@ function AuthPage() {
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
+                sx={{
+                  backgroundColor: '#FF7043', // Turuncu renk
+                  '&:hover': {
+                    backgroundColor: '#FF5722', // Daha koyu turuncu renk hover efekti
+                  },
+                  mb: 2,
+                  transform: 'scale(1.0)', // Butonu büyüt
+                }}
                 fullWidth
               >
                 Üye Ol
