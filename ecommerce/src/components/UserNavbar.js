@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Button, Badge } from '@mui/material';
+import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Badge } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
@@ -13,25 +13,23 @@ import { Link } from 'react-router-dom';
 
 export default function UserNavbar() {
     const navigate = useNavigate();
-    const location = useLocation(); // Mevcut yol bilgisini almak için
+    const location = useLocation();
     const { token, logout } = useAuth();
     const [isSearchModalOpen, setSearchModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [dropdownOpen, setDropdownOpen] = useState(false);
     const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
-    const [cartItemCount, setCartItemCount] = useState(0);
     const [cartItems, setCartItems] = useState([]);
     const searchInputRef = useRef(null);
     const [searchWidth, setSearchWidth] = useState(0);
     const [searchLeftMargin, setSearchLeftMargin] = useState(0);
-    const [totalQuantity, seTtotalQuantity] = useState(0);
+    const [totalQuantity, setTotalQuantity] = useState(0);
 
     const fetchCartItems = async () => {
         try {
             const response = await api.get('/user/my-basket');
             setCartItems(response.data);
             const totalquantity = response.data.reduce((total, item) => total + item.quantity, 0);
-            seTtotalQuantity(totalquantity);
+            setTotalQuantity(totalquantity);
         } catch (error) {
             console.error('Error fetching cart data:', error);
         }
@@ -39,14 +37,13 @@ export default function UserNavbar() {
 
     useEffect(() => {
         fetchCartItems();
-        const interval = setInterval(fetchCartItems, 60000); // Her 60 saniyede bir sepet öğelerini günceller
+        const interval = setInterval(fetchCartItems, 100); // Her 60 saniyede bir sepet öğelerini günceller
 
         return () => clearInterval(interval); // Component unmount edildiğinde interval'i temizler
     }, []);
 
     useEffect(() => {
         const handleResize = () => {
-            // Eğer ekran boyutu 1532px altına düşerse ve modal açıksa kapat
             if (window.innerWidth < 1532 && isSearchModalOpen) {
                 setSearchModalOpen(false);
             }
@@ -54,9 +51,8 @@ export default function UserNavbar() {
 
         window.addEventListener('resize', handleResize);
 
-        // Cleanup function
         return () => window.removeEventListener('resize', handleResize);
-    }, [isSearchModalOpen]); // Bu hook isSearchModalOpen state'ine bağlı
+    }, [isSearchModalOpen]);
 
     const handleOpenSearchModal = () => {
         if (window.innerWidth >= 1532) {
@@ -111,7 +107,7 @@ export default function UserNavbar() {
                                     height: '100%',
                                     '& .MuiInputBase-input': {
                                         marginLeft: '8px',
-                                        padding: '10px 0', // Padding eklenerek yazının yukarıya kayması önlenir
+                                        padding: '10px 0',
                                     },
                                 }}
                                 value={searchQuery}
@@ -140,9 +136,6 @@ export default function UserNavbar() {
                             <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
                                 Profilim
                             </Typography>
-                            {/* <Button color="inherit" onClick={logout}>
-                                Çıkış Yap
-                            </Button> */}
                         </>
                     ) : (
                         <>

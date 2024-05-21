@@ -159,7 +159,7 @@ const OrdersPage = () => {
                     </Card>
                   ))
                 ) : (
-                  <Typography>Siparişler yükleniyor...</Typography>
+                  <Typography>Siparişiniz bulunamadı</Typography>
                 )}
               </Paper>
             </Box>

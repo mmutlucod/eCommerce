@@ -68,13 +68,17 @@ const ProductPage = () => {
   }, [productSlug]);
 
   const handleAddToCart = useCallback((product) => {
+    console.log('Adding to cart:', product);
     if (!cartItems || !product) {
       console.warn('Cart items or product not yet loaded. Please wait a moment.');
       return;
     }
 
-    const existingItem = cartItems.find(item => item.sellerProductId === product.product.seller_product_id);
+    const existingItem = cartItems.find(item => item.sellerProductId === product.seller_product_id);
+    console.log('Existing item:', existingItem);
     const newQuantity = existingItem ? existingItem.quantity + 1 : 1;
+
+    console.log('New quantity:', newQuantity);
 
     if (newQuantity > product.product.max_buy) {
       setAlertMessage(`Sepete maksimum ${product.product.max_buy} adet ürün ekleyebilirsiniz.`);
@@ -87,19 +91,22 @@ const ProductPage = () => {
     }
 
     if (existingItem) {
+      console.log('Updating item in cart');
       dispatch(updateItem({
-        sellerProductId: product.product.seller_product_id,
+        sellerProductId: product.seller_product_id,
         quantity: newQuantity,
         price: product.product.price
       }));
     } else {
+      console.log('Adding new item to cart');
       dispatch(addItem({
-        sellerProductId: product.product.seller_product_id,
+        sellerProductId: product.seller_product_id,
         quantity: 1,
         price: product.product.price
       }));
     }
   }, [cartItems, dispatch, product]);
+
 
   const handleCloseAlert = () => {
     setAlertOpen(false);
@@ -143,11 +150,11 @@ const ProductPage = () => {
                 <Typography variant="h6" sx={{ color: 'secondary.main', fontWeight: 'bold', mb: 2 }}>
                   {`${product?.price.toFixed(2)} ₺`}
                 </Typography>
-                <Button variant="contained" color="secondary" sx={{ width: '100%', mt: 3, py: 1, color: 'white' }} onClick={() => handleAddToCart(product?.product)}>Sepete Ekle</Button>
+                <Button variant="contained" color="secondary" sx={{ width: '100%', mt: 3, py: 1, color: 'white' }} onClick={() => handleAddToCart(product)}>Sepete Ekle</Button>
               </Grid>
             </Grid>
           </Paper>
-          {product && <ProductTabs product={product.product} />}
+          {product && <ProductTabs product={product} />}
         </Grid>
         <Footer />
         <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert}>
