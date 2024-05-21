@@ -8,19 +8,47 @@ import {
   Tooltip,
   Menu,
   MenuItem,
-  Paper
+  Paper,
+  Snackbar,
+  Backdrop,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  Box
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import MoreVertIcon from '@mui/icons-material/MoreVert'; // Menü ikonu için
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import AddIcon from '@mui/icons-material/Add';
 import SellerNavbar from '../components/SellerNavbar';
+import { Link } from 'react-router-dom';
 import api from '../api/api';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+function formatDate(dateString) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+  return new Date(dateString).toLocaleDateString('tr-TR', options);
+}
+
 function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [editProduct, setEditProduct] = useState(null);
+  const [openEditModal, setOpenEditModal] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -37,9 +65,9 @@ function Products() {
     }
   };
 
-  const handlePriceChange = (event, productId) => {
+  const handlePriceChange = (event, sellerProductId) => {
     const updatedProducts = products.map(product => {
-      if (product.product_id === productId) {
+      if (product.seller_product_id === sellerProductId) {
         return { ...product, price: event.target.value };
       }
       return product;
@@ -47,159 +75,231 @@ function Products() {
     setProducts(updatedProducts);
   };
 
-  const handleSubmit = async (event, productId) => {
+  const handleSubmit = async (event, sellerProductId) => {
     if (event.key === 'Enter') {
       event.preventDefault(); // Formun yeniden yüklenmesini önle
-      const product = products.find(product => product.product_id === productId);
+      const product = products.find(product => product.seller_product_id === sellerProductId);
+      setUpdateLoading(true);
       try {
-        await api.put(`/seller/products/${productId}`, {
+        await api.put(`/seller/products/${sellerProductId}`, {
           price: product.price
         });
-        // Başarılı güncelleme mesajı eklenebilir
+        setSuccessMessage('Fiyat başarıyla güncellendi.');
+        event.target.blur();
       } catch (error) {
+        setErrorMessage('Fiyat güncellenirken bir hata oluştu.');
         console.error('Fiyat güncellenirken bir hata oluştu:', error);
-        // Hata mesajı eklenebilir
+      } finally {
+        setTimeout(() => {
+          setUpdateLoading(false);
+        }, 2000);
       }
     }
   };
 
-  // Menü açma işlevi
-  const handleClick = (event, productId) => {
+  const handleClick = (event, sellerProductId) => {
     setAnchorEl(event.currentTarget);
-    setSelectedProductId(productId);
+    setSelectedProductId(sellerProductId);
   };
 
-  // Menü kapama işlevi
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  // Düzenleme ve silme işlevleri burada tanımlanabilir
   const handleEdit = () => {
-    console.log("Düzenle", selectedProductId);
+    const product = products.find(product => product.seller_product_id === selectedProductId);
+    setEditProduct(product);
+    setOpenEditModal(true);
     handleClose();
   };
 
-  const handleListStatusChange = async (productId, shouldBeListed) => {
+  const handleListStatusChange = async (sellerProductId, shouldBeListed) => {
+    setUpdateLoading(true);
     try {
-      // API endpoint'inize uygun olarak düzenleyin
-      const response = await api.put(`/seller/activateProduct/${productId}`, {
+      await api.put(`/seller/products/${sellerProductId}`, {
         is_active: shouldBeListed ? 1 : 0,
       });
-      console.log(response.data);
-      fetchProducts(); // Ürün listesini güncelle
+      fetchProducts();
+      setSuccessMessage(shouldBeListed ? 'Ürün başarıyla listelendi.' : 'Ürün başarıyla listeden kaldırıldı.');
     } catch (error) {
+      setErrorMessage('Ürün durumu güncellenirken bir hata oluştu.');
       console.error('Ürün durumu güncellenirken bir hata oluştu:', error);
+    } finally {
+      setTimeout(() => {
+        setUpdateLoading(false);
+      }, 2000);
+      handleClose();
     }
-    handleClose(); // Menüyü kapat
   };
-  
-  const handleListStatusChange1 = async (productId, shouldBeListed) => {
+
+  const handleCloseSnackbar = () => {
+    setSuccessMessage('');
+    setErrorMessage('');
+  };
+
+  const handleEditChange = (event) => {
+    const { name, value } = event.target;
+    const [mainKey, subKey] = name.split('.');
+    if (subKey) {
+      setEditProduct({ ...editProduct, [mainKey]: { ...editProduct[mainKey], [subKey]: value } });
+    } else {
+      setEditProduct({ ...editProduct, [name]: value });
+    }
+  };
+
+  const handleEditSubmit = async () => {
+    setUpdateLoading(true);
     try {
-      // API endpoint'inize uygun olarak düzenleyin
-      const response = await api.put(`/seller/deactivateProduct/${productId}`, {
-        is_active: shouldBeListed ? 1 : 0,
-      });
-      console.log(response.data);
-      fetchProducts(); // Ürün listesini güncelle
+      await api.put(`/seller/products/${editProduct.seller_product_id}`, editProduct);
+      fetchProducts();
+      setSuccessMessage('Ürün başarıyla güncellendi.');
+      setOpenEditModal(false);
     } catch (error) {
-      console.error('Ürün durumu güncellenirken bir hata oluştu:', error);
+      setErrorMessage('Ürün güncellenirken bir hata oluştu.');
+      console.error('Ürün güncellenirken bir hata oluştu:', error);
+    } finally {
+      setTimeout(() => {
+        setUpdateLoading(false);
+      }, 2000);
     }
-    handleClose(); // Menüyü kapat
   };
-  
-  
+
   return (
     <>
       <SellerNavbar />
       <Container maxWidth="lg" style={{ marginTop: '20px', marginBottom: '20px' }}>
-        <Typography variant="h5" gutterBottom>
-          Ürün Listesi
-        </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography variant="h5" gutterBottom>
+            Ürün Listesi
+          </Typography>
+          <IconButton component={Link} to="/seller/urun-ekle" color="primary">
+            <AddIcon />
+          </IconButton>
+        </Box>
         {loading ? (
           <CircularProgress />
         ) : (
           <Paper elevation={3} style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ürün Foto</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ürün Adı</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Kategori</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Onay Durumu</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Aktiflik Durumu</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Marka Adi</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Fiyat</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Guncelleme Tarihi</th>
-                <th style={{ border: '1px solid #ddd', padding: '8px' }}>Stok aded</th>
-              </tr>
-            </thead>
-            <tbody>
-              {console.log(products)}
-              {products.map((product) => (
-                <tr key={product.product_id}>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.product_id}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.product.name}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.product.category.category_name}</td>
-                 
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.ApprovalStatus.status_name}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.is_active}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.product.Brand.brand_name}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <thead>
+                <tr>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ürün Foto</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ürün Adı</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Kategori</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Onay Durumu</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Aktiflik Durumu</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Marka Adı</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Fiyat</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Güncelleme Tarihi</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Stok Adedi</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>İşlemler</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr key={product.seller_product_id}>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.seller_product_id}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.product.name}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.product.category.category_name}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.ApprovalStatus.status_name}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.is_active ? 'Aktif' : 'Pasif'}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.product.Brand.brand_name}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
                       <TextField
                         size="small"
                         value={product.price}
-                        onChange={(event) => handlePriceChange(event, product.product_id)}
-                        onKeyDown={(event) => handleSubmit(event, product.product_id)}
+                        onChange={(event) => handlePriceChange(event, product.seller_product_id)}
+                        onKeyDown={(event) => handleSubmit(event, product.seller_product_id)}
                         type="text"
                         variant="standard"
-                        
                         InputProps={{
                           disableUnderline: false,
                           style: { textAlign: 'center' },
                         }}
-                        sx={{ '& .MuiInput-underline:after': { borderBottomColor: 'primary.main' } }}
                       />
+                      {console.log(product)}
                     </td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.updatedAt}</td>
-                  <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.stock}</td>
-                  <tr key={product.product_id}>
-                    {/* Ürün detayları ve düzenle/sil menüsü */}
-                    <td style={{ border: '1px solid #ddd', padding: '8px', textAlign: 'center' }}>
-    <IconButton
-      aria-label="more"
-      aria-controls="long-menu"
-      aria-haspopup="true"
-      onClick={(event) => handleClick(event, product.product_id)}
-    >
-      <KeyboardArrowDownIcon />
-    </IconButton>
-    <Menu
-      id="long-menu"
-      anchorEl={anchorEl}
-      keepMounted
-      open={Boolean(anchorEl) && selectedProductId === product.product_id}
-      onClose={handleClose}
-    >
-      <MenuItem onClick={handleEdit}>Düzenle</MenuItem>
-      {product.is_active === 1 ? (
-        <MenuItem onClick={() => handleListStatusChange1(product.product_id, false)}>Listeden Kaldır</MenuItem>
-      ) : (
-        <MenuItem onClick={() => handleListStatusChange(product.product_id, true)}>Listele</MenuItem>
-      )}
-    </Menu>
-  </td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formatDate(product.updatedAt)}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.stock}</td>
+                    <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                      <Tooltip title="Daha Fazla">
+                        <IconButton onClick={(event) => handleClick(event, product.seller_product_id)}>
+                          <MoreVertIcon />
+                        </IconButton>
+                      </Tooltip>
+                      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
+                        <MenuItem onClick={handleEdit}>
+                          <EditIcon fontSize="small" /> Düzenle
+                        </MenuItem>
+                        <MenuItem onClick={() => handleListStatusChange(product.seller_product_id, !product.is_active)}>
+                          <DeleteIcon fontSize="small" /> {product.is_active ? 'Pasif Et' : 'Aktif Et'}
+                        </MenuItem>
+                      </Menu>
+                    </td>
                   </tr>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
           </Paper>
         )}
       </Container>
+      <Snackbar open={Boolean(successMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="success">
+          {successMessage}
+        </Alert>
+      </Snackbar>
+      <Snackbar open={Boolean(errorMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="error">
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+      <Backdrop open={updateLoading} style={{ zIndex: 9999 }}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
+        <DialogTitle>Ürünü Düzenle</DialogTitle>
+        <DialogContent>
+          {editProduct && (
+            <form>
+             
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Fiyat"
+                name="price"
+                value={editProduct.price}
+                onChange={handleEditChange}
+              />
+              <TextField
+                fullWidth
+                margin="normal"
+                label="Stok Adedi"
+                name="stock_quantity"
+                value={editProduct.stock}
+                onChange={handleEditChange}
+              />
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Aktiflik Durumu</InputLabel>
+                <Select
+                  name="is_active"
+                  value={editProduct.is_active}
+                  onChange={handleEditChange}
+                  native
+                >
+                  <option value={1}>Aktif</option>
+                  <option value={0}>Pasif</option>
+                </Select>
+              </FormControl>
+            </form>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditModal(false)}>İptal</Button>
+          <Button onClick={handleEditSubmit} color="primary">Kaydet</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }
 
 export default Products;
-
