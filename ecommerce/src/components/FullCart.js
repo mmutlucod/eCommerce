@@ -51,7 +51,7 @@ function FullCart() {
 
     return (
         <>
-            <div className="full-cart-container">
+            <div className="full-cart-container" style={{ marginBottom: '200px', marginTop: '25px' }}>
                 <div className='item-count'>
                     <div className='basket-text'>Sepetim ({totalQuantity} Ürün)</div>
                     <div className="clear-cart" onClick={() => dispatch(clearCartAPI())}>
