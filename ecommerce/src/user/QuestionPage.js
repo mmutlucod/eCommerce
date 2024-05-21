@@ -116,7 +116,7 @@ const QuestionsPage = () => {
                                         </ListItem>
                                     ))
                                 ) : (
-                                    <Typography marginLeft={'40%'} marginTop={'15px'} variant="h6">Henüz sorunuz yok.</Typography>
+                                    <Typography variant="h6">Henüz sorunuz yok.</Typography>
                                 )}
                             </List>
                         </Grid>

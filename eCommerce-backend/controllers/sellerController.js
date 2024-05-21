@@ -314,15 +314,7 @@ const createProduct = async (req, res) => {
             where:
             {
                 stock_code: req.body.stock_code
-            },
-            include: [
-                {
-                    model: Brand
-                },
-                {
-                    model: Category
-                }
-            ]
+            }
         })
 
         if (product) {
