@@ -128,6 +128,7 @@ const ProductAdd = () => {
                   <ProductNameTypography variant="subtitle1" noWrap>
                     {product.name}
                   </ProductNameTypography>
+                  {console.log(product)}
                 </Box>
                 <CustomTypography variant="h6" mt={1}>
                   {product.price ? `${product.price.toFixed(2)} ₺` : 'Fiyat Bilinmiyor'}
