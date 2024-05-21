@@ -96,6 +96,19 @@ const ProductAdd = () => {
     }
   };
 
+  const handleProductBind = async (productId) => {
+    setLoading(true);
+    try {
+      await api.post('/seller/create-seller-product', { product_id: productId });
+      setSuccessMessage('Ürün başarıyla satıcıya bağlandı.');
+    } catch (error) {
+      setErrorMessage('Ürün bağlanırken bir hata oluştu.');
+      console.error('Ürün bağlanırken bir hata oluştu:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCloseSnackbar = () => {
     setSuccessMessage('');
     setErrorMessage('');
@@ -124,18 +137,19 @@ const ProductAdd = () => {
             <CustomCard key={product.product_id}>
               <CustomCardContent>
                 <Box display="flex" justifyContent="start" alignItems="center">
-                  
+                  <CustomTypography variant="subtitle1" noWrap>
+                    {product.Brand.brand_name || 'Unknown Brand'}
+                  </CustomTypography>
                   <ProductNameTypography variant="subtitle1" noWrap>
                     {product.name}
                   </ProductNameTypography>
-                  {console.log(product)}
                 </Box>
                 <CustomTypography variant="h6" mt={1}>
-                  {product.price ? `${product.price.toFixed(2)} ₺` : 'Fiyat Bilinmiyor'}
+                  Stok Kodu: {product.stock_code }
                 </CustomTypography>
               </CustomCardContent>
               <CardActions>
-                <CustomButton size="medium" fullWidth>
+                <CustomButton size="medium" fullWidth onClick={() => handleProductBind(product.product_id)}>
                   Ürünü Bağla
                 </CustomButton>
               </CardActions>
