@@ -321,6 +321,7 @@ const createProduct = async (req, res) => {
         } else {
             await Product.create({
                 approval_status_id: 3,
+                max_buy: 5,
                 ...req.body,
             });
 
