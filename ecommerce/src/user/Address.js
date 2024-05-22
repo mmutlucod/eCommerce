@@ -158,7 +158,6 @@ const AddressesPage = () => {
                   Adres Bilgilerim
                 </Typography>
                 <Divider sx={{ my: 2 }} />
-                {console.log(addresses)}
                 {
                   addresses.length > 0 ? (
                     addresses.map((address, index) => (

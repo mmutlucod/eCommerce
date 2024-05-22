@@ -8,47 +8,47 @@ import {
   Button,
   Typography,
   Divider,
-  Switch,
-  FormControlLabel, Container, CssBaseline,
+  Container,
+  CssBaseline,
   ThemeProvider,
   createTheme
 } from '@mui/material';
 import Navbar from '../components/UserNavbar';
 import { renderMenuItems } from './RenderMenuItems';
-import api from '../api/api'; // API iletişimi sağlayan modülünüz
+import api from '../api/api';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#4B0082', // Navbar ve butonlar için mor renk
+      main: '#4B0082',
     },
     secondary: {
-      main: '#FFD700', // İkincil eylemler ve butonlar için sarı renk
+      main: '#FFD700',
     },
     background: {
-      default: '#f4f4f4', // Sayfanın arka plan rengi
+      default: '#f4f4f4',
     },
   },
   components: {
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)', // Kart gölgelendirme
+          boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          fontWeight: 'bold', // Buton yazı tipi kalınlığı
+          fontWeight: 'bold',
         },
       },
     },
   },
 });
+
 const UserProfile = () => {
   const [selectedItem, setSelectedItem] = useState('profile');
-  // Kullanıcı bilgileri ve şifre güncellemesi için state tanımlamaları
   const [userInfo, setUserInfo] = useState({
     name: '',
     surname: '',
@@ -60,13 +60,11 @@ const UserProfile = () => {
   });
 
   useEffect(() => {
-    // Kullanıcı bilgilerini API'den çekme
     const fetchUserInfo = async () => {
       try {
         const response = await api.get('/user/my-account');
-        // API'den dönen veri yapısına göre ayarlama yapın
         const { name, surname, email, phone } = response.data;
-        setUserInfo(userInfo => ({ ...userInfo, name, surname, email, phone }));
+        setUserInfo({ ...userInfo, name, surname, email, phone });
       } catch (error) {
         console.error('Profil bilgileri alınırken hata oluştu:', error);
       }
@@ -80,7 +78,6 @@ const UserProfile = () => {
     setUserInfo({ ...userInfo, [name]: value });
   };
 
-  // Güncelle butonunun onClick handler'ı
   const handleUpdate = async () => {
     try {
       const data = {
@@ -88,24 +85,17 @@ const UserProfile = () => {
         surname: userInfo.surname,
         email: userInfo.email,
         phone: userInfo.phone,
+        currentPassword: userInfo.currentPassword,
+        newPassword: userInfo.newPassword,
+        confirmPassword: userInfo.confirmPassword,
       };
-
-      if (userInfo.currentPassword && userInfo.newPassword && userInfo.confirmPassword) {
-        data.currentPassword = userInfo.currentPassword;
-        data.newPassword = userInfo.newPassword;
-        data.confirmPassword = userInfo.confirmPassword;
-      }
 
       const response = await api.put('/user/update-account', data);
 
       if (response.status === 200) {
-        // Profil güncellemesi başarılı, yeni token varsa onu saklayın
-        const newToken = response.data.token; // Örneğin backend yeni token döndürüyorsa
+        const newToken = response.data.token;
         if (newToken) {
-          // Token'ı güncelleyin
           localStorage.setItem('token', newToken);
-          // Veya cookie güncellemesi
-          // document.cookie = `authToken=${newToken}; path=/;`;
         }
         alert('Profil bilgileriniz başarıyla güncellendi.');
       } else {
@@ -117,75 +107,64 @@ const UserProfile = () => {
     }
   };
 
-
-
   return (
-    <>
-
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Navbar />
-        <Container maxWidth="lg" sx={{ mt: 8 }}>
-          <Grid container spacing={3} justifyContent="center">
-            <Grid item xs={12} md={3}>
-              <Paper elevation={0} square>
-                <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
-              </Paper>
-            </Grid>
-            <Box flex={1} sx={{ maxWidth: '750px', mx: 4 }}>
-              <Paper sx={{ p: 3 }}>
-                {/* Kullanıcı bilgileri formu */}
-                <Typography variant="h6" gutterBottom>
-                  Kullanıcı Bilgilerim
-                </Typography>
-                <Divider sx={{ my: 2 }} />
-                <Grid container spacing={2}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField label="Ad" fullWidth name="firstName" value={userInfo.name} onChange={handleChange} />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField label="Soyad" fullWidth name="lastName" value={userInfo.surname} onChange={handleChange} />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField label="E-Mail" fullWidth name="email" value={userInfo.email} onChange={handleChange} />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField label="Cep Telefonu" fullWidth name="phone" value={userInfo.phone} onChange={handleChange} />
-                  </Grid>
-                </Grid>
-
-                {/* Şifre güncelleme formu */}
-                <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-                  Şifre Güncelleme
-                </Typography>
-                <Divider sx={{ my: 2 }} />
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField label="Şu Anki Şifre" type="password" fullWidth name="currentPassword" value={userInfo.currentPassword} onChange={handleChange} />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField label="Yeni Şifre" type="password" fullWidth name="newPassword" value={userInfo.newPassword} onChange={handleChange} />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField label="Yeni Şifre (Tekrar)" type="password" fullWidth name="confirmPassword" value={userInfo.confirmPassword} onChange={handleChange} />
-                  </Grid>
-                </Grid>
-
-                {/* İki adımlı doğrulama */}
-                {/* Bu kısım API'nizde destekleniyorsa güncellenebilir */}
-                {/* <FormControlLabel control={<Switch name="twoFactorAuth" />} label="İki adımlı doğrulama" sx={{ mt: 2 }} /> */}
-
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
-                  <Button variant="contained" color="primary" onClick={handleUpdate}>
-                    Güncelle
-                  </Button>
-                </Box>
-              </Paper>
-            </Box>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Navbar />
+      <Container maxWidth="lg" sx={{ mt: 8 }}>
+        <Grid container spacing={3} justifyContent="center">
+          <Grid item xs={12} md={3}>
+            <Paper elevation={0} square>
+              <List>{renderMenuItems(selectedItem, setSelectedItem)}</List>
+            </Paper>
           </Grid>
-        </Container>
-      </ThemeProvider>
-    </>
+          <Box flex={1} sx={{ maxWidth: '750px', mx: 4 }}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" gutterBottom>
+                Kullanıcı Bilgilerim
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              {console.log(userInfo)}
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField label="Ad" fullWidth name="name" value={userInfo.name} onChange={handleChange} />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField label="Soyad" fullWidth name="surname" value={userInfo.surname} onChange={handleChange} />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField label="E-Mail" fullWidth name="email" value={userInfo.email} onChange={handleChange} />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField label="Cep Telefonu" fullWidth name="phone" value={userInfo.phone} onChange={handleChange} />
+                </Grid>
+              </Grid>
+
+              <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
+                Şifre Güncelleme
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <Grid container spacing={2}>
+                <Grid item xs={12}>
+                  <TextField label="Şu Anki Şifre" type="password" fullWidth name="currentPassword" value={userInfo.currentPassword} onChange={handleChange} />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField label="Yeni Şifre" type="password" fullWidth name="newPassword" value={userInfo.newPassword} onChange={handleChange} />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField label="Yeni Şifre (Tekrar)" type="password" fullWidth name="confirmPassword" value={userInfo.confirmPassword} onChange={handleChange} />
+                </Grid>
+              </Grid>
+              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                <Button variant="contained" color="primary" onClick={handleUpdate}>
+                  Güncelle
+                </Button>
+              </Box>
+            </Paper>
+          </Box>
+        </Grid>
+      </Container>
+    </ThemeProvider>
   );
 };
 

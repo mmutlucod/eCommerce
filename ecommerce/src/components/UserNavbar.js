@@ -1,24 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Badge } from '@mui/material';
+import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Badge, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import MailIcon from '@mui/icons-material/Mail';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import CardGiftcardIcon from '@mui/icons-material/CardGiftcard';
+import GradeIcon from '@mui/icons-material/Grade';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchModal from './SearchModal';
 import CartDropdown from './CartDropdown';
 import api from '../api/api';
 import { Link } from 'react-router-dom';
+import '../styles/UserNavbar.css'; // CSS dosyamız
 
 export default function UserNavbar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { token, logout } = useAuth();
+    const { token, logout, user } = useAuth();
     const [isSearchModalOpen, setSearchModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
     const [cartItems, setCartItems] = useState([]);
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const searchInputRef = useRef(null);
     const [searchWidth, setSearchWidth] = useState(0);
     const [searchLeftMargin, setSearchLeftMargin] = useState(0);
@@ -37,7 +46,7 @@ export default function UserNavbar() {
 
     useEffect(() => {
         fetchCartItems();
-        const interval = setInterval(fetchCartItems, 100); // Her 60 saniyede bir sepet öğelerini günceller
+        const interval = setInterval(fetchCartItems, 60000); // Her 60 saniyede bir sepet öğelerini günceller
 
         return () => clearInterval(interval); // Component unmount edildiğinde interval'i temizler
     }, []);
@@ -86,6 +95,14 @@ export default function UserNavbar() {
         }
     }, []);
 
+    const handleProfileMenuOpen = () => {
+        setProfileMenuOpen(true);
+    };
+
+    const handleProfileMenuClose = () => {
+        setProfileMenuOpen(false);
+    };
+
     return (
         <AppBar position="static" sx={{ backgroundColor: '#4B0082', paddingY: '8px' }}>
             <Toolbar sx={{ justifyContent: 'space-evenly', alignItems: 'center' }}>
@@ -121,32 +138,90 @@ export default function UserNavbar() {
                 </Box>
                 <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
-                    <IconButton color="inherit" onClick={() => navigate('/adres-ekle')}>
-                        <LocationOnIcon />
+                    <IconButton color="inherit" onClick={() => navigate('/favorilerim')}>
+                        <FavoriteIcon />
                     </IconButton>
                     <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
-                        Teslimat Adresi Ekle
+                        Favorilerim
                     </Typography>
                     <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
-                    <IconButton color="inherit" onClick={() => navigate('/profilim')}>
-                        <PersonOutlineIcon />
-                    </IconButton>
-                    {token ? (
-                        <>
-                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
-                                Profilim
-                            </Typography>
-                        </>
-                    ) : (
-                        <>
-                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/kayit-ol')}>
-                                Üye Ol
-                            </Typography>
-                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/giris-yap')}>
-                                Giriş Yap
-                            </Typography>
-                        </>
-                    )}
+                    <Box
+                        onMouseEnter={handleProfileMenuOpen}
+                        onMouseLeave={handleProfileMenuClose}
+                        className="profile-menu-container"
+                        sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}
+                    >
+                        <IconButton color="inherit">
+                            <PersonOutlineIcon />
+                        </IconButton>
+                        <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+                            Profilim
+                        </Typography>
+                        {profileMenuOpen && (
+                            <Box className="profile-menu" onMouseEnter={handleProfileMenuOpen} onMouseLeave={handleProfileMenuClose}>
+                                <Typography variant="subtitle1" sx={{ p: 2, fontWeight: 'bold', color: '#4B0082' }}>
+                                    {user.name}
+                                </Typography>
+                                <Divider />
+                                <MenuItem onClick={() => navigate('/siparislerim')}>
+                                    <ListItemIcon>
+                                        <AssignmentIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Tüm Siparişlerim" />
+                                </MenuItem>
+                                <MenuItem onClick={() => navigate('/degerlendirmelerim')}>
+                                    <ListItemIcon>
+                                        <GradeIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Değerlendirmelerim" />
+                                </MenuItem>
+                                <MenuItem onClick={() => navigate('/satci-mesajlarim')}>
+                                    <ListItemIcon>
+                                        <MailIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Satıcı Mesajlarım" />
+                                </MenuItem>
+                                <MenuItem onClick={() => navigate('/sansli-cekilis')}>
+                                    <ListItemIcon>
+                                        <EmojiEventsIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Şanslı Çekiliş" />
+                                    <Typography variant="caption" color="error" sx={{ ml: 1 }}>YENİ</Typography>
+                                </MenuItem>
+                                <MenuItem onClick={() => navigate('/indirim-kuponlarim')}>
+                                    <ListItemIcon>
+                                        <CardGiftcardIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="İndirim Kuponlarım" />
+                                </MenuItem>
+                                <MenuItem onClick={() => navigate('/profilim')}>
+                                    <ListItemIcon>
+                                        <PersonOutlineIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Kullanıcı Bilgilerim" />
+                                </MenuItem>
+                                <MenuItem onClick={() => navigate('/trendoy-elite')}>
+                                    <ListItemIcon>
+                                        <GradeIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Trendyol Elite" />
+                                </MenuItem>
+                                <MenuItem onClick={() => navigate('/trendoy-asistan')}>
+                                    <ListItemIcon>
+                                        <PersonOutlineIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Trendyol Asistan" />
+                                </MenuItem>
+                                <Divider />
+                                <MenuItem onClick={logout}>
+                                    <ListItemIcon>
+                                        <ExitToAppIcon fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Çıkış Yap" />
+                                </MenuItem>
+                            </Box>
+                        )}
+                    </Box>
                     <IconButton
                         color="inherit"
                         onMouseEnter={() => setCartDropdownOpen(true)}
