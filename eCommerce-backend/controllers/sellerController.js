@@ -310,29 +310,27 @@ const searchAllProducts = async (req, res) => {
 };
 const createProduct = async (req, res) => {
     try {
-
-        const product = Product.findOne({
-            where:
-            {
+        const product = await Product.findOne({
+            where: {
                 stock_code: req.body.stock_code
             }
-        })
+        });
 
         if (product) {
-            return res.status(404).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
+            res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
+        } else {
+            await Product.create({
+                approval_status_id: 3,
+                ...req.body,
+            });
+
+            res.status(200).json({ success: true, message: 'Ürün sisteme eklendi.' });
         }
-
-        await Product.create({
-            approval_status_id: 3,
-            ...req.body,
-        })
-
-        return res.status(200).json({ success: true, message: 'Ürün sisteme eklendi.' });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
-    catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
-    }
-}
+};
+
 // MARKA
 const getAllBrands = async (req, res) => {
     try {
