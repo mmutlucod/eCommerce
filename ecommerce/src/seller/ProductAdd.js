@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 import SellerNavbar from '../components/SellerNavbar';
 import api from '../api/api';
 
@@ -76,6 +77,7 @@ const ProductAdd = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const navigate = useNavigate();
 
   const handleSearchChange = async (event) => {
     const { value } = event.target;
@@ -114,6 +116,10 @@ const ProductAdd = () => {
     setErrorMessage('');
   };
 
+  const handleAddProductClick = () => {
+    navigate('/urun-ekle');
+  };
+
   return (
     <>
       <SellerNavbar />
@@ -133,7 +139,18 @@ const ProductAdd = () => {
           {loading && <CircularProgress />}
         </Paper>
         <Box display="flex" flexWrap="wrap" justifyContent="center" padding="0 8px" gap={2}>
-          {searchResults.map((product) => (
+          {searchQuery.length > 2 && searchResults.length === 0 && !loading && (
+            <Button
+              variant="contained"
+              color="warning"
+              size="large"
+              onClick={handleAddProductClick}
+              style={{ marginTop: '20px' }}
+            >
+              Aradığınız ürün yoksa ekleme yapabilirsiniz
+            </Button>
+          )}
+          {searchResults.length > 0 && searchResults.map((product) => (
             <CustomCard key={product.product_id}>
               <CustomCardContent>
                 <Box display="flex" justifyContent="start" alignItems="center">
@@ -145,7 +162,7 @@ const ProductAdd = () => {
                   </ProductNameTypography>
                 </Box>
                 <CustomTypography variant="h6" mt={1}>
-                  Stok Kodu: {product.stock_code }
+                  Stok Kodu: {product.stock_code}
                 </CustomTypography>
               </CustomCardContent>
               <CardActions>

@@ -21,6 +21,7 @@ import SellerMainPage from './seller/MainPage';
 import SellerAdd from './seller/SellerAdd';
 import SellerProduct from './seller/Product';
 import SellerProductAdd from './seller/ProductAdd';
+import SellerSellerProductAdd from './seller/SellerProductAdd';
 
 
 import UserLogin from './user/Login';
@@ -78,6 +79,7 @@ function App() {
             <Route path="/seller/seller-add" element={<SellerAdd />} />
             <Route path="/seller/product" element={<SellerProduct />} />
             <Route path="/seller/urun-ekle" element={<SellerProductAdd />} />
+            <Route path="/urun-ekle" element={<SellerSellerProductAdd />} />
 
 
 
@@ -98,6 +100,7 @@ function App() {
             <Route path="kategori/:categorySlug" element={<UserCategorySearch />} />
             <Route path="/arama/:query" element={<UserSearchProducts />} />
             <Route path="/satici/:sellerSlug" element={<UserSellerPage />} />
+            
           </Routes>
         </Router>
 

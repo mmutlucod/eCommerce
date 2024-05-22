@@ -274,7 +274,7 @@ function Products() {
                 fullWidth
                 margin="normal"
                 label="Stok Adedi"
-                name="stock_quantity"
+                name="stock"
                 value={editProduct.stock}
                 onChange={handleEditChange}
               />
