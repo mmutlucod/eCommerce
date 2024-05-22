@@ -1,0 +1,39 @@
+.profile-menu-container {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: 250px; /* Menü genişliği */
+}
+
+.profile-menu .MuiMenuItem-root {
+    padding: 10px 20px;
+    color: #4B0082;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+}
+
+.profile-menu .MuiMenuItem-root:hover {
+    background-color: #f0f0f0;
+}
+
+.profile-menu .MuiDivider-root {
+    margin: 0 10px;
+}
+
+.profile-menu .MuiTypography-root {
+    font-weight: bold;
+    padding: 10px 20px;
+    color: #4B0082;
+}

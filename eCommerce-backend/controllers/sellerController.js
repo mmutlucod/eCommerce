@@ -319,7 +319,7 @@ const createProduct = async (req, res) => {
         })
 
         if (product) {
-            res.status(404).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
+            return res.status(404).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
         }
 
         await Product.create({
@@ -327,10 +327,10 @@ const createProduct = async (req, res) => {
             ...req.body,
         })
 
-        res.status(200).json({ success: true, message: 'Ürün sisteme eklendi.' });
+        return res.status(200).json({ success: true, message: 'Ürün sisteme eklendi.' });
     }
     catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 }
 // MARKA

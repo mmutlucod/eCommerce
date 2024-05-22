@@ -15,9 +15,8 @@ import QuestionIcon from '@mui/icons-material/QuestionAnswer';
 const menuItems = [
   { id: 'orders', label: 'Siparişlerim', icon: <ShoppingCartIcon />, link: "/siparislerim" },
   { id: 'profile', label: 'Kullanıcı Bilgileri', icon: <PersonOutlineIcon />, link: "/profilim" },
-  { id: 'address-info', label: 'Adres Bilgilerim', icon: <HomeWorkIcon />, link: "/adreslerim" },
+  { id: 'addresses', label: 'Adres Bilgilerim', icon: <HomeWorkIcon />, link: "/adreslerim" },
   { id: 'favorites', label: 'Favorilerim', icon: <StarBorderIcon />, link: "/favorilerim" },
-  // { id: 'card-preferences', label: 'Kayıtlı Kartlarım', icon: <CreditCardIcon />, link: "/kayitli-kartlarim" },
   { id: 'questions', label: 'Sorularım', icon: < QuestionIcon />, link: "/sorularim" },
   { id: 'reviews', label: 'Değerlendirmelerim', icon: <StarBorderIcon />, link: "/degerlendirmelerim" },
 ];
