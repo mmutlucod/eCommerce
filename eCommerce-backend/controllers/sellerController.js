@@ -317,7 +317,7 @@ const createProduct = async (req, res) => {
         });
 
         if (product) {
-            res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
+            res.status(404).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
         } else {
             await Product.create({
                 approval_status_id: 3,
