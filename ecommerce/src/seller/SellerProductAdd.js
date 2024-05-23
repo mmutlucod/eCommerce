@@ -16,6 +16,8 @@ import {
 import MuiAlert from '@mui/material/Alert';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import SellerNavbar from '../components/SellerNavbar';
 import api from '../api/api';
 
@@ -60,8 +62,6 @@ const ProductAdd = () => {
     brand_id: '',
     description: '',
     stock_code: '',
-  
-   
     category_id: '',
   });
   const [loading, setLoading] = useState(false);
@@ -89,6 +89,11 @@ const ProductAdd = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleEditorChange = (event, editor) => {
+    const data = editor.getData();
+    setFormData({ ...formData, description: data });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -106,7 +111,6 @@ const ProductAdd = () => {
       setLoading(false);
     }
   };
-  
 
   const handleCloseSnackbar = () => {
     setSuccessMessage('');
@@ -182,14 +186,16 @@ const ProductAdd = () => {
               onChange={handleChange}
               required
             />
-            <CustomTextField
-              fullWidth
-              margin="normal"
-              label="Açıklama"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-            />
+            <Box margin="normal">
+              <Typography variant="body1" gutterBottom>
+                Açıklama
+              </Typography>
+              <CKEditor
+                editor={ClassicEditor}
+                data={formData.description}
+                onChange={handleEditorChange}
+              />
+            </Box>
             <Box display="flex" justifyContent="center" marginTop="20px">
               <CustomButton type="submit" variant="contained" disabled={loading}>
                 {loading ? <CircularProgress size={24} /> : 'Ürün Ekle'}

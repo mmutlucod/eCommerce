@@ -22,7 +22,7 @@ import SellerAdd from './seller/SellerAdd';
 import SellerProduct from './seller/Product';
 import SellerProductAdd from './seller/ProductAdd';
 import SellerSellerProductAdd from './seller/SellerProductAdd';
-
+import SellerOrders from './seller/Orders';
 
 import UserLogin from './user/Login';
 import UserMainPage from './user/MainPage';
@@ -80,7 +80,7 @@ function App() {
             <Route path="/seller/product" element={<SellerProduct />} />
             <Route path="/seller/urun-ekle" element={<SellerProductAdd />} />
             <Route path="/urun-ekle" element={<SellerSellerProductAdd />} />
-
+            <Route path="/seller/orders" element={<SellerOrders/>} />
 
 
             <Route path="/anasayfa" element={< UserMainPage />} />
