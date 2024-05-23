@@ -693,9 +693,9 @@ const getQuestions = async (req, res) => {
 const answerQuestion = async (req, res) => {
     try {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
-        if (seller) {
-            res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
-        }
+        // if (seller) {
+        //    return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+        // }
 
         const { questionId } = req.params;
 
