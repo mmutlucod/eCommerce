@@ -643,7 +643,7 @@ const updateShippingCodeOrderItem = async (req, res) => {
         await OrderItem.update(
             {
                 shipping_code: shippingCode,
-                order_status_id: 2
+                order_status_id: 3
             },
             { where: { order_item_id: id } }
         );
