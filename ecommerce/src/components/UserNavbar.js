@@ -156,10 +156,10 @@ export default function UserNavbar() {
                         className="profile-menu-container"
                         sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}
                     >
-                        <IconButton color="inherit">
+                        <IconButton color="inherit" onClick={() => navigate('../profilim')}>
                             <PersonOutlineIcon />
                         </IconButton>
-                        <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+                        <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('../profilim')}>
                             Profilim
                         </Typography>
                         {profileMenuOpen && (
@@ -170,29 +170,34 @@ export default function UserNavbar() {
                                     </Typography>
                                 ) : (
                                     <Typography variant="body2" className="profile-menu-user" sx={{ fontWeight: 'bold', color: '#4B0082' }}>
-                                        Kullanıcı
+
                                     </Typography>
                                 )}
                                 <Divider />
-                                <MenuItem onClick={() => navigate('/profilim')} className="profile-menu-item">
-                                    <ListItemIcon sx={{ minWidth: '30px' }}>
-                                        <PersonOutlineIcon fontSize="small" />
-                                    </ListItemIcon>
-                                    <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Hesabım" />
-                                </MenuItem>
-                                <MenuItem onClick={() => navigate('/siparislerim')} className="profile-menu-item">
-                                    <ListItemIcon sx={{ minWidth: '30px' }}>
-                                        <AssignmentIcon fontSize="small" />
-                                    </ListItemIcon>
-                                    <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Siparişlerim" />
-                                </MenuItem>
-                                <MenuItem onClick={() => navigate('/sorularim')} className="profile-menu-item">
-                                    <ListItemIcon sx={{ minWidth: '30px' }}>
-                                        <GradeIcon fontSize="small" />
-                                    </ListItemIcon>
-                                    <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Sorularım" />
-                                </MenuItem>
-
+                                <Link to={'/profilim'} style={{ textDecoration: 'none' }}>
+                                    <MenuItem className="profile-menu-item">
+                                        <ListItemIcon sx={{ minWidth: '30px' }}>
+                                            <PersonOutlineIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Hesabım" />
+                                    </MenuItem>
+                                </Link>
+                                <Link to={'/siparislerim'} style={{ textDecoration: 'none' }}>
+                                    <MenuItem className="profile-menu-item">
+                                        <ListItemIcon sx={{ minWidth: '30px' }}>
+                                            <AssignmentIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Siparişlerim" />
+                                    </MenuItem>
+                                </Link>
+                                <Link to={'/sorularim'} style={{ textDecoration: 'none' }}>
+                                    <MenuItem className="profile-menu-item">
+                                        <ListItemIcon sx={{ minWidth: '30px' }}>
+                                            <GradeIcon fontSize="small" />
+                                        </ListItemIcon>
+                                        <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Sorularım" />
+                                    </MenuItem>
+                                </Link>
                                 <Divider />
                                 <MenuItem onClick={logout} className="profile-menu-item">
                                     <ListItemIcon sx={{ minWidth: '30px' }}>
@@ -207,7 +212,7 @@ export default function UserNavbar() {
                     <IconButton color="inherit" onClick={() => navigate('/favorilerim')}>
                         <FavoriteIcon />
                     </IconButton>
-                    <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+                    <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/favorilerim')}>
                         Favorilerim
                     </Typography>
                     <IconButton

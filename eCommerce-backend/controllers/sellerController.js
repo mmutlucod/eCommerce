@@ -515,8 +515,7 @@ const getSellerOrders = async (req, res) => {
                 },
                 {
                     model: OrderStatus,
-                    attributes: ['status_name'],
-                    required: false
+                    attributes: ['status_name']
                 }
             ],
         });
