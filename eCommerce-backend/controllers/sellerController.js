@@ -657,7 +657,6 @@ const updateShippingCodeOrderItem = async (req, res) => {
 }
 const updateOrderStatus = async (req, res) => {
     const { id } = req.params;
-    const { newStatusId } = req.body;
 
     try {
         // Öncelikle, güncellenecek OrderItem'ı bul
@@ -674,9 +673,8 @@ const updateOrderStatus = async (req, res) => {
         }
 
         // OrderItem için order_status_id alanını güncelle
-        await OrderItem.update(
-            { order_status_id: newStatusId },
-            { where: { order_item_id: id } }
+        await orderItem.update(
+            { order_status_id: 4 }
         );
 
         return res.status(200).json({ success: true, message: 'Order status updated successfully.' });

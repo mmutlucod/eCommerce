@@ -34,6 +34,7 @@ router.patch('/update-order-status/:id', authMiddleware, sellerController.update
 router.get('/seller-orders', authMiddleware, sellerController.getSellerOrders);
 router.get('/orders/:orderStatusId', authMiddleware, sellerController.getSellerOrdersByStatusId);
 router.post('/update-shipping-code/:id', authMiddleware, sellerController.updateShippingCodeOrderItem);
+router.post('/complete-order/:id', authMiddleware, sellerController.updateOrderStatus);
 router.post('/cancel-order-item', authMiddleware, sellerController.cancelOrderItemQuantity);
 
 router.get('/my-questions', authMiddleware, sellerController.getQuestions);
