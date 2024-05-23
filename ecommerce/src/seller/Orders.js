@@ -35,6 +35,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [open, setOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [shippingCode, setShippingCode] = useState('');
@@ -57,6 +58,7 @@ const Orders = () => {
 
   const handleCloseSnackbar = () => {
     setErrorMessage('');
+    setSuccessMessage('');
   };
 
   const handleOpenDialog = (order) => {
@@ -84,6 +86,19 @@ const Orders = () => {
     } catch (error) {
       setErrorMessage('Kargo kodu güncellenirken bir hata oluştu.');
       console.error('Kargo kodu güncellenirken bir hata oluştu:', error);
+    }
+  };
+
+  const handleCompleteOrder = async (order) => {
+    try {
+      await api.post(`seller/complete-order/${order.order_item_id}`);
+      setOrders((prevOrders) => prevOrders.map((o) => 
+        o.order_item_id === order.order_item_id ? { ...o, orderStatus: { status_name: 'Tamamlandı' } } : o
+      ));
+      setSuccessMessage('Sipariş başarıyla tamamlandı.');
+    } catch (error) {
+      setErrorMessage('Sipariş tamamlanırken bir hata oluştu.');
+      console.error('Sipariş tamamlanırken bir hata oluştu:', error);
     }
   };
 
@@ -126,7 +141,12 @@ const Orders = () => {
                       <TableCell>{order.shipping_code ? order.shipping_code : 'Kargo kodu yok'}</TableCell>
                       <TableCell>
                         {order.shipping_code ? (
-                          <CheckCircleIcon style={{ color: 'green' }} />
+                          <IconButton
+                            aria-label="complete"
+                            onClick={() => handleCompleteOrder(order)}
+                          >
+                            <CheckCircleIcon style={{ color: 'green' }} />
+                          </IconButton>
                         ) : (
                           <IconButton
                             aria-label="shipping"
@@ -168,9 +188,9 @@ const Orders = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar open={Boolean(errorMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity="error">
-          {errorMessage}
+      <Snackbar open={Boolean(errorMessage) || Boolean(successMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={errorMessage ? "error" : "success"}>
+          {errorMessage || successMessage}
         </Alert>
       </Snackbar>
     </>
