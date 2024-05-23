@@ -154,7 +154,7 @@ const ProductPage = () => {
               </Grid>
             </Grid>
           </Paper>
-          {product && <ProductTabs product={product} />}
+          {product && <ProductTabs product={product} sellerProductId={product.seller_product_id} />}
         </Grid>
         <Footer />
         <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert}>

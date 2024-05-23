@@ -5,17 +5,29 @@ import {
 } from '@mui/material';
 import api from '../api/api';
 
-function QuestionsTab({ productId }) {
+function QuestionsTab({ productId, seller }) {
   const [questions, setQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState('');
   const [openModal, setOpenModal] = useState(false);
   const [showCriteria, setShowCriteria] = useState(false);
-  const [sellerId, setSellerId] = useState(null); // sellerId için state
   const [userId, setUserId] = useState(null); // userId için state
   const [isPublic, setIsPublic] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Snackbar türü için state
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const response = await api.get('/user/my-account');
+        setUserId(response.data.user_id);
+      } catch (error) {
+        console.error('Kullanıcı ID\'si alınırken hata oluştu:', error);
+      }
+    };
+
+    fetchUserId();
+  }, []);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -31,8 +43,6 @@ function QuestionsTab({ productId }) {
             userId: question.user_id,
             sellerId: question.seller_id
           })));
-          setSellerId(response.data[0].seller_id);
-          setUserId(response.data[0].user_id);
         }
       } catch (error) {
         console.error('Soruları getirirken hata oluştu:', error);
@@ -75,15 +85,14 @@ function QuestionsTab({ productId }) {
     try {
       const payload = {
         product_id: productId,
-        seller_id: sellerId,
-        user_id: userId,
+        seller_id: seller.seller_id,
+        user_id: userId, // userId burada kullanılıyor
         question: newQuestion,
         date_asked: new Date(),
         is_public: isPublic
       };
 
       const response = await api.post('user/create-product-question', payload);
-      console.log('API Response:', response);
       if (response.status === 200 || response.status === 201) {
         setNewQuestion('');
         setSnackbarMessage('Sorunuz başarıyla gönderildi. Sorularınız sayfasından süreci takip edebilirsiniz.');
@@ -218,7 +227,6 @@ function QuestionsTab({ productId }) {
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#f27a1a' }}>
                 Soru: {question.questionContent}
               </Typography>
-              {console.log(question)}
               <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
                 Sorulduğu Tarih: {new Date(question.dateAsked).toLocaleDateString()}
               </Typography>
@@ -233,8 +241,8 @@ function QuestionsTab({ productId }) {
                 </Paper>
               )}
               {!question.answerContent && (
-                <Typography variant="body2" sx={{ mt: 2, color: 'gray' }}>
-                  Cevap bekleniyor...
+                <Typography variant="body1" sx={{ mt: 2 }}>
+                  Bu soru henüz cevaplanmamıştır.
                 </Typography>
               )}
             </Paper>

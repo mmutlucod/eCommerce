@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Typography, Paper, Button, Avatar, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Link, AppBar, Tabs, Tab, Alert } from '@mui/material';
+import { Box, Typography, Paper, Button, Avatar, Table, TableBody, TableCell, TableContainer, TableRow, Link, AppBar, Tabs, Tab, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import StarIcon from '@mui/icons-material/Star';
 import { useDispatch, useSelector } from 'react-redux';
@@ -56,7 +56,6 @@ function OtherSellersTab({ product }) {
         setReviews(reviewsResponse.data);
 
         const questionsResponse = await api.get(`/user/products/${product.product.product_id}/answered-questions/`);
-        console.log('console:' + questionsResponse)
         setQuestions(questionsResponse.data);
       } catch (err) {
         console.error('API error: ', err);
@@ -152,7 +151,7 @@ function OtherSellersTab({ product }) {
         <ReviewsTab productId={product.product.product_id} reviews={reviews} />
       </TabPanel>
       <TabPanel value={tabValue} index={2}>
-        <QuestionsTab productId={product.product.product_id} questions={questions} />
+        <QuestionsTab productId={product.product.product_id} questions={questions} seller={product} />
       </TabPanel>
       <TabPanel value={tabValue} index={3}>
         <Box sx={{ p: 2 }}>
