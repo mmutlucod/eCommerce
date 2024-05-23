@@ -121,7 +121,6 @@ router.get('/sellerProducts/:productId/:sellerProductId', authOptionalMiddleware
 //Diğer satıcılar
 
 
-
 router.get('/sellerInfo/:sellerSlug', authOptionalMiddleware, userController.getSellerInfo);
 router.get('/category/:categorySlug', authOptionalMiddleware, userController.getProductsByCategorySlug);
 router.get('/brand/:brandSlug', authOptionalMiddleware, userController.getProductsByBrandSlug);

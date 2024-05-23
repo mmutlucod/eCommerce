@@ -33,6 +33,8 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const ProductPage = () => {
   const { productSlug } = useParams();
+  const queryParams = new URLSearchParams(window.location.search);
+  const sellerSlug = queryParams.get('mg'); // 'mg' parametresini al
   const [product, setProduct] = useState(null);
   const [sellers, setSellers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +57,10 @@ const ProductPage = () => {
       }
 
       try {
-        const sellersResponse = await api.get(`user/products/${productSlug}`);
+        const sellersResponse = sellerSlug
+          ? await api.get(`/user/products/${productSlug}?mg=${sellerSlug}`) // Satıcıya göre filtrele
+          : await api.get(`/user/product/${productSlug}`);
+        console.log(sellersResponse.data)
         setSellers(sellersResponse.data.sellers);
       } catch (err) {
         setError('Satıcı bilgileri yüklenirken bir hata oluştu: ' + err.message);
@@ -65,7 +70,7 @@ const ProductPage = () => {
     };
 
     fetchProductAndSellers();
-  }, [productSlug]);
+  }, [productSlug, sellerSlug]);
 
   const handleAddToCart = useCallback((product) => {
     console.log('Adding to cart:', product);
