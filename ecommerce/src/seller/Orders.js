@@ -23,6 +23,7 @@ import {
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import SellerNavbar from '../components/SellerNavbar';
 import api from '../api/api';
 
@@ -75,102 +76,105 @@ const Orders = () => {
 
   const handleSaveShippingCode = async () => {
     try {
-      await api.post(`seller/update-shipping-code/${selectedOrder.order_id}`, { shippingCode });
+      await api.post(`seller/update-shipping-code/${selectedOrder.order_item_id}`, { shippingCode });
       setOrders((prevOrders) => prevOrders.map((order) => 
-        order.order_id === selectedOrder.order_id ? { ...order, shipping_code: shippingCode } : order
+        order.order_item_id === selectedOrder.order_item_id ? { ...order, shipping_code: shippingCode } : order
       ));
       handleCloseDialog();
     } catch (error) {
-      setErrorMessage('Kargo kodu güncellenirken birhata oluştu.');
+      setErrorMessage('Kargo kodu güncellenirken bir hata oluştu.');
       console.error('Kargo kodu güncellenirken bir hata oluştu:', error);
-      }
-      };
-      
-      return (
-      <>
+    }
+  };
+
+  return (
+    <>
       <SellerNavbar />
       <Container maxWidth="md" style={{ marginTop: '20px', marginBottom: '20px' }}>
-      <Paper elevation={3} style={{ padding: '20px' }}>
-      <Typography variant="h5" gutterBottom>
-      Siparişler
-      </Typography>
-      {loading ? (
-      <Box display="flex" justifyContent="center" marginTop="20px">
-      <CircularProgress />
-      </Box>
-      ) : (
-      <TableContainer component={Paper}>
-      <Table>
-      <TableHead>
-      <TableRow>
-      <TableCell>Sipariş ID</TableCell>
-      <TableCell>Ürün Adı</TableCell>
-      <TableCell>Marka</TableCell>
-      <TableCell>Fiyat</TableCell>
-      <TableCell>Adet</TableCell>
-      <TableCell>Sipariş Durumu</TableCell>
-      <TableCell>Kargo Kodu</TableCell>
-      <TableCell>İşlemler</TableCell>
-      </TableRow>
-      </TableHead>
-      <TableBody>
-      {orders.map((order) => (
-      <TableRow key={order.order_id}>
-      <TableCell>{order.order_order_id}</TableCell>
-      <TableCell>{order.sellerProduct.product.name}</TableCell>
-      {console.log(order)}
-      <TableCell>{order.sellerProduct.product.Brand.brand_name}</TableCell>
-      <TableCell>{order.sellerProduct.price}</TableCell>
-      <TableCell>{order.quantity}</TableCell>
-      <TableCell>{order.orderStatus ? order.orderStatus.status_name : 'Durum Bilinmiyor'}</TableCell>
-      <TableCell>{order.shipping_code ? order.shipping_code : 'Kargo kodu yok'}</TableCell>
-      <TableCell>
-      <IconButton
-      aria-label="shipping"
-      onClick={() => handleOpenDialog(order)}
-      >
-      <LocalShippingIcon />
-      </IconButton>
-      </TableCell>
-      </TableRow>
-      ))}
-      </TableBody>
-      </Table>
-      </TableContainer>
-      )}
-      </Paper>
+        <Paper elevation={3} style={{ padding: '20px' }}>
+          <Typography variant="h5" gutterBottom>
+            Siparişler
+          </Typography>
+          {loading ? (
+            <Box display="flex" justifyContent="center" marginTop="20px">
+              <CircularProgress />
+            </Box>
+          ) : (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Sipariş ID</TableCell>
+                    <TableCell>Ürün Adı</TableCell>
+                    <TableCell>Marka</TableCell>
+                    <TableCell>Fiyat</TableCell>
+                    <TableCell>Adet</TableCell>
+                    <TableCell>Sipariş Durumu</TableCell>
+                    <TableCell>Kargo Kodu</TableCell>
+                    <TableCell>İşlemler</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {orders.map((order) => (
+                    <TableRow key={order.order_item_id}>
+                      <TableCell>{order.order_item_id}</TableCell>
+                      <TableCell>{order.sellerProduct.product.name}</TableCell>
+                      <TableCell>{order.sellerProduct.product.Brand.brand_name}</TableCell>
+                      <TableCell>{order.sellerProduct.price}</TableCell>
+                      <TableCell>{order.quantity}</TableCell>
+                      <TableCell>{order.orderStatus ? order.orderStatus.status_name : 'Durum Bilinmiyor'}</TableCell>
+                      <TableCell>{order.shipping_code ? order.shipping_code : 'Kargo kodu yok'}</TableCell>
+                      <TableCell>
+                        {order.shipping_code ? (
+                          <CheckCircleIcon style={{ color: 'green' }} />
+                        ) : (
+                          <IconButton
+                            aria-label="shipping"
+                            onClick={() => handleOpenDialog(order)}
+                          >
+                            <LocalShippingIcon />
+                          </IconButton>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </Paper>
       </Container>
       <Dialog open={open} onClose={handleCloseDialog}>
-      <DialogTitle>Kargo Kodu Ekle</DialogTitle>
-      <DialogContent>
-      <DialogContentText>
-      Sipariş için kargo kodunu giriniz:
-      </DialogContentText>
-      <TextField
-               autoFocus
-               margin="dense"
-               label="Kargo Kodu"
-               fullWidth
-               value={shippingCode}
-               onChange={handleShippingCodeChange}
-             />
-      </DialogContent>
-      <DialogActions>
-      <Button onClick={handleCloseDialog} color="primary">
-      İptal
-      </Button>
-      <Button onClick={handleSaveShippingCode} color="primary">
-      Kaydet
-      </Button>
-      </DialogActions>
+        <DialogTitle>Kargo Kodu Ekle</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Sipariş için kargo kodunu giriniz:
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Kargo Kodu"
+            fullWidth
+            value={shippingCode}
+            onChange={handleShippingCodeChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            İptal
+          </Button>
+          <Button onClick={handleSaveShippingCode} color="primary">
+            Kaydet
+          </Button>
+        </DialogActions>
       </Dialog>
       <Snackbar open={Boolean(errorMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
-      <Alert onClose={handleCloseSnackbar} severity="error">
-      {errorMessage}
-      </Alert>
+        <Alert onClose={handleCloseSnackbar} severity="error">
+          {errorMessage}
+        </Alert>
       </Snackbar>
-      </>
-      );
-      };
-      
-      export default Orders;
+    </>
+  );
+};
+
+export default Orders;
