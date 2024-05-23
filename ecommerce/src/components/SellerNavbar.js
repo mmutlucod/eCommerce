@@ -50,7 +50,7 @@ export default function SellerNavbar() {
     ,{ name: 'Urunlerim', path: '/seller/product' }, 
     { name: 'Kategori 3', path: '/seller/category3' }] },
     { title: 'SİPARİŞ & KARGO', subItems: [
-    { name: 'Sipariş Takibi', path: '/seller/order-tracking' },
+    { name: 'Siparişlerim', path: '/seller/orders' },
     { name: 'Kargo Seçenekleri', path: '/seller/shipping-options' }] },
    
   ];
