@@ -73,7 +73,7 @@ function AuthPage() {
       if (response.data && response.data.token) {
         login(response.data); // Giriş yapınca token'ı sakla ve kullanıcı durumunu güncelle
       }
-      navigate('/user/mainpage'); // Giriş başarılıysa ana sayfaya yönlendir
+      navigate('/'); // Giriş başarılıysa ana sayfaya yönlendir
     } catch (error) {
       setError(error.response.data.message || 'Giriş yapılırken bir hata oluştu.');
     }
@@ -87,7 +87,7 @@ function AuthPage() {
       if (response.data && response.data.token) {
         login(response.data); // Kayıt sonrası otomatik giriş yap
       }
-      navigate('/user/mainpage'); // Or wherever you want
+      navigate('/'); // Or wherever you want
     } catch (error) {
       setError(error.response.data.message || 'Kayıt sırasında bir hata oluştu.');
     }

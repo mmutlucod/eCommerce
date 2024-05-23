@@ -18,6 +18,7 @@ import '../styles/UserNavbar.css'; // CSS dosyamız
 export default function UserNavbar() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { token, logoutUser } = useAuth(); // logout fonksiyonunu buradan alıyoruz
     const [isSearchModalOpen, setSearchModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
@@ -41,26 +42,36 @@ export default function UserNavbar() {
     };
 
     const fetchUserDetails = async () => {
-        try {
-            const response = await api.get('/user/my-account');
-            setUser(response.data);
-        } catch (error) {
-            console.error('Error fetching user details:', error);
+        if (token) {
+            try {
+                const response = await api.get('/user/my-account');
+                setUser(response.data);
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+            }
         }
     };
 
     useEffect(() => {
-        fetchCartItems();
-        fetchUserDetails();
+        if (token) {
+            fetchUserDetails();
+        }
+    }, [token]);
 
-        const cartInterval = setInterval(fetchCartItems, 100); // Her 10 saniyede bir sepet öğelerini g nceller
-        const userInterval = setInterval(fetchUserDetails, 100); // Her 10 saniyede bir kullanıcı bilgilerini günceller
+    useEffect(() => {
+        if (token) {
+            fetchCartItems();
 
-        return () => {
-            clearInterval(cartInterval);
-            clearInterval(userInterval);
-        };
-    }, []);
+
+            const cartInterval = setInterval(fetchCartItems, 100); // Her 0.1 saniyede bir sepet öğelerini günceller
+            const userInterval = setInterval(fetchUserDetails, 100); // Her 0.1 saniyede bir kullanıcı bilgilerini günceller
+
+            return () => {
+                clearInterval(cartInterval);
+                clearInterval(userInterval);
+            };
+        }
+    }, [token]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -114,15 +125,9 @@ export default function UserNavbar() {
         setProfileMenuOpen(false);
     };
 
-    const logout = () => {
-        // Token'ı localStorage'dan sil
-        localStorage.removeItem('token');
-
-    };
-
     const handleLogout = () => {
-        logout();
-        navigate('/anasayfa'); // Anasayfaya yönlendirir
+        logoutUser();
+        navigate('/'); // Anasayfaya yönlendirir
     };
 
     return (
@@ -160,64 +165,77 @@ export default function UserNavbar() {
                 </Box>
                 <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', color: 'white' }}>
-                    <Box
-                        onMouseEnter={handleProfileMenuOpen}
-                        onMouseLeave={handleProfileMenuClose}
-                        className="profile-menu-container"
-                        sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}
-                    >
-                        <IconButton color="inherit" onClick={() => navigate('../profilim')}>
-                            <PersonOutlineIcon />
-                        </IconButton>
-                        <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('../profilim')}>
-                            Profilim
-                        </Typography>
-                        {profileMenuOpen && (
-                            <Box className="profile-menu" onMouseEnter={handleProfileMenuOpen} onMouseLeave={handleProfileMenuClose}>
-                                {user && user.name ? (
-                                    <Typography variant="body2" className="profile-menu-user" sx={{ fontWeight: 'bold', color: '#4B0082' }}>
-                                        {user.name + ' ' + user.surname}
-                                    </Typography>
-                                ) : (
-                                    <Typography variant="body2" className="profile-menu-user" sx={{ fontWeight: 'bold', color: '#4B0082' }}>
-
-                                    </Typography>
+                    {token ? (
+                        <>
+                            <Box
+                                onMouseEnter={handleProfileMenuOpen}
+                                onMouseLeave={handleProfileMenuClose}
+                                className="profile-menu-container"
+                                sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}
+                            >
+                                <IconButton color="inherit">
+                                    <PersonOutlineIcon />
+                                </IconButton>
+                                <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+                                    Profilim
+                                </Typography>
+                                {profileMenuOpen && (
+                                    <Box className="profile-menu" onMouseEnter={handleProfileMenuOpen} onMouseLeave={handleProfileMenuClose}>
+                                        {user && user.name ? (
+                                            <Typography variant="body2" className="profile-menu-user" sx={{ fontWeight: 'bold', color: '#4B0082' }}>
+                                                {user.name + ' ' + user.surname}
+                                            </Typography>
+                                        ) : (
+                                            <Typography variant="body2" className="profile-menu-user" sx={{ fontWeight: 'bold', color: '#4B0082' }}>
+                                                Kullanıcı
+                                            </Typography>
+                                        )}
+                                        <Divider />
+                                        <Link to={'/profilim'} style={{ textDecoration: 'none' }}>
+                                            <MenuItem className="profile-menu-item">
+                                                <ListItemIcon sx={{ minWidth: '30px' }}>
+                                                    <PersonOutlineIcon fontSize="small" />
+                                                </ListItemIcon>
+                                                <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Hesabım" />
+                                            </MenuItem>
+                                        </Link>
+                                        <Link to={'/siparislerim'} style={{ textDecoration: 'none' }}>
+                                            <MenuItem className="profile-menu-item">
+                                                <ListItemIcon sx={{ minWidth: '30px' }}>
+                                                    <AssignmentIcon fontSize="small" />
+                                                </ListItemIcon>
+                                                <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Siparişlerim" />
+                                            </MenuItem>
+                                        </Link>
+                                        <Link to={'/sorularim'} style={{ textDecoration: 'none' }}>
+                                            <MenuItem className="profile-menu-item">
+                                                <ListItemIcon sx={{ minWidth: '30px' }}>
+                                                    <GradeIcon fontSize="small" />
+                                                </ListItemIcon>
+                                                <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Sorularım" />
+                                            </MenuItem>
+                                        </Link>
+                                        <Divider />
+                                        <MenuItem onClick={handleLogout} className="profile-menu-item">
+                                            <ListItemIcon sx={{ minWidth: '30px' }}>
+                                                <ExitToAppIcon fontSize="small" />
+                                            </ListItemIcon>
+                                            <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Çıkış Yap" />
+                                        </MenuItem>
+                                    </Box>
                                 )}
-                                <Divider />
-                                <Link to={'/profilim'} style={{ textDecoration: 'none' }}>
-                                    <MenuItem className="profile-menu-item">
-                                        <ListItemIcon sx={{ minWidth: '30px' }}>
-                                            <PersonOutlineIcon fontSize="small" />
-                                        </ListItemIcon>
-                                        <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Hesabım" />
-                                    </MenuItem>
-                                </Link>
-                                <Link to={'/siparislerim'} style={{ textDecoration: 'none' }}>
-                                    <MenuItem className="profile-menu-item">
-                                        <ListItemIcon sx={{ minWidth: '30px' }}>
-                                            <AssignmentIcon fontSize="small" />
-                                        </ListItemIcon>
-                                        <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Siparişlerim" />
-                                    </MenuItem>
-                                </Link>
-                                <Link to={'/sorularim'} style={{ textDecoration: 'none' }}>
-                                    <MenuItem className="profile-menu-item">
-                                        <ListItemIcon sx={{ minWidth: '30px' }}>
-                                            <GradeIcon fontSize="small" />
-                                        </ListItemIcon>
-                                        <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Sorularım" />
-                                    </MenuItem>
-                                </Link>
-                                <Divider />
-                                <MenuItem onClick={handleLogout} className="profile-menu-item">
-                                    <ListItemIcon sx={{ minWidth: '30px' }}>
-                                        <ExitToAppIcon fontSize="small" />
-                                    </ListItemIcon>
-                                    <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Çıkış Yap" />
-                                </MenuItem>
                             </Box>
-                        )}
-                    </Box>
+                        </>
+                    ) : (
+                        <>
+                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/kayit-ol')}>
+                                Üye Ol
+                            </Typography>
+                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/giris-yap')}>
+                                Giriş Yap
+                            </Typography>
+                        </>
+                    )}
                     <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
                     <IconButton color="inherit" onClick={() => navigate('/favorilerim')}>
                         <FavoriteIcon />

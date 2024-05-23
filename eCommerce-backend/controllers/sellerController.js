@@ -495,6 +495,7 @@ const getSellerOrders = async (req, res) => {
                 'quantity',
                 'order_id',
                 'canceled_quantity',
+                'shpping_code',
                 [Sequelize.literal('quantity + IFNULL(canceled_quantity, 0)'), 'total_quantity']
             ],
             include: [
