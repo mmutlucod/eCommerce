@@ -33,10 +33,14 @@ function AuthPage() {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [loginErrors, setLoginErrors] = useState({});
+  const [registerErrors, setRegisterErrors] = useState({});
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
     setError('');
+    setLoginErrors({});
+    setRegisterErrors({});
   };
 
   const handleLoginChange = (event) => {
@@ -44,12 +48,20 @@ function AuthPage() {
       ...loginData,
       [event.target.name]: event.target.value,
     });
+    setLoginErrors({
+      ...loginErrors,
+      [event.target.name]: '',
+    });
   };
 
   const handleRegisterChange = (event) => {
     setFormData({
       ...formData,
       [event.target.name]: event.target.value,
+    });
+    setRegisterErrors({
+      ...registerErrors,
+      [event.target.name]: '',
     });
   };
 
@@ -65,8 +77,39 @@ function AuthPage() {
     event.preventDefault();
   };
 
+  const validateLogin = () => {
+    let errors = {};
+    if (!loginData.email) {
+      errors.email = 'E-posta gerekli';
+    } else if (!/\S+@\S+\.\S+/.test(loginData.email)) {
+      errors.email = 'Geçerli bir e-posta adresi girin';
+    }
+    if (!loginData.password) {
+      errors.password = 'Şifre gerekli';
+    }
+    setLoginErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const validateRegister = () => {
+    let errors = {};
+    if (!formData.email) {
+      errors.email = 'E-posta gerekli';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Geçerli bir e-posta adresi girin';
+    }
+    if (!formData.password) {
+      errors.password = 'Şifre gerekli';
+    } else if (formData.password.length < 6) {
+      errors.password = 'Şifre en az 6 karakter olmalıdır';
+    }
+    setRegisterErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleLoginSubmit = async (event) => {
     event.preventDefault();
+    if (!validateLogin()) return;
     try {
       const response = await api.post('/user/login', loginData);
       console.log('Giriş başarılı:', response.data);
@@ -81,6 +124,7 @@ function AuthPage() {
 
   const handleRegisterSubmit = async (event) => {
     event.preventDefault();
+    if (!validateRegister()) return;
     try {
       const response = await api.post('/user/register', formData);
       console.log('Kayıt başarılı:', response.data);
@@ -144,7 +188,8 @@ function AuthPage() {
                 value={loginData.email}
                 onChange={handleLoginChange}
                 fullWidth
-                required
+                error={!!loginErrors.email}
+                helperText={loginErrors.email}
                 sx={{
                   mb: 2,
                   '& .MuiInputLabel-root': {
@@ -170,7 +215,8 @@ function AuthPage() {
                 value={loginData.password}
                 onChange={handleLoginChange}
                 fullWidth
-                required
+                error={!!loginErrors.password}
+                helperText={loginErrors.password}
                 sx={{
                   mb: 2,
                   '& .MuiInputLabel-root': {
@@ -231,7 +277,8 @@ function AuthPage() {
                 value={formData.email}
                 onChange={handleRegisterChange}
                 fullWidth
-                required
+                error={!!registerErrors.email}
+                helperText={registerErrors.email}
                 sx={{
                   mb: 2,
                   '& .MuiInputLabel-root': {
@@ -257,7 +304,8 @@ function AuthPage() {
                 value={formData.password}
                 onChange={handleRegisterChange}
                 fullWidth
-                required
+                error={!!registerErrors.password}
+                helperText={registerErrors.password}
                 sx={{
                   mb: 2,
                   '& .MuiInputLabel-root': {
@@ -320,3 +368,4 @@ function AuthPage() {
 }
 
 export default AuthPage;
+
