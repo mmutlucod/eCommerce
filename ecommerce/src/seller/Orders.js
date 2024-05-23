@@ -75,7 +75,9 @@ const Orders = () => {
                   {orders.map((order) => (
                     <TableRow key={order.order_id}>
                       <TableCell>{order.order_id}</TableCell>
+                      {console.log(order)}
                       <TableCell>{order.sellerProduct.product.name}</TableCell>
+                      {console.log(order)}
                       <TableCell>{order.sellerProduct.product.Brand.brand_name}</TableCell>
                       <TableCell>{order.sellerProduct.price}</TableCell>
                       <TableCell>{order.quantity}</TableCell>
