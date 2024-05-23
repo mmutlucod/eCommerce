@@ -112,8 +112,7 @@ function AuthPage() {
     event.preventDefault();
     if (!validateLogin()) return;
     try {
-      const response = await api.post('/user/login', formData);
-      console.log('Giriş başarılı:', response.data);
+      const response = await api.post('/user/login', loginData);
       if (response.data && response.data.token) {
         login(response.data); // Giriş yapınca token'ı sakla ve kullanıcı durumunu güncelle
       }

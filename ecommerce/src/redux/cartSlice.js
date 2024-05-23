@@ -9,12 +9,23 @@ const initialState = {
     error: null
 };
 
+// Helper function to get token from local storage
+const getToken = () => localStorage.getItem('token');
+
 // Sepeti API'den çekme
 export const fetchCart = createAsyncThunk(
     'cart/fetchCart',
     async (_, { rejectWithValue }) => {
+        const token = getToken();
+        if (!token) {
+            return rejectWithValue('Token bulunamadı. Lütfen giriş yapın.');
+        }
         try {
-            const response = await api.get('/user/my-basket');
+            const response = await api.get('/user/my-basket', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -26,8 +37,16 @@ export const fetchCart = createAsyncThunk(
 export const updateItem = createAsyncThunk(
     'cart/updateItem',
     async (itemData, { rejectWithValue }) => {
+        const token = getToken();
+        if (!token) {
+            return rejectWithValue('Token bulunamadı. Lütfen giriş yapın.');
+        }
         try {
-            const response = await api.post('/user/update-item', itemData);
+            const response = await api.post('/user/update-item', itemData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             return itemData;
         } catch (error) {
             console.error('API error:', error.response ? error.response.data : error.message);
@@ -40,8 +59,16 @@ export const updateItem = createAsyncThunk(
 export const addItem = createAsyncThunk(
     'cart/addItem',
     async (itemData, { rejectWithValue }) => {
+        const token = getToken();
+        if (!token) {
+            return rejectWithValue('Token bulunamadı. Lütfen giriş yapın.');
+        }
         try {
-            const response = await api.post('/user/add-item', itemData);
+            const response = await api.post('/user/add-item', itemData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             return itemData;
         } catch (error) {
             console.error('API error:', error.response ? error.response.data : error.message);
@@ -54,8 +81,16 @@ export const addItem = createAsyncThunk(
 export const deleteItem = createAsyncThunk(
     'cart/deleteItem',
     async (itemData, { rejectWithValue }) => {
+        const token = getToken();
+        if (!token) {
+            return rejectWithValue('Token bulunamadı. Lütfen giriş yapın.');
+        }
         try {
-            const response = await api.post('/user/delete-item', itemData);
+            const response = await api.post('/user/delete-item', itemData, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             return itemData;
         } catch (error) {
             console.error('API error:', error.response ? error.response.data : error.message);
@@ -68,8 +103,16 @@ export const deleteItem = createAsyncThunk(
 export const clearCartAPI = createAsyncThunk(
     'cart/clearCartAPI',
     async (_, { rejectWithValue }) => {
+        const token = getToken();
+        if (!token) {
+            return rejectWithValue('Token bulunamadı. Lütfen giriş yapın.');
+        }
         try {
-            const response = await api.post('/user/clear-cart');
+            const response = await api.post('/user/clear-cart', {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);

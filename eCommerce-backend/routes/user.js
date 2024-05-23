@@ -63,7 +63,7 @@ router.post('/deleteFavoriteItem', authMiddleware, userController.deleteFavorite
 
 // ÜRÜN DEĞERLENDİRME  İŞLEMLERİ
 
-router.get('/product-comments/:productId', authMiddleware, userController.getProductComments);
+router.get('/product-comments/:productId', authOptionalMiddleware, userController.getProductComments);
 router.get('/my-product-comments', authMiddleware, userController.getProductCommentsByUser);
 router.post('/create-product-comment', authMiddleware, userController.createProductComments);
 router.post('/update-product-comment', authMiddleware, userController.updateProductComments);
