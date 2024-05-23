@@ -317,17 +317,18 @@ const createProduct = async (req, res) => {
         });
 
         if (product) {
-            res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
+            res.status(404).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
         } else {
             await Product.create({
                 approval_status_id: 3,
+                max_buy: 5,
                 ...req.body,
             });
 
-            res.status(200).json({ success: true, message: 'Ürün sisteme eklendi.' });
+            return res.status(200).json({ success: true, message: 'Ürün sisteme eklendi.' });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 
@@ -514,8 +515,7 @@ const getSellerOrders = async (req, res) => {
                 },
                 {
                     model: OrderStatus,
-                    attributes: ['status_name'],
-                    required: false
+                    attributes: ['status_name']
                 }
             ],
         });

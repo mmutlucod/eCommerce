@@ -6,34 +6,64 @@
 .profile-menu {
     position: absolute;
     top: 100%;
-    left: 0;
+    left: 50%;
+    transform: translateX(-50%);
     background-color: white;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     z-index: 1;
     display: flex;
     flex-direction: column;
-    width: 250px; /* Menü genişliği */
+    width: 180px; /* Menü genişliği */
+    border-radius: 4px;
+    padding: 10px;
 }
 
-.profile-menu .MuiMenuItem-root {
-    padding: 10px 20px;
+.profile-menu::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent white transparent;
+}
+
+.profile-menu .profile-menu-user {
+    padding: 6px 2px; /* Kullanıcı adı için padding */
+    text-align: center; /* Kullanıcı adının sola hizalanması */
+}
+
+.profile-menu .profile-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 2px; /* Menü öğelerinin iç boşluğu */
     color: #4B0082;
     cursor: pointer;
     transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
+    border-radius: 4px;
 }
 
-.profile-menu .MuiMenuItem-root:hover {
+.profile-menu .profile-menu-item:hover {
     background-color: #f0f0f0;
 }
 
 .profile-menu .MuiDivider-root {
-    margin: 0 10px;
+    margin: 8px 0;
 }
 
 .profile-menu .MuiTypography-root {
     font-weight: bold;
-    padding: 10px 20px;
+    padding: 1px -2px;
     color: #4B0082;
+    font-size: 14px; /* Küçük yazı boyutu */
+}
+
+.profile-menu .MuiListItemIcon-root {
+    min-width: 30px; /* İkon ve metin arasındaki mesafe */
+}
+
+.profile-menu .profile-menu-text {
+    margin: 0; /* Metin ve ikon arasındaki boşluğu kaldırma */
+    margin-right: 100%;
 }
