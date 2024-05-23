@@ -951,6 +951,7 @@ const createOrder = async (req, res) => {
         order_id: order.order_id,
         seller_product_id: item.seller_product_id,
         quantity: item.quantity,
+        order_status_id: 1
       });
 
       // Stoktan düşür

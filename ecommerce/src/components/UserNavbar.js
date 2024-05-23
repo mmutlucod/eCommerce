@@ -18,7 +18,6 @@ import '../styles/UserNavbar.css'; // CSS dosyamız
 export default function UserNavbar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { token, logout } = useAuth();
     const [isSearchModalOpen, setSearchModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [cartDropdownOpen, setCartDropdownOpen] = useState(false);
@@ -54,7 +53,7 @@ export default function UserNavbar() {
         fetchCartItems();
         fetchUserDetails();
 
-        const cartInterval = setInterval(fetchCartItems, 100); // Her 10 saniyede bir sepet öğelerini günceller
+        const cartInterval = setInterval(fetchCartItems, 100); // Her 10 saniyede bir sepet öğelerini g nceller
         const userInterval = setInterval(fetchUserDetails, 100); // Her 10 saniyede bir kullanıcı bilgilerini günceller
 
         return () => {
@@ -113,6 +112,17 @@ export default function UserNavbar() {
 
     const handleProfileMenuClose = () => {
         setProfileMenuOpen(false);
+    };
+
+    const logout = () => {
+        // Token'ı localStorage'dan sil
+        localStorage.removeItem('token');
+
+    };
+
+    const handleLogout = () => {
+        logout();
+        navigate('/anasayfa'); // Anasayfaya yönlendirir
     };
 
     return (
@@ -199,7 +209,7 @@ export default function UserNavbar() {
                                     </MenuItem>
                                 </Link>
                                 <Divider />
-                                <MenuItem onClick={logout} className="profile-menu-item">
+                                <MenuItem onClick={handleLogout} className="profile-menu-item">
                                     <ListItemIcon sx={{ minWidth: '30px' }}>
                                         <ExitToAppIcon fontSize="small" />
                                     </ListItemIcon>
