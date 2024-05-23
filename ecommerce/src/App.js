@@ -23,6 +23,7 @@ import SellerProduct from './seller/Product';
 import SellerProductAdd from './seller/ProductAdd';
 import SellerSellerProductAdd from './seller/SellerProductAdd';
 import SellerOrders from './seller/Orders';
+import SellerQuestion from './seller/Question';
 
 import UserLogin from './user/Login';
 import UserMainPage from './user/MainPage';
@@ -81,6 +82,7 @@ function App() {
             <Route path="/seller/urun-ekle" element={<SellerProductAdd />} />
             <Route path="/urun-ekle" element={<SellerSellerProductAdd />} />
             <Route path="/seller/orders" element={<SellerOrders/>} />
+            <Route path="/seller/question" element={<SellerQuestion/>} />
 
 
             <Route path="/anasayfa" element={< UserMainPage />} />
