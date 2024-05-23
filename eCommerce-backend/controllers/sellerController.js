@@ -666,12 +666,6 @@ const updateOrderStatus = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Order item not found.' });
         }
 
-        // Yeni durumu kontrol et
-        const newStatus = await OrderStatus.findByPk(newStatusId);
-        if (!newStatus) {
-            return res.status(404).json({ success: false, message: 'Order status not found.' });
-        }
-
         // OrderItem için order_status_id alanını güncelle
         await orderItem.update(
             { order_status_id: 4 }
