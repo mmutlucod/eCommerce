@@ -24,6 +24,7 @@ import {
 import MuiAlert from '@mui/material/Alert';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 import SellerNavbar from '../components/SellerNavbar';
 import api from '../api/api';
 
@@ -80,8 +81,11 @@ const Orders = () => {
     try {
       await api.post(`seller/update-shipping-code/${selectedOrder.order_item_id}`, { shippingCode });
       setOrders((prevOrders) => prevOrders.map((order) => 
-        order.order_item_id === selectedOrder.order_item_id ? { ...order, shipping_code: shippingCode } : order
+        order.order_item_id === selectedOrder.order_item_id 
+          ? { ...order, shipping_code: shippingCode, orderStatus: { status_name: 'Siparişiniz kargoya verildi' } } 
+          : order
       ));
+      setSuccessMessage('Kargo kodu başarıyla eklendi.');
       handleCloseDialog();
     } catch (error) {
       setErrorMessage('Kargo kodu güncellenirken bir hata oluştu.');
@@ -93,7 +97,9 @@ const Orders = () => {
     try {
       await api.post(`seller/complete-order/${order.order_item_id}`);
       setOrders((prevOrders) => prevOrders.map((o) => 
-        o.order_item_id === order.order_item_id ? { ...o, orderStatus: { status_name: 'Tamamlandı' } } : o
+        o.order_item_id === order.order_item_id 
+          ? { ...o, orderStatus: { status_name: 'Sipariş Teslim Edildi' }, completed: true } 
+          : o
       ));
       setSuccessMessage('Sipariş başarıyla tamamlandı.');
     } catch (error) {
@@ -140,7 +146,9 @@ const Orders = () => {
                       <TableCell>{order.orderStatus ? order.orderStatus.status_name : 'Durum Bilinmiyor'}</TableCell>
                       <TableCell>{order.shipping_code ? order.shipping_code : 'Kargo kodu yok'}</TableCell>
                       <TableCell>
-                        {order.shipping_code ? (
+                        {order.orderStatus.status_name === 'Sipariş Teslim Edildi' ? (
+                          <DoneAllIcon style={{ color: 'blue' }} />
+                        ) : order.shipping_code ? (
                           <IconButton
                             aria-label="complete"
                             onClick={() => handleCompleteOrder(order)}
