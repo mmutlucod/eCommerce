@@ -31,13 +31,15 @@ export default function UserNavbar() {
     const [totalQuantity, setTotalQuantity] = useState(0);
 
     const fetchCartItems = async () => {
-        try {
-            const response = await api.get('/user/my-basket');
-            setCartItems(response.data);
-            const totalquantity = response.data.reduce((total, item) => total + item.quantity, 0);
-            setTotalQuantity(totalquantity);
-        } catch (error) {
-            console.error('Error fetching cart data:', error);
+        if (token) {
+            try {
+                const response = await api.get('/user/my-basket');
+                setCartItems(response.data);
+                const totalquantity = response.data.reduce((total, item) => total + item.quantity, 0);
+                setTotalQuantity(totalquantity);
+            } catch (error) {
+                console.error('Error fetching cart data:', error);
+            }
         }
     };
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -112,7 +112,7 @@ function AuthPage() {
     event.preventDefault();
     if (!validateLogin()) return;
     try {
-      const response = await api.post('/user/login', loginData);
+      const response = await api.post('/user/login', formData);
       console.log('Giriş başarılı:', response.data);
       if (response.data && response.data.token) {
         login(response.data); // Giriş yapınca token'ı sakla ve kullanıcı durumunu güncelle
@@ -127,16 +127,29 @@ function AuthPage() {
     event.preventDefault();
     if (!validateRegister()) return;
     try {
-      const response = await api.post('/user/register', formData);
-      console.log('Kayıt başarılı:', response.data);
+      await api.post('/user/register', formData);
+      const response = await api.post('/user/login', formData);
       if (response.data && response.data.token) {
         login(response.data); // Kayıt sonrası otomatik giriş yap
+        navigate('/'); // Kayıt başarılıysa ana sayfaya yönlendir
       }
-      navigate('/'); // Or wherever you want
     } catch (error) {
       setError(error.response.data.message || 'Kayıt sırasında bir hata oluştu.');
     }
   };
+
+
+  // useEffect to automatically close alerts after 5 seconds
+  useEffect(() => {
+    if (error || loginErrors.email || loginErrors.password || registerErrors.email || registerErrors.password) {
+      const timer = setTimeout(() => {
+        setError('');
+        setLoginErrors({});
+        setRegisterErrors({});
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [error, loginErrors, registerErrors]);
 
   return (
     <>
@@ -182,11 +195,24 @@ function AuthPage() {
               onSubmit={handleLoginSubmit}
               sx={{ p: 4 }}
             >
-              {loginErrors.email && (
+              {error && !registerErrors.email && !registerErrors.password ? (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              ) : loginErrors.email && loginErrors.password ? (
                 <Alert severity="error" sx={{ mb: 2 }}>
                   {loginErrors.email}
                 </Alert>
-              )}
+              ) : loginErrors.email ? (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {loginErrors.email}
+                </Alert>
+              ) : loginErrors.password ? (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {loginErrors.password}
+                </Alert>
+              ) : null}
+
               <TextField
                 label="E-posta"
                 type="email"
@@ -195,7 +221,6 @@ function AuthPage() {
                 onChange={handleLoginChange}
                 fullWidth
                 error={!!loginErrors.email}
-                helperText={loginErrors.email}
                 sx={{
                   mb: 2,
                   '& .MuiInputLabel-root': {
@@ -214,11 +239,7 @@ function AuthPage() {
                   },
                 }}
               />
-              {loginErrors.password && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {loginErrors.password}
-                </Alert>
-              )}
+
               <TextField
                 label="Parola"
                 type={showPassword ? 'text' : 'password'}
@@ -227,7 +248,6 @@ function AuthPage() {
                 onChange={handleLoginChange}
                 fullWidth
                 error={!!loginErrors.password}
-                helperText={loginErrors.password}
                 sx={{
                   mb: 2,
                   '& .MuiInputLabel-root': {
@@ -263,17 +283,18 @@ function AuthPage() {
               <Button
                 type="submit"
                 variant="contained"
-                color="secondary"
+                color="primary"
                 fullWidth
-                sx={{ mb: 2 }}
+                sx={{
+                  mt: 2,
+                  backgroundColor: '#FF7043',
+                  '&:hover': {
+                    backgroundColor: '#FF5722', // Hover rengi
+                  },
+                }}
               >
                 Giriş Yap
               </Button>
-              {error && !loginErrors.email && !loginErrors.password && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
             </Box>
           )}
           {tabValue === 'register' && (
@@ -282,20 +303,32 @@ function AuthPage() {
               onSubmit={handleRegisterSubmit}
               sx={{ p: 4 }}
             >
-              {registerErrors.email && (
+              {error && !loginErrors.email && !loginErrors.password ? (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              ) : registerErrors.email && registerErrors.password ? (
                 <Alert severity="error" sx={{ mb: 2 }}>
                   {registerErrors.email}
                 </Alert>
-              )}
+              ) : registerErrors.email ? (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {registerErrors.email}
+                </Alert>
+              ) : registerErrors.password ? (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {registerErrors.password}
+                </Alert>
+              ) : null}
+
               <TextField
-                label="E-posta Adresi"
+                label="E-posta"
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleRegisterChange}
                 fullWidth
                 error={!!registerErrors.email}
-                helperText={registerErrors.email}
                 sx={{
                   mb: 2,
                   '& .MuiInputLabel-root': {
@@ -314,11 +347,7 @@ function AuthPage() {
                   },
                 }}
               />
-              {registerErrors.password && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {registerErrors.password}
-                </Alert>
-              )}
+
               <TextField
                 label="Parola"
                 type={showRegisterPassword ? 'text' : 'password'}
@@ -327,7 +356,6 @@ function AuthPage() {
                 onChange={handleRegisterChange}
                 fullWidth
                 error={!!registerErrors.password}
-                helperText={registerErrors.password}
                 sx={{
                   mb: 2,
                   '& .MuiInputLabel-root': {
@@ -363,17 +391,18 @@ function AuthPage() {
               <Button
                 type="submit"
                 variant="contained"
-                color="secondary"
+                color="primary"
                 fullWidth
-                sx={{ mb: 2 }}
+                sx={{
+                  mt: 2,
+                  backgroundColor: '#FF7043',
+                  '&:hover': {
+                    backgroundColor: '#FF5722', // Hover rengi
+                  },
+                }}
               >
-                Kayıt Ol
+                Üye Ol
               </Button>
-              {error && !registerErrors.email && !registerErrors.password && (
-                <Alert severity="error" sx={{ mb: 2 }}>
-                  {error}
-                </Alert>
-              )}
             </Box>
           )}
         </Paper>
