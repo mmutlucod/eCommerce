@@ -99,8 +99,8 @@ const register = async (req, res) => {
 
     return res.status(201).json({
       message: "Kullanıcı başarıyla oluşturuldu.",
-      user: newUser,
       token,
+      role: "user"
     });
   } catch (error) {
     console.error("Kullanıcı kaydı sırasında bir hata oluştu:", error);
@@ -1639,6 +1639,14 @@ const getAnsweredQuestionsForProduct = async (req, res) => {
           [Op.not]: '' // ve answer alanı boş string olmayan kayıtları getir
         }
       },
+      include: [
+        {
+          model: Seller,
+        },
+        {
+          model: User
+        }
+      ],
       order: [['date_asked', 'DESC']] // En son sorulan soruları ilk sırada getir
     });
 
