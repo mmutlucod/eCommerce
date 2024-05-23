@@ -9,6 +9,7 @@ import {
   Paper,
   InputAdornment,
   IconButton,
+  Alert,
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -80,12 +81,12 @@ function AuthPage() {
   const validateLogin = () => {
     let errors = {};
     if (!loginData.email) {
-      errors.email = 'E-posta gerekli';
+      errors.email = 'E-posta adresinizi giriniz';
     } else if (!/\S+@\S+\.\S+/.test(loginData.email)) {
       errors.email = 'Geçerli bir e-posta adresi girin';
     }
     if (!loginData.password) {
-      errors.password = 'Şifre gerekli';
+      errors.password = 'Şifrenizi giriniz';
     }
     setLoginErrors(errors);
     return Object.keys(errors).length === 0;
@@ -94,12 +95,12 @@ function AuthPage() {
   const validateRegister = () => {
     let errors = {};
     if (!formData.email) {
-      errors.email = 'E-posta gerekli';
+      errors.email = 'E-posta adresinizi giriniz';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = 'Geçerli bir e-posta adresi girin';
     }
     if (!formData.password) {
-      errors.password = 'Şifre gerekli';
+      errors.password = 'Şifrenizi giriniz';
     } else if (formData.password.length < 6) {
       errors.password = 'Şifre en az 6 karakter olmalıdır';
     }
@@ -181,6 +182,11 @@ function AuthPage() {
               onSubmit={handleLoginSubmit}
               sx={{ p: 4 }}
             >
+              {loginErrors.email && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {loginErrors.email}
+                </Alert>
+              )}
               <TextField
                 label="E-posta"
                 type="email"
@@ -208,6 +214,11 @@ function AuthPage() {
                   },
                 }}
               />
+              {loginErrors.password && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {loginErrors.password}
+                </Alert>
+              )}
               <TextField
                 label="Parola"
                 type={showPassword ? 'text' : 'password'}
@@ -258,10 +269,10 @@ function AuthPage() {
               >
                 Giriş Yap
               </Button>
-              {error && (
-                <Typography color="error" sx={{ mb: 2 }}>
+              {error && !loginErrors.email && !loginErrors.password && (
+                <Alert severity="error" sx={{ mb: 2 }}>
                   {error}
-                </Typography>
+                </Alert>
               )}
             </Box>
           )}
@@ -271,8 +282,14 @@ function AuthPage() {
               onSubmit={handleRegisterSubmit}
               sx={{ p: 4 }}
             >
+              {registerErrors.email && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {registerErrors.email}
+                </Alert>
+              )}
               <TextField
                 label="E-posta Adresi"
+                type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleRegisterChange}
@@ -297,6 +314,11 @@ function AuthPage() {
                   },
                 }}
               />
+              {registerErrors.password && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {registerErrors.password}
+                </Alert>
+              )}
               <TextField
                 label="Parola"
                 type={showRegisterPassword ? 'text' : 'password'}
@@ -341,22 +363,16 @@ function AuthPage() {
               <Button
                 type="submit"
                 variant="contained"
-                sx={{
-                  backgroundColor: '#FF7043', // Turuncu renk
-                  '&:hover': {
-                    backgroundColor: '#FF5722', // Daha koyu turuncu renk hover efekti
-                  },
-                  mb: 2,
-                  transform: 'scale(1.0)', // Butonu büyüt
-                }}
+                color="secondary"
                 fullWidth
+                sx={{ mb: 2 }}
               >
-                Üye Ol
+                Kayıt Ol
               </Button>
-              {error && (
-                <Typography color="error" sx={{ mb: 2 }}>
+              {error && !registerErrors.email && !registerErrors.password && (
+                <Alert severity="error" sx={{ mb: 2 }}>
                   {error}
-                </Typography>
+                </Alert>
               )}
             </Box>
           )}
@@ -368,4 +384,3 @@ function AuthPage() {
 }
 
 export default AuthPage;
-
