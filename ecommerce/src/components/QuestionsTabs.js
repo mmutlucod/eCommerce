@@ -218,7 +218,6 @@ function QuestionsTab({ productId }) {
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#f27a1a' }}>
                 Soru: {question.questionContent}
               </Typography>
-              {console.log(question)}
               <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
                 Sorulduğu Tarih: {new Date(question.dateAsked).toLocaleDateString()}
               </Typography>
