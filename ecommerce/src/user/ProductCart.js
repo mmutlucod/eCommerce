@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateItem, fetchCart, addItem } from '../redux/cartSlice';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import { useAuth } from '../context/AuthContext';
 
 const CustomCard = styled(Card)(({ theme }) => ({
   flex: '1 0 calc(25% - 16px)',
@@ -89,6 +90,7 @@ const ProductCards = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   const cartItems = useSelector(state => state.cart.items);
 
@@ -113,6 +115,15 @@ const ProductCards = () => {
   }, [dispatch]);
 
   const handleAddToCart = useCallback((product) => {
+    if (!token) {
+      setAlertMessage('Lütfen önce giriş yapınız.');
+      setAlertOpen(true);
+      setTimeout(() => {
+        navigate('/giris-yap');
+      }, 2000);
+      return;
+    }
+
     if (!cartItems) {
       console.warn('Cart items not yet loaded. Please wait a moment.');
       return;
@@ -144,7 +155,7 @@ const ProductCards = () => {
         price: product.price
       }));
     }
-  }, [cartItems, dispatch]);
+  }, [cartItems, dispatch, token, navigate]);
 
   const handleCloseAlert = () => {
     setAlertOpen(false);
