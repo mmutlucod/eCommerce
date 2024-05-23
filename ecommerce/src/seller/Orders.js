@@ -75,7 +75,7 @@ const Orders = () => {
 
   const handleSaveShippingCode = async () => {
     try {
-      await api.post(`/update-shipping-code/${selectedOrder.order_id}`, { shippingCode });
+      await api.post(`seller/update-shipping-code/${selectedOrder.order_id}`, { shippingCode });
       setOrders((prevOrders) => prevOrders.map((order) => 
         order.order_id === selectedOrder.order_id ? { ...order, shipping_code: shippingCode } : order
       ));
@@ -111,13 +111,12 @@ const Orders = () => {
       <TableCell>Sipariş Durumu</TableCell>
       <TableCell>Kargo Kodu</TableCell>
       <TableCell>İşlemler</TableCell>
-      
       </TableRow>
       </TableHead>
       <TableBody>
       {orders.map((order) => (
       <TableRow key={order.order_id}>
-      <TableCell>{order.order_id}</TableCell>
+      <TableCell>{order.order_order_id}</TableCell>
       <TableCell>{order.sellerProduct.product.name}</TableCell>
       {console.log(order)}
       <TableCell>{order.sellerProduct.product.Brand.brand_name}</TableCell>
