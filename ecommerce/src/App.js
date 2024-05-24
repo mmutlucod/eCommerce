@@ -25,6 +25,7 @@ import SellerSellerProductAdd from './seller/SellerProductAdd';
 import SellerOrders from './seller/Orders';
 import SellerQuestion from './seller/Question';
 
+
 import UserLogin from './user/Login';
 import UserMainPage from './user/MainPage';
 import UserRegister from './user/Register';
@@ -43,6 +44,7 @@ import UserSearchProducts from './user/SearchProducts';
 import UserSellerPage from './user/SellerPage';
 import ReviewsPage from './user/ReviewsPage';
 import QuestionsPage from './user/QuestionPage';
+import UserErrorPage from './user/ErrorPage';
 
 export const images = [
   "https://n11scdn.akamaized.net/a1/org/24/04/26/50/30/87/81/38/19/97/83/96/43595415462427475004.jpg",
@@ -102,7 +104,8 @@ function App() {
             <Route path="kategori/:categorySlug" element={<UserCategorySearch />} />
             <Route path="/arama/:query" element={<UserSearchProducts />} />
             <Route path="/satici/:sellerSlug" element={<UserSellerPage />} />
-            
+            <Route path="/hata404" element={<UserErrorPage />} />
+            <Route path="*" element={<UserErrorPage />} />
           </Routes>
         </Router>
 
