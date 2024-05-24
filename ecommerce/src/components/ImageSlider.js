@@ -2,7 +2,8 @@ import React from 'react';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import '../styles/ImageSlider.css'; 
+import '../styles/ImageSlider.css';
+
 const ImageSlider = ({ images }) => {
     const settings = {
         dots: true,
@@ -17,7 +18,7 @@ const ImageSlider = ({ images }) => {
             <div
                 style={{
                     position: 'absolute',
-                    bottom: '25px',
+                    bottom: '0', // Dots'un altındaki boşluğu kaldırmak için bottom değerini değiştirdik
                     width: '100%',
                 }}
             >
@@ -43,18 +44,18 @@ const ImageSlider = ({ images }) => {
     return (
         <div style={{
             position: 'relative',
-            padding: '0 0 50px 0',
+            padding: '0', // Slider altındaki boşluğu kaldırmak için paddingBottom: 0 eklendi
             border: '1px solid #ccc', // Çerçeve eklendi
             borderRadius: '8px', // Köşeleri yuvarlak yapmak için
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', // Hafif bir gölge eklemek için
             backgroundColor: '#fff', // Çerçeve içerisini beyaz yapmak için
-            margin: '80px', // Çerçeve etrafında boşluk bırakmak için
+            margin: '20px 20px', // Çerçeve etrafında boşluk bırakmak için
             overflow: 'hidden', // İçeriğin dışına taşmaması için
         }}>
             <Slider {...settings}>
                 {images.map((img, index) => (
-                    <div key={index}>
-                        <img src={img} alt={`Slide ${index}`} style={{ width: "100%", height: "auto" }} />
+                    <div key={index} style={{ margin: '0', padding: '0' }}> {/* Div içindeki boşlukları kaldırmak için */}
+                        <img src={img} alt={`Slide ${index}`} style={{ width: "100%", height: "auto", display: 'block' }} /> {/* Resmi tam oturtmak için */}
                     </div>
                 ))}
             </Slider>

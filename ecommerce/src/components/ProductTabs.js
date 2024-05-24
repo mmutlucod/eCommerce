@@ -44,6 +44,7 @@ function OtherSellersTab({ product }) {
     const fetchSellers = async () => {
       try {
         const response = await api.get(`user/sellerProducts/${product.product.product_id}/${product.seller_product_id}`);
+        console.log(response.data)
         setSellers(response.data);
       } catch (error) {
         console.error('Satıcılar getirilirken hata oluştu:', error);
@@ -127,6 +128,7 @@ function OtherSellersTab({ product }) {
       }));
     }
   }, [cartItems, dispatch]);
+  console.log(sellers)
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -141,7 +143,7 @@ function OtherSellersTab({ product }) {
           <Tab label="Ürün Açıklaması" />
           <Tab label={`Değerlendirmeler (${reviews.length})`} />
           <Tab label={`Soru & Cevap (${questions.length})`} />
-          <Tab label="Diğer Satıcılar" />
+          <Tab label={`Diğer Satıcılar (${sellers.length})`} />
         </Tabs>
       </AppBar>
       <TabPanel value={tabValue} index={0}>
@@ -163,16 +165,11 @@ function OtherSellersTab({ product }) {
                   <TableRow key={index}>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Avatar alt={seller.seller.username} src="/static/images/avatar/1.jpg" sx={{ width: 56, height: 56, mr: 2 }} />
+                        <Avatar alt={seller.seller.username} src="" sx={{ width: 56, height: 56, mr: 2 }} onClick={() => handleSellerClick(seller.seller.slug)} style={{ cursor: 'pointer' }} />
                         <Box>
-                          <Link
-                            component="button"
-                            variant="h6"
-                            onClick={() => handleSellerClick(seller.seller.slug)}
-                            sx={{ fontWeight: 'bold', color: '#0070C0', textDecoration: 'none' }}
-                          >
-                            {seller.seller.username}
-                          </Link>
+                          <div style={{ fontSize: '18px', color: '#4b0082', cursor: 'pointer' }} onClick={() => handleSellerClick(seller.seller.slug)}>
+                            {seller.seller.username.toUpperCase()}
+                          </div>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <StarIcon sx={{ color: '#FFD700', fontSize: 16 }} />
                             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#4CAF50', ml: 0.5 }}>
@@ -190,6 +187,9 @@ function OtherSellersTab({ product }) {
                     <TableCell>
                       <Button variant="contained" color="secondary" sx={{ color: 'white' }} onClick={() => handleAddToCart(seller)}>
                         Sepete Ekle
+                      </Button>
+                      <Button sx={{ marginLeft: '20%' }} variant="text" color="primary" onClick={() => navigate(`/urun/${seller.product.slug}?mg=${seller.seller.slug}`)}>
+                        Ürüne Git
                       </Button>
                     </TableCell>
                   </TableRow>
