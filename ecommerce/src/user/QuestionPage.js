@@ -67,6 +67,16 @@ const QuestionsPage = () => {
         fetchQuestions();
     }, []);
 
+    // Soruları ürün adına göre gruplama
+    const groupedQuestions = questions.reduce((acc, question) => {
+        const productName = question.product.name;
+        if (!acc[productName]) {
+            acc[productName] = [];
+        }
+        acc[productName].push(question);
+        return acc;
+    }, {});
+
     return (
         <>
             <Navbar />
@@ -82,36 +92,43 @@ const QuestionsPage = () => {
                         <Grid item xs={12} md={9}>
                             {/* Burada kullanıcı soruları listelenir */}
                             <List sx={{ mb: 2 }}>
-                                {questions.length > 0 ? (
-                                    questions.map((question, index) => (
+                                {Object.keys(groupedQuestions).length > 0 ? (
+                                    Object.keys(groupedQuestions).map((productName, index) => (
                                         <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                                             <Paper elevation={3} sx={{ p: 2, width: '100%' }}>
-                                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#f27a1a' }}>
-                                                    Soru: {question.question}
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'black', ml: '30%', mb: 2 }}>
+                                                    Ürün Adı:  <Link style={{ textDecoration: 'none' }} to={'/urun/' + groupedQuestions[productName][0].product.slug}>{productName}</Link>
                                                 </Typography>
-                                                <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
-                                                    Sorulduğu Tarih: {new Date(question.date_asked).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                                                </Typography>
-                                                {question.approval_status_id === 1 ? (
-                                                    question.answer ? (
-                                                        <Paper elevation={2} sx={{ mt: 2, p: 2, backgroundColor: '#e0f7fa' }}>
-                                                            <Typography variant="body1">
-                                                                Cevap: {question.answer}
-                                                            </Typography>
-                                                            <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
-                                                                Cevaplandığı Tarih: {new Date(question.date_answered).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                                                            </Typography>
-                                                        </Paper>
-                                                    ) : (
-                                                        <Typography variant="body2" sx={{ mt: 2, color: 'gray' }}>
-                                                            Sorunuz cevap bekliyor...
+                                                {groupedQuestions[productName].map((question, qIndex) => (
+                                                    <Box key={qIndex} sx={{ mb: 2 }}>
+                                                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#f27a1a' }}>
+                                                            Soru: {question.question}
                                                         </Typography>
-                                                    )
-                                                ) : (
-                                                    <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
-                                                        Moderatör onayı bekliyor...
-                                                    </Typography>
-                                                )}
+                                                        <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
+                                                            Sorulduğu Tarih: {new Date(question.date_asked).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                                        </Typography>
+                                                        {question.approval_status_id === 1 ? (
+                                                            question.answer ? (
+                                                                <Paper elevation={2} sx={{ mt: 2, p: 2, backgroundColor: '#e0f7fa' }}>
+                                                                    <Typography variant="body1">
+                                                                        Cevap: {question.answer}
+                                                                    </Typography>
+                                                                    <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                                                                        Cevaplandığı Tarih: {new Date(question.date_answered).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                                                    </Typography>
+                                                                </Paper>
+                                                            ) : (
+                                                                <Typography variant="body2" sx={{ mt: 2, color: 'gray' }}>
+                                                                    Sorunuz cevap bekliyor...
+                                                                </Typography>
+                                                            )
+                                                        ) : (
+                                                            <Typography variant="body2" sx={{ mt: 2, color: 'red' }}>
+                                                                Moderatör onayı bekliyor...
+                                                            </Typography>
+                                                        )}
+                                                    </Box>
+                                                ))}
                                             </Paper>
                                         </ListItem>
                                     ))

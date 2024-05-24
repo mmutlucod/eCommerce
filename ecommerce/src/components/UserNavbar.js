@@ -3,10 +3,7 @@ import { AppBar, Toolbar, IconButton, InputBase, Box, Typography, Divider, Badge
 import SearchIcon from '@mui/icons-material/Search';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import FavoriteIcon from '@mui/icons-material/FavoriteBorder';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import GradeIcon from '@mui/icons-material/Grade';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import SearchModal from './SearchModal';
@@ -14,6 +11,13 @@ import CartDropdown from './CartDropdown';
 import api from '../api/api';
 import { Link } from 'react-router-dom';
 import '../styles/UserNavbar.css'; // CSS dosyamız
+import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
+import PersonIcon from '@mui/icons-material/Person';
+import CardTravelTwoToneIcon from '@mui/icons-material/CardTravelTwoTone';
+import QuestionMarkTwoToneIcon from '@mui/icons-material/QuestionMarkTwoTone';
+import ExitToAppTwoToneIcon from '@mui/icons-material/ExitToAppTwoTone';
+import PersonOutlineTwoToneIcon from '@mui/icons-material/PersonOutlineTwoTone';
 
 export default function UserNavbar() {
     const navigate = useNavigate();
@@ -29,6 +33,10 @@ export default function UserNavbar() {
     const [searchWidth, setSearchWidth] = useState(0);
     const [searchLeftMargin, setSearchLeftMargin] = useState(0);
     const [totalQuantity, setTotalQuantity] = useState(0);
+    const [isHoveredShoppingCartIcon, setIsHoveredShoppingCartIcon] = useState(false);
+    const [isHoveredFavoriteIcon, setIsHoveredFavoriteIcon] = useState(false);
+    const [isHoveredProfileIcon, setIsHoveredProfileIcon] = useState(false);
+
 
     const fetchCartItems = async () => {
         if (token) {
@@ -175,14 +183,24 @@ export default function UserNavbar() {
                                 className="profile-menu-container"
                                 sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}
                             >
-                                <IconButton color="inherit">
-                                    <PersonOutlineIcon />
-                                </IconButton>
-                                <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
-                                    Profilim
-                                </Typography>
+                                <Link to='/profilim' style={{ textDecoration: 'none', color: 'inherit' }}>
+                                    <IconButton
+                                        color="inherit"
+                                        onMouseOver={() => setIsHoveredProfileIcon(true)}
+                                        onMouseOut={() => setIsHoveredProfileIcon(false)}
+                                    >
+                                        {isHoveredProfileIcon ? <PersonIcon /> : <PersonOutlineIcon />}
+                                        <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+                                            Profilim
+                                        </Typography>
+                                    </IconButton>
+                                </Link>
+
                                 {profileMenuOpen && (
-                                    <Box className="profile-menu" onMouseEnter={handleProfileMenuOpen} onMouseLeave={handleProfileMenuClose}>
+                                    <Box className="profile-menu"
+                                        onMouseEnter={handleProfileMenuOpen}
+                                        onMouseLeave={handleProfileMenuClose}
+                                    >
                                         {user && user.name ? (
                                             <Typography variant="body2" className="profile-menu-user" sx={{ fontWeight: 'bold', color: '#4B0082' }}>
                                                 {user.name + ' ' + user.surname}
@@ -196,7 +214,7 @@ export default function UserNavbar() {
                                         <Link to={'/profilim'} style={{ textDecoration: 'none' }}>
                                             <MenuItem className="profile-menu-item">
                                                 <ListItemIcon sx={{ minWidth: '30px' }}>
-                                                    <PersonOutlineIcon fontSize="small" />
+                                                    <PersonOutlineTwoToneIcon fontSize="small" />
                                                 </ListItemIcon>
                                                 <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Hesabım" />
                                             </MenuItem>
@@ -204,7 +222,7 @@ export default function UserNavbar() {
                                         <Link to={'/siparislerim'} style={{ textDecoration: 'none' }}>
                                             <MenuItem className="profile-menu-item">
                                                 <ListItemIcon sx={{ minWidth: '30px' }}>
-                                                    <AssignmentIcon fontSize="small" />
+                                                    <CardTravelTwoToneIcon fontSize="small" />
                                                 </ListItemIcon>
                                                 <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Siparişlerim" />
                                             </MenuItem>
@@ -212,7 +230,7 @@ export default function UserNavbar() {
                                         <Link to={'/sorularim'} style={{ textDecoration: 'none' }}>
                                             <MenuItem className="profile-menu-item">
                                                 <ListItemIcon sx={{ minWidth: '30px' }}>
-                                                    <GradeIcon fontSize="small" />
+                                                    <QuestionMarkTwoToneIcon fontSize="small" />
                                                 </ListItemIcon>
                                                 <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Sorularım" />
                                             </MenuItem>
@@ -220,7 +238,7 @@ export default function UserNavbar() {
                                         <Divider />
                                         <MenuItem onClick={handleLogout} className="profile-menu-item">
                                             <ListItemIcon sx={{ minWidth: '30px' }}>
-                                                <ExitToAppIcon fontSize="small" />
+                                                <ExitToAppTwoToneIcon fontSize="small" />
                                             </ListItemIcon>
                                             <ListItemText className="profile-menu-text" primaryTypographyProps={{ variant: 'body2' }} primary="Çıkış Yap" />
                                         </MenuItem>
@@ -239,21 +257,29 @@ export default function UserNavbar() {
                         </>
                     )}
                     <Divider orientation="vertical" flexItem sx={{ bgcolor: 'white', mx: 2 }} />
-                    <IconButton color="inherit" onClick={() => navigate('/favorilerim')}>
-                        <FavoriteIcon />
-                    </IconButton>
-                    <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }} onClick={() => navigate('/favorilerim')}>
-                        Favorilerim
-                    </Typography>
+                    <Link to='/favorilerim' style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <IconButton
+                            color="inherit"
+                            onMouseOver={() => setIsHoveredFavoriteIcon(true)}
+                            onMouseOut={() => setIsHoveredFavoriteIcon(false)}>
+                            {isHoveredFavoriteIcon ? <FavoriteIcon /> : <FavoriteBorderOutlinedIcon />}
+                            <Typography variant="body2" noWrap sx={{ mx: 1, cursor: 'pointer' }}>
+                                Favorilerim
+                            </Typography>
+                        </IconButton>
+                    </Link>
+
                     <IconButton
                         color="inherit"
                         onMouseEnter={() => setCartDropdownOpen(true)}
                         onMouseLeave={() => setCartDropdownOpen(false)}
+                        onMouseOver={() => setIsHoveredShoppingCartIcon(true)}
+                        onMouseOut={() => setIsHoveredShoppingCartIcon(false)}
                         aria-label="show cart items"
                     >
                         <Link to='/sepetim' style={{ textDecoration: 'none', color: 'inherit' }}>
                             <Badge badgeContent={totalQuantity} color="secondary">
-                                <ShoppingCartIcon sx={{ marginLeft: '10px' }} />
+                                {isHoveredShoppingCartIcon ? <ShoppingCartIcon /> : <ShoppingCartOutlinedIcon />}
                             </Badge>
                         </Link>
                         {cartDropdownOpen && cartItems.length > 0 && location.pathname !== '/sepetim' && <CartDropdown />}

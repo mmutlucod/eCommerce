@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Box, Grid, Typography, Button, Rating, Paper } from '@mui/material';
+import { Box, Grid, Typography, Button, Rating, Paper, IconButton, Snackbar } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import NavBar from '../components/UserNavbar';
 import Footer from '../components/UserFooter';
 import SimpleImageSlider from '../components/SimpleImageSlider';
@@ -10,8 +11,12 @@ import '../styles/ProductPage.css';
 import ProductTabs from '../components/ProductTabs';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateItem, addItem } from '../redux/cartSlice';
-import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import { useAuth } from '../context/AuthContext';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { Tooltip } from '@mui/material';
+
 
 const theme = createTheme({
   palette: {
@@ -31,37 +36,43 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
+const FavoriteButton = styled(IconButton)(({ theme }) => ({
+  position: 'absolute',
+  top: 8,
+  right: 8,
+  zIndex: 10,
+  backgroundColor: 'rgba(255, 255, 255, 0.7)',
+  '&:hover': {
+    backgroundColor: 'rgba(255, 255, 255, 1)',
+  },
+}));
+
 const ProductPage = () => {
   const { productSlug } = useParams();
   const queryParams = new URLSearchParams(window.location.search);
-  const sellerSlug = queryParams.get('mg'); // 'mg' parametresini al
+  const sellerSlug = queryParams.get('mg');
   const [product, setProduct] = useState(null);
-  const [sellers, setSellers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [caption, setCaption] = useState('');
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState('success');
   const dispatch = useDispatch();
   const cartItems = useSelector(state => state.cart.items);
+  const { token } = useAuth();
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     const fetchProductAndSellers = async () => {
       setLoading(true);
       try {
-        const productResponse = await api.get(`user/product/${productSlug}`);
-        setProduct(productResponse.data);
-        setCaption(productResponse.data.product.caption);
-      } catch (err) {
-        setError('Ürün bilgileri yüklenirken bir hata oluştu: ' + err.message);
-      }
-
-      try {
-        const sellersResponse = sellerSlug
-          ? await api.get(`/user/products/${productSlug}?mg=${sellerSlug}`) // Satıcıya göre filtrele
-          : await api.get(`/user/product/${productSlug}`);
-        console.log(sellersResponse.data)
-        setSellers(sellersResponse.data.sellers);
+        if (sellerSlug) {
+          const response = await api.get(`/user/products/${productSlug}?mg=${sellerSlug}`);
+          setProduct(response.data[0]);
+        } else {
+          const response = await api.get(`/user/product/${productSlug}`);
+          setProduct(response.data);
+        }
       } catch (err) {
         setError('Satıcı bilgileri yüklenirken bir hata oluştu: ' + err.message);
       } finally {
@@ -72,60 +83,123 @@ const ProductPage = () => {
     fetchProductAndSellers();
   }, [productSlug, sellerSlug]);
 
+  useEffect(() => {
+    if (token) {
+      const fetchFavorites = async () => {
+        try {
+          const response = await api.get('/user/favorites');
+          setFavorites(response.data.map(fav => fav.product_id));
+        } catch (err) {
+          console.error('Favori ürünler alınırken hata oluştu:', err);
+        }
+      };
+
+      fetchFavorites();
+    }
+  }, [token]);
+
   const handleAddToCart = useCallback((product) => {
-    console.log('Adding to cart:', product);
+    if (!token) {
+      setAlertMessage('Lütfen önce giriş yapınız.');
+      setAlertSeverity('warning');
+      setAlertOpen(true);
+      setTimeout(() => {
+        window.location.href = '/giris-yap';
+      }, 2000);
+      return;
+    }
+
     if (!cartItems || !product) {
       console.warn('Cart items or product not yet loaded. Please wait a moment.');
       return;
     }
 
     const existingItem = cartItems.find(item => item.sellerProductId === product.seller_product_id);
-    console.log('Existing item:', existingItem);
     const newQuantity = existingItem ? existingItem.quantity + 1 : 1;
-
-    console.log('New quantity:', newQuantity);
 
     if (newQuantity > product.product.max_buy) {
       setAlertMessage(`Sepete maksimum ${product.product.max_buy} adet ürün ekleyebilirsiniz.`);
+      setAlertSeverity('warning');
       setAlertOpen(true);
       return;
     } else if (newQuantity > product.stock) {
       setAlertMessage(`Yeterli stok yok. Maksimum alım limiti: ${product.stock}`);
+      setAlertSeverity('warning');
       setAlertOpen(true);
       return;
     }
 
     if (existingItem) {
-      console.log('Updating item in cart');
       dispatch(updateItem({
         sellerProductId: product.seller_product_id,
         quantity: newQuantity,
         price: product.product.price
       }));
     } else {
-      console.log('Adding new item to cart');
       dispatch(addItem({
         sellerProductId: product.seller_product_id,
         quantity: 1,
         price: product.product.price
       }));
     }
-  }, [cartItems, dispatch, product]);
+  }, [cartItems, dispatch, product, token]);
 
+  const handleFavoriteToggle = useCallback(async (productId) => {
+    if (!token) {
+      setAlertMessage('Lütfen önce giriş yapınız.');
+      setAlertSeverity('warning');
+      setAlertOpen(true);
+      setTimeout(() => {
+        window.location.href = '/giris-yap';
+      }, 2000);
+      return;
+    }
+
+    try {
+      const isFavorited = favorites.includes(productId);
+      if (isFavorited) {
+        await api.post('/user/deleteFavoriteItem', { productId });
+        setFavorites(prev => prev.filter(id => id !== productId));
+        setAlertMessage('Ürün favorilerden çıkarıldı.');
+        setAlertSeverity('warning');
+      } else {
+        await api.post('/user/addFavoriteItem', { productId });
+        setFavorites(prev => [...prev, productId]);
+        setAlertMessage('Ürün favorilere eklendi.');
+        setAlertSeverity('success');
+      }
+      setAlertOpen(true);
+    } catch (err) {
+      console.error('Favori işlemi sırasında hata oluştu:', err);
+    }
+  }, [token, favorites]);
 
   const handleCloseAlert = () => {
     setAlertOpen(false);
   };
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography>Error: {error}</Typography>;
+  }
 
   return (
     <>
       <NavBar />
       <ThemeProvider theme={theme}>
         <Grid container spacing={2} sx={{ maxWidth: 1200, mx: 'auto', my: 5 }}>
-          <Paper elevation={3} sx={{ width: '100%', display: 'flex', flexDirection: 'column', p: 3 }}>
+          <Paper elevation={3} sx={{ width: '100%', display: 'flex', flexDirection: 'column', p: 3, position: 'relative' }}>
+            <Tooltip title={favorites.includes(product.product.product_id) ? "Favorilerden çıkar" : "Favorilere ekle"}>
+              <FavoriteButton onClick={() => handleFavoriteToggle(product.product.product_id)}>
+                {favorites.includes(product.product.product_id) ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
+              </FavoriteButton>
+            </Tooltip>
             <Grid container spacing={2} justifyContent="center">
               <Grid item xs={12} md={6} className="image-carousel" sx={{ position: 'relative' }}>
-                {product && (
+                {product && product.product.productImages && (
                   <SimpleImageSlider images={product.product.productImages.map(img => img.image_path)} showNavs={true} />
                 )}
               </Grid>
@@ -155,15 +229,28 @@ const ProductPage = () => {
                 <Typography variant="h6" sx={{ color: 'secondary.main', fontWeight: 'bold', mb: 2 }}>
                   {`${product?.price.toFixed(2)} ₺`}
                 </Typography>
-                <Button variant="contained" color="secondary" sx={{ width: '100%', mt: 3, py: 1, color: 'white' }} onClick={() => handleAddToCart(product)}>Sepete Ekle</Button>
+                {product.stock > 0 ? (
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    sx={{ width: '100%', mt: 3, py: 1, color: 'white' }}
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    Sepete Ekle
+                  </Button>
+                ) : (
+                  <Typography variant="h6" color="error" sx={{ mb: 3, mx: 'auto' }}>
+                    Bu satıcıda stok bulunamadı. Diğer satıcılara göz atın.
+                  </Typography>
+                )}
               </Grid>
             </Grid>
           </Paper>
           {product && <ProductTabs product={product} sellerProductId={product.seller_product_id} />}
         </Grid>
         <Footer />
-        <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert}>
-          <Alert onClose={handleCloseAlert} severity="warning">
+        <Snackbar open={alertOpen} autoHideDuration={800} onClose={handleCloseAlert}>
+          <Alert onClose={handleCloseAlert} severity={alertSeverity}>
             {alertMessage}
           </Alert>
         </Snackbar>

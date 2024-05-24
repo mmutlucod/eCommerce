@@ -130,11 +130,27 @@ const getUserDetails = async (req, res) => {
 };
 const updateUserDetail = async (req, res) => {
   try {
-    const { currentPassword, newPassword, confirmPassword, ...updateData } = req.body;
+    const { currentPassword, newPassword, confirmPassword, email, phone, ...updateData } = req.body;
     const user = await User.findOne({ where: { email: req.user.email } });
 
     if (!user) {
       return res.status(404).json({ success: false, message: 'Kullanıcı Bulunamadı' });
+    }
+
+    // E-posta ve telefon kontrolü
+    const emailExists = await User.findOne({ where: { email: email, user_id: { [Op.ne]: user.user_id } } });
+    const phoneExists = await User.findOne({ where: { phone: phone, user_id: { [Op.ne]: user.user_id } } });
+
+    if (emailExists && phoneExists) {
+      return res.status(400).json({ success: false, message: 'E-posta ve Telefon zaten kullanılıyor.' });
+    }
+
+    if (emailExists) {
+      return res.status(400).json({ success: false, message: 'Bu E-posta zaten kullanılıyor.' });
+    }
+
+    if (phoneExists) {
+      return res.status(400).json({ success: false, message: 'Bu Telefon zaten kullanılıyor.' });
     }
 
     // Şifre güncelleme işlemi yapılıyor mu kontrolü
@@ -142,12 +158,12 @@ const updateUserDetail = async (req, res) => {
       // Mevcut şifreyi doğrula
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
-        return res.status(400).json({ success: false, message: 'Mevcut şifre yanlış' });
+        return res.status(400).json({ success: false, message: 'Mevcut şifre yanlış.' });
       }
 
       // Yeni şifreler uyuşuyor mu kontrolü
       if (newPassword !== confirmPassword) {
-        return res.status(400).json({ success: false, message: 'Yeni şifreler eşleşmiyor' });
+        return res.status(400).json({ success: false, message: 'Yeni şifreler eşleşmiyor.' });
       }
 
       // Yeni şifreyi hashle ve güncelle
@@ -156,7 +172,7 @@ const updateUserDetail = async (req, res) => {
     }
 
     // Kullanıcı bilgilerini güncelle
-    await user.update(updateData);
+    await user.update({ ...updateData, email, phone });
 
     // Yeni bir token oluştur
     const payload = {
@@ -169,7 +185,7 @@ const updateUserDetail = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Bilgileriniz güncellendi',
+      message: 'Bilgileriniz güncellendi.',
       token: newToken, // Yeni token'ı yanıtla birlikte döndür
     });
 
@@ -177,6 +193,7 @@ const updateUserDetail = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 //SEPET İŞLEMLERİ
 
@@ -1007,6 +1024,7 @@ const cancelOrder = async (req, res) => {
 const getFavorites = async (req, res) => {
   try {
     const user = await User.findOne({ where: { email: req.user.email } });
+
     favorites = await UserFavoriteProduct.findAll({
       where: { user_id: user.user_id },
       include: [
@@ -1039,11 +1057,18 @@ const addFavoriteItem = async (req, res) => {
     const { productId } = req.body;
     const user = await User.findOne({ where: { email: req.user.email } });
 
+    const favoriteProduct = await UserFavoriteProduct.findOne({ where: { user_id: user.user_id, product_id: productId } });
+
+    if (favoriteProduct) {
+      return res.status(404).json({ success: false, message: 'Bu ürün zaten favorilerde mevcut!' });
+    }
+
     await UserFavoriteProduct.create({
       user_id: user.user_id,
       product_id: productId
     })
 
+    return res.status(200).json({ success: true, message: 'Ürün favorilere eklendi.' });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -1615,6 +1640,11 @@ const listMyQuestions = async (req, res) => {
 
     const questions = await productQuestion.findAll({
       where: { user_id: user.user_id },
+      include: [
+        {
+          model: Product
+        }
+      ],
       order: [['date_asked', 'DESC']],
     });
 
@@ -1808,7 +1838,7 @@ const getProductsBySlug = async (req, res) => {
     }
 
     const sellerProductData = await sellerProduct.findOne({
-      where: { product_id: product.product_id, is_active: 1 },
+      where: { product_id: product.product_id, is_active: 1, stock: { [Op.gt]: 0 } },
       include: [{
         model: Seller
       }, {
@@ -1905,11 +1935,17 @@ const getProductsBySellerSlug = async (req, res) => {
         model: Seller
       }, {
         model: Product,
-        include: [{
-          model: Brand
-        }, {
-          model: Category
-        }]
+        include: [
+          {
+            model: Brand
+          },
+          {
+            model: Category
+          },
+          {
+            model: productImage
+          }
+        ]
       }],
       order: [['price', 'ASC']], // Fiyata göre sırala
     });
@@ -2173,7 +2209,7 @@ const getSellerProductByProductId = async (req, res) => {
         },
         {
           model: Seller, // Satıcı bilgilerini çekmek için eklenen model
-          attributes: ['seller_id', 'username'] // Çekilecek satıcı bilgileri
+          attributes: ['seller_id', 'username', 'slug']
         }
       ],
       order: [['price', 'ASC']]

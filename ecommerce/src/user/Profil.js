@@ -11,8 +11,10 @@ import {
   Container,
   CssBaseline,
   ThemeProvider,
-  createTheme
+  createTheme,
+  Snackbar
 } from '@mui/material';
+import MuiAlert from '@mui/material/Alert';
 import Navbar from '../components/UserNavbar';
 import { renderMenuItems } from './RenderMenuItems';
 import api from '../api/api';
@@ -47,6 +49,10 @@ const theme = createTheme({
   },
 });
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
 const UserProfile = () => {
   const [selectedItem, setSelectedItem] = useState('profile');
   const [userInfo, setUserInfo] = useState({
@@ -58,13 +64,31 @@ const UserProfile = () => {
     newPassword: '',
     confirmPassword: '',
   });
+  const [originalUserInfo, setOriginalUserInfo] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    phone: '',
+  });
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState('warning');
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
         const response = await api.get('/user/my-account');
         const { name, surname, email, phone } = response.data;
-        setUserInfo({ ...userInfo, name, surname, email, phone });
+        setUserInfo({
+          name,
+          surname,
+          email,
+          phone,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        });
+        setOriginalUserInfo({ name, surname, email, phone });
       } catch (error) {
         console.error('Profil bilgileri alınırken hata oluştu:', error);
       }
@@ -75,10 +99,31 @@ const UserProfile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserInfo({ ...userInfo, [name]: value });
+    setUserInfo((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
 
   const handleUpdate = async () => {
+    if (!userInfo.name || !userInfo.surname || !userInfo.email || !userInfo.phone) {
+      setAlertMessage('Ad, Soyad, E-Mail ve Telefon alanları boş bırakılamaz.');
+      setAlertSeverity('warning');
+      setAlertOpen(true);
+      return;
+    }
+
+    const isUserInfoChanged = Object.keys(originalUserInfo).some(
+      (key) => userInfo[key] !== originalUserInfo[key]
+    );
+
+    if (!isUserInfoChanged) {
+      setAlertMessage('Hiçbir değişiklik yapılmadı.');
+      setAlertSeverity('info');
+      setAlertOpen(true);
+      return;
+    }
+
     try {
       const data = {
         name: userInfo.name,
@@ -97,14 +142,30 @@ const UserProfile = () => {
         if (newToken) {
           localStorage.setItem('token', newToken);
         }
-        alert('Profil bilgileriniz başarıyla güncellendi.');
+        setAlertMessage('Profil bilgileriniz başarıyla güncellendi.');
+        setAlertSeverity('success');
+        setAlertOpen(true);
+        setOriginalUserInfo({
+          name: userInfo.name,
+          surname: userInfo.surname,
+          email: userInfo.email,
+          phone: userInfo.phone,
+        });
       } else {
-        alert('Güncelleme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.');
+        setAlertMessage(response.data.message || 'Güncelleme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.');
+        setAlertSeverity('error');
+        setAlertOpen(true);
       }
     } catch (error) {
       console.error('Profil güncelleme işlemi sırasında bir hata oluştu:', error);
-      alert('Profil güncelleme işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      setAlertMessage(error.response?.data?.message || 'Profil güncelleme işlemi sırasında bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
+      setAlertSeverity('error');
+      setAlertOpen(true);
     }
+  };
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
   };
 
   return (
@@ -124,7 +185,6 @@ const UserProfile = () => {
                 Kullanıcı Bilgilerim
               </Typography>
               <Divider sx={{ my: 2 }} />
-              {console.log(userInfo)}
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField label="Ad" fullWidth name="name" value={userInfo.name} onChange={handleChange} />
@@ -164,6 +224,11 @@ const UserProfile = () => {
           </Box>
         </Grid>
       </Container>
+      <Snackbar open={alertOpen} autoHideDuration={2000} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity={alertSeverity}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </ThemeProvider>
   );
 };
