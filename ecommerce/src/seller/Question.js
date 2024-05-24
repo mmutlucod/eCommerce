@@ -67,7 +67,7 @@ const Questions = () => {
 
   const handleSaveAnswer = async () => {
     try {
-      await api.patch(`seller/my-questions/${selectedQuestion.id}`, { answer });
+      await api.patch(`seller/my-questions/${selectedQuestion.question_id}`, { answer });
       setQuestions((prevQuestions) => prevQuestions.map((q) => 
         q.id === selectedQuestion.id ? { ...q, answer } : q
       ));
