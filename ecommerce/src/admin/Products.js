@@ -137,9 +137,9 @@ function ProductsAdmin() {
   };
 
   const handleApprovalStatusChange = (event) => {
-   
     setProductToEdit({ ...productToEdit, approval_status_id: event.target.value });
   };
+
   const handleBrandChange = (event) => {
     setProductToEdit({ ...productToEdit, brand_id: event.target.value });
   };
@@ -156,20 +156,20 @@ function ProductsAdmin() {
           <Grid item xs={12}>
             <Card>
               <CardContent>
-              <Grid container justifyContent="space-between" alignItems="center">
-    <Grid item>
-      <Typography variant="h5" gutterBottom>Ürün Listesi</Typography>
-    </Grid>
-    <Grid item>
-      <IconButton
-        color="primary"
-        aria-label="Menü Ekle"
-        onClick={handleAddMenuClick}
-      >
-        <AddCircleOutlineIcon />
-      </IconButton>
-    </Grid>
-  </Grid>
+                <Grid container justifyContent="space-between" alignItems="center">
+                  <Grid item>
+                    <Typography variant="h5" gutterBottom>Ürün Listesi</Typography>
+                  </Grid>
+                  <Grid item>
+                    <IconButton
+                      color="primary"
+                      aria-label="Menü Ekle"
+                      onClick={handleAddMenuClick}
+                    >
+                      <AddCircleOutlineIcon />
+                    </IconButton>
+                  </Grid>
+                </Grid>
                 <TableContainer component={Paper}>
                   <Table>
                     <TableHead>
@@ -182,19 +182,18 @@ function ProductsAdmin() {
                         <TableCell align="right">Onay Durumu</TableCell>
                         <TableCell align="right">Onaylayan Kişi</TableCell>
                         <TableCell align="right" style={{ textAlign: "right", paddingRight: 0 }}>İşlemler</TableCell>
-                       
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {products.map((product) => (
-                        <TableRow key={product.id}>
+                        <TableRow key={product.product_id}>
                           <TableCell component="th" scope="row">{product.name}</TableCell>
                           <TableCell align="right">{product.stock_code}</TableCell>
-                          <TableCell align="right">{product.category.category_name}</TableCell>
-                          <TableCell align="right">{product.Brand.brand_name}</TableCell>
+                          <TableCell align="right">{product.category?.category_name || 'Bilinmiyor'}</TableCell>
+                          <TableCell align="right">{product.Brand?.brand_name || 'Bilinmiyor'}</TableCell>
                           <TableCell align="right">{product.price}</TableCell>
-                          <TableCell align="right">{product.ApprovalStatus.status_name}</TableCell>
-                          <TableCell align="right">{product.Admin.full_name}</TableCell>
+                          <TableCell align="right">{product.ApprovalStatus?.status_name || 'Bilinmiyor'}</TableCell>
+                          <TableCell align="right">{product.Admin?.full_name || 'Bilinmiyor'}</TableCell>
                           <TableCell align="right">{product.approver}</TableCell>
                           <TableCell>
                             <IconButton aria-label="settings" onClick={(event) => handleMenuClick(event, product)}>
@@ -237,7 +236,6 @@ function ProductsAdmin() {
             value={productToEdit.name}
             onChange={(e) => setProductToEdit({ ...productToEdit, name: e.target.value })}
           />
-         {console.log(categories)}
           <FormControl fullWidth margin="dense">
             <InputLabel>Kategori</InputLabel>
             <Select
@@ -329,6 +327,5 @@ function ProductsAdmin() {
     </>
   );
 }
-
 
 export default ProductsAdmin;

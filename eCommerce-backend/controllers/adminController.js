@@ -14,7 +14,7 @@ const saltRounds = 10; // Bcrypt için salt tur sayısı
 const { Sequelize, Op } = require('sequelize');
 const ProductComment = require('../models/productComment');
 const productQuestion = require('../models/productQuestion');
-
+const productImage = require('../models/productImage');
 const login = async (req, res) => {
     const { username, password } = req.body;
 
@@ -157,21 +157,40 @@ const getProductsById = async (req, res) => {
     }
 }
 const createProduct = async (req, res) => {
-    // İstek gövdesinden ürün bilgilerini al
-    try {
-        // Yeni ürünü veritabanına ekle
-        const product = await Product.create({
-            ...req.body,
-            approval_status_id: 1,
-            max_buy: 10
-        });
+    const transaction = await Product.sequelize.transaction(); // Transaction başlat
+  try {
+    const existingProduct = await Product.findOne({
+      where: {
+        stock_code: req.body.stock_code
+      }
+    });
 
-        // Ürün başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön
-        return res.status(201).json({ success: true, message: 'Ürün başarıyla oluşturuldu.', product });
-    } catch (error) {
-        // Ürün oluşturma işlemi sırasında bir hata oluşursa, hata mesajını döndür
-        return res.status(500).json({ success: false, message: 'Ürün oluşturulurken bir hata oluştu.', error: error.message });
+    if (existingProduct) {
+      res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
+    } else {
+      const newProduct = await Product.create({
+        ...req.body,
+        approval_status_id: 3, // Onay bekleyen durum
+        max_buy: 10 // Örneğin max_buy değeri
+      }, { transaction });
+
+      // Dosya isimlerini al ve productImages tablosuna ekle
+      if (req.files && req.files.length > 0) {
+        const imagePaths = req.files.map(file => ({
+          product_id: newProduct.product_id,
+          image_path: file.filename
+        }));
+
+        await productImage.bulkCreate(imagePaths, { transaction });
+      }
+
+      await transaction.commit();
+      res.status(200).json({ success: true, message: 'Ürün ve resimler sisteme eklendi.', product: newProduct });
     }
+  } catch (error) {
+    await transaction.rollback();
+    res.status(500).json({ success: false, message: 'Ürün oluşturulurken bir hata oluştu.', error: error.message });
+  }
 };
 const editProduct = async (req, res) => {
     const { id } = req.params; // URL'den ürün ID'si alınır

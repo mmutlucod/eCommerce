@@ -2,157 +2,254 @@ import React, { useState, useEffect } from 'react';
 import {
   Container,
   TextField,
-  Button,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Grid,
   Paper,
-  Typography
+  Typography,
+  Snackbar,
+  CircularProgress,
+  Box,
+  Button,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
 } from '@mui/material';
-import api from '../api/api'; // API işlemleri için
+import MuiAlert from '@mui/material/Alert';
+import { styled } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import AdminNavbar from '../components/AdminNavbar';
+import api from '../api/api';
 
-function ProductAdd() {
-  const [categories, setCategories] = useState([]);
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+
+const CustomTextField = styled(TextField)(({ theme }) => ({
+  '& label.Mui-focused': {
+    color: '#9c27b0',
+  },
+  '& .MuiInput-underline:after': {
+    borderBottomColor: '#9c27b0',
+  },
+  '& .MuiOutlinedInput-root': {
+    '& fieldset': {
+      borderColor: '#9c27b0',
+    },
+    '&:hover fieldset': {
+      borderColor: '#9c27b0',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#9c27b0',
+    },
+  },
+}));
+
+const CustomButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#9c27b0',
+  color: 'white',
+  '&:hover': {
+    backgroundColor: '#7b1fa2',
+  },
+}));
+
+const ProductAdd = () => {
   const [brands, setBrands] = useState([]);
-  const [approvalStatuses, setApprovalStatuses] = useState([]);
-  const [product, setProduct] = useState({
+  const [categories, setCategories] = useState([]);
+  const [formData, setFormData] = useState({
     name: '',
-    stockCode: '',
-    categoryId: '',
-    brandId: '',
     price: '',
-    approvalStatusId: '',
-    approver: ''
+    brand_id: '',
+    description: '',
+    stock_code: '',
+    category_id: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Kategorileri, markaları ve onay durumlarını API'den çek
-    fetchCategories();
-    fetchBrands();
-    fetchApprovalStatuses();
+    const fetchData = async () => {
+      try {
+        const brandsResponse = await api.get('admin/brands');
+        const categoriesResponse = await api.get('admin/categories');
+        setBrands(brandsResponse.data);
+        setCategories(categoriesResponse.data);
+      } catch (error) {
+        setErrorMessage('Veriler yüklenirken bir hata oluştu.');
+        console.error('Veriler yüklenirken bir hata oluştu:', error);
+      }
+    };
+
+    fetchData();
   }, []);
 
-  const fetchCategories = async () => {
-    const response = await api.get('/admin/categories');
-    setCategories(response.data);
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const fetchBrands = async () => {
-    const response = await api.get('/admin/brands');
-    setBrands(response.data);
+  const handleEditorChange = (event, editor) => {
+    const data = editor.getData();
+    setFormData({ ...formData, description: data });
   };
 
-  const fetchApprovalStatuses = async () => {
-    const response = await api.get('/admin/approvalstatuses');
-    setApprovalStatuses(response.data);
+  const handleFileChange = (event) => {
+    setSelectedFiles(event.target.files);
   };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setProduct({ ...product, [name]: value });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    const formDataWithFiles = new FormData();
+    for (const key in formData) {
+      formDataWithFiles.append(key, formData[key]);
+    }
+    if (selectedFiles) {
+      for (let i = 0; i < selectedFiles.length; i++) {
+        formDataWithFiles.append('files', selectedFiles[i]);
+      }
+    }
+
+    try {
+      const response = await api.post('/admin/create-product', formDataWithFiles, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setSuccessMessage('Ürün başarıyla oluşturuldu.');
+      setFormData({
+        name: '',
+        price: '',
+        brand_id: '',
+        description: '',
+        stock_code: '',
+        category_id: '',
+      });
+      setSelectedFiles(null);
+    } catch (error) {
+      setErrorMessage('Ürün oluşturulurken bir hata oluştu.');
+      console.error('Ürün oluşturulurken bir hata oluştu:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    await api.post('/admin/create-product', product);
-    // Başarıyla eklendikten sonra formu temizle veya kullanıcıyı başka bir sayfaya yönlendir
+  const handleCloseSnackbar = () => {
+    setSuccessMessage('');
+    setErrorMessage('');
   };
 
   return (
     <>
-      <AdminNavbar/>
-      <Container maxWidth="sm" component={Paper} elevation={3} sx={{ p: 4, marginTop: 8 }}>
-        <Typography variant="h6" gutterBottom>Ürün Ekle</Typography>
-        <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
+      <AdminNavbar />
+      <Container maxWidth="md" style={{ marginTop: '40px', marginBottom: '40px' }}>
+        <Paper elevation={3} style={{ padding: '20px' }}>
+          <Typography variant="h5" gutterBottom>
+            Yeni Ürün Ekle
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <CustomTextField
               fullWidth
+              margin="normal"
               label="Ürün Adı"
               name="name"
-              value={product.name}
+              value={formData.name}
               onChange={handleChange}
+              required
             />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Stok Kodu"
-              name="stockCode"
-              value={product.stockCode}
-              onChange={handleChange}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel>Kategori</InputLabel>
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="category-label">Kategori</InputLabel>
               <Select
-                name="categoryId"
-                value={product.categoryId}
-                label="Kategori"
+                labelId="category-label"
+                name="category_id"
+                value={formData.category_id}
                 onChange={handleChange}
+                required
               >
                 {categories.map((category) => (
-                  <MenuItem key={category.id} value={category.id}>{category.category_name}</MenuItem>
+                  <MenuItem key={category.id} value={category.id}>
+                    {category.category_name}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel>Marka</InputLabel>
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="brand-label">Marka</InputLabel>
               <Select
-                name="brandId"
-                value={product.brandId}
-                label="Marka"
+                labelId="brand-label"
+                name="brand_id"
+                value={formData.brand_id}
                 onChange={handleChange}
+                required
               >
                 {brands.map((brand) => (
-                  <MenuItem key={brand.brand_id} value={brand.brand_id}>{brand.brand_name}</MenuItem>
+                  <MenuItem key={brand.brand_id} value={brand.brand_id}>
+                    {brand.brand_name}
+                  </MenuItem>
                 ))}
               </Select>
             </FormControl>
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
+            <CustomTextField
               fullWidth
+              margin="normal"
               label="Fiyat"
               name="price"
               type="number"
-              value={product.price}
+              value={formData.price}
               onChange={handleChange}
+              required
             />
-          </Grid>
-          <Grid item xs={12}>
-            {/* <FormControl fullWidth>
-              <InputLabel>Onay Durumu</InputLabel>
-              <Select
-                name="approvalStatusId"
-                value={product.approvalStatusId}
-                label="Onay Durumu"
-                onChange={handleChange}
-              >
-                {approvalStatuses.map((status) => (
-                  <MenuItem key={status.approval_status_id} value={status.approval_status_id}>{status.status_name}</MenuItem>
-                ))}
-              </Select>
-            </FormControl> */}
-          </Grid>
-          <Grid item xs={12}>
-            <Button type="submit" variant="contained" color="primary">
-              Ürün Ekle
-            </Button>
-          </Grid>
-        </Grid>
-      </form>
+            <CustomTextField
+              fullWidth
+              margin="normal"
+              label="Stok Kodu"
+              name="stock_code"
+              value={formData.stock_code}
+              onChange={handleChange}
+              required
+            />
+            <Box margin="normal">
+              <Typography variant="body1" gutterBottom>
+                Açıklama
+              </Typography>
+              <CKEditor
+                editor={ClassicEditor}
+                data={formData.description}
+                onChange={handleEditorChange}
+              />
+            </Box>
+            <Box margin="normal">
+              <Typography variant="body1" gutterBottom>
+                Resim Yükle
+              </Typography>
+              <input
+                type="file"
+                multiple
+                onChange={handleFileChange}
+              />
+            </Box>
+            <Box display="flex" justifyContent="center" marginTop="20px">
+              <CustomButton type="submit" variant="contained" disabled={loading}>
+                {loading ? <CircularProgress size={24} /> : 'Ürün Ekle'}
+              </CustomButton>
+            </Box>
+          </form>
+        </Paper>
       </Container>
+      <Snackbar open={Boolean(successMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="success">
+          {successMessage}
+        </Alert>
+      </Snackbar>
+      <Snackbar open={Boolean(errorMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity="error">
+          {errorMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
-}
+};
 
 export default ProductAdd;
-
-

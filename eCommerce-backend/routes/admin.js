@@ -6,7 +6,7 @@ const ProductComment = require('../models/productComment');
 const Product = require('../models/product');
 const sellerProduct = require('../models/sellerProduct');
 const productQuestion = require('../models/productQuestion');
-
+const upload = require('../upload'); // upload.js dosyasını içe aktarın
 
 router.post('/login', adminController.login);
 router.post('/register', adminController.register);
@@ -14,7 +14,7 @@ router.get('/listAdmins', authMiddleware, roleCheckMiddleware('admin'), adminCon
 
 router.get('/products', authMiddleware, roleCheckMiddleware('admin'), adminController.getProducts)
 router.get('/products/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.getProductsById);
-router.post('/create-product', authMiddleware, roleCheckMiddleware('admin'), adminController.createProduct);
+router.post('/create-product', authMiddleware, roleCheckMiddleware('admin'), upload.array('files', 10), adminController.createProduct);
 router.put('/products/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.editProduct);
 router.delete('/products/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.deleteProduct);
 router.get('/searchProduct', authMiddleware, roleCheckMiddleware('admin'), adminController.searchProduct);
