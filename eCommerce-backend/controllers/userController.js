@@ -1278,7 +1278,9 @@ const createProductComments = async (req, res) => {
       rating: rating,
       is_public: isPublic,
       is_deleted: 0,
-      comment_date: new Date()
+      comment_date: new Date(),
+      admin_id: 1,
+      approval_status_id: 3
     });
 
     return res.status(201).json(newComment);

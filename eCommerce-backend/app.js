@@ -11,6 +11,7 @@ const sequelize = require('./utility/db');
 const session = require('express-session');
 const cors = require('cors')
 require('dotenv').config();
+const path = require('path')
 
 
 // sequelize.sync({force:true});
@@ -26,7 +27,7 @@ app.use('/admin', adminRoutes);
 app.use('/seller', sellerRoutes);
 app.use('/user', userRoutes);
 
-app.use(express.static('public'));
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.listen(port, () => {
     console.log(`Sunucu ${port} portunda çalışıyor...`);

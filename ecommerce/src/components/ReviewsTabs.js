@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Rating, Grid, Paper, List, Card, CardHeader, Avatar,
-  CardContent, Button, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, TextField, Modal
+  CardContent, Button, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, TextField, Modal, FormControlLabel, Checkbox
 } from '@mui/material';
 import { purple } from '@mui/material/colors'; // Mor renk import edildi
 import api from '../api/api';
@@ -15,7 +15,7 @@ function formatUserName(name, isPublic) {
   }
 }
 
-function ReviewsTab({ productId }) {
+function ReviewsTab({ productId, sellerProductId }) {
   const [reviews, setReviews] = useState([]);
   const [ratingSummary, setRatingSummary] = useState({});
   const [selectedRating, setSelectedRating] = useState('');
@@ -25,6 +25,9 @@ function ReviewsTab({ productId }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [newRating, setNewRating] = useState(0);
   const [newComment, setNewComment] = useState('');
+  const [isPublic, setIsPublic] = useState(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState('warning'); // Snackbar severity durumu eklendi
+
 
   const { token } = useAuth();
 
@@ -68,6 +71,7 @@ function ReviewsTab({ productId }) {
   const handleReviewButtonClick = async () => {
     if (!token) {
       setSnackbarMessage('Değerlendirme ekleyebilmek için giriş yapmalısınız.');
+      setSnackbarSeverity('warning');
       setSnackbarOpen(true);
       return;
     }
@@ -76,21 +80,26 @@ function ReviewsTab({ productId }) {
       const response = await api.get(`/user/commentControl/${productId}`);
       if (response.data.success) {
         if (response.data.purchased) {
-          setCanReview(true);
-          setSnackbarMessage('Değerlendirme ekleyebilirsiniz.');
+          // setCanReview(true);
+          // setSnackbarMessage('Değerlendirme ekleyebilirsiniz.');
           setModalOpen(true);
         } else {
           setSnackbarMessage('Bu ürüne değerlendirme eklemek için satın almış olmalısınız.');
+          setSnackbarSeverity('warning');
           setCanReview(false);
+          setSnackbarOpen(true);
         }
       } else {
         setSnackbarMessage(response.data.message);
+        setSnackbarSeverity('warning');
         setCanReview(false);
+        setSnackbarOpen(true);
       }
-      setSnackbarOpen(true);
+
     } catch (error) {
       console.error('Error checking purchase:', error);
       setSnackbarMessage('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.');
+      setSnackbarSeverity('error');
       setCanReview(false);
     }
   };
@@ -110,42 +119,42 @@ function ReviewsTab({ productId }) {
 
   const handleSaveReview = async () => {
     try {
-      const response = await api.post('/user/create-seller-comment', {
-        product_id: productId,
-        rating: newRating,
-        comment: newComment,
-        token
+      // Kullanıcı bilgilerini çekmek için /user/my-account endpoint'ine istek at
+      const userResponse = await api.get('/user/my-account', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       });
 
-      if (response.data.success) {
-        setSnackbarMessage('Değerlendirmeniz kaydedildi.');
-        setReviews([...reviews, {
-          id: response.data.comment_id,
-          userId: response.data.user_id,
-          title: newComment,
-          content: newComment,
-          rating: newRating,
-          date: new Date().toISOString(),
-          user: {
-            name: formatUserName(response.data.user.name, response.data.is_public),
-            surname: formatUserName(response.data.user.surname, response.data.is_public),
-          },
-          isPublic: response.data.is_public,
-        }]);
-        const newSummary = { ...ratingSummary };
-        newSummary[newRating] = (newSummary[newRating] || 0) + 1;
-        setRatingSummary(newSummary);
-      } else {
-        setSnackbarMessage(response.data.message);
-      }
+      const userData = userResponse.data;
+
+      // Yorum kaydetmek için API isteği
+      const response = await api.post('/user/create-product-comment', {
+        sellerProductId: sellerProductId,
+        rating: newRating,
+        comment: newComment,
+        isPublic: isPublic
+      });
+
+
+      setSnackbarMessage('Yorumunuz gönderildi. Moderatör onayı sonrası herkese gösterilecektir.');
+      setSnackbarSeverity('success');
       setSnackbarOpen(true);
       handleModalClose();
+
     } catch (error) {
       console.error('Error saving review:', error);
       setSnackbarMessage('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.');
+      setSnackbarSeverity('error');
       setSnackbarOpen(true);
     }
   };
+
+
+  const handleIsPublicChange = (event) => {
+    setIsPublic(event.target.checked);
+  };
+
 
   const filteredReviews = reviews.filter(review => review.rating.toString().includes(selectedRating));
 
@@ -231,7 +240,7 @@ function ReviewsTab({ productId }) {
         </Grid>
       </Grid>
       <Snackbar open={snackbarOpen} autoHideDuration={1200} onClose={handleSnackbarClose}>
-        <Alert onClose={handleSnackbarClose} severity="warning" sx={{ width: '100%' }}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
@@ -263,6 +272,22 @@ function ReviewsTab({ productId }) {
                   '&:hover fieldset': { borderColor: purple[700] },
                 }
               }}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isPublic}
+                  onChange={handleIsPublicChange}
+                  sx={{
+                    color: purple[500],
+                    '&.Mui-checked': {
+                      color: purple[700],
+                    }
+                  }}
+                />
+              }
+              label="Yorumlarda ismim görünsün."
+              sx={{ mt: 2 }}
             />
             <Button
               variant="contained"

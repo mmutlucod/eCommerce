@@ -18,12 +18,15 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  CircularProgress
+  CircularProgress,
+  Link
 } from '@mui/material';
 import Navbar from '../components/UserNavbar';
 import { renderMenuItems } from './RenderMenuItems';
 import api from '../api/api';
 import '../styles/OrderPage.css'; // Eklenen CSS dosyası
+import { useNavigate } from 'react-router-dom';
+
 
 const theme = createTheme({
   palette: {
@@ -62,6 +65,8 @@ const OrdersPage = () => {
   const [selectedOrderAddress, setSelectedOrderAddress] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     fetchOrders();
@@ -105,8 +110,8 @@ const OrdersPage = () => {
     setSelectedOrderAddress(null);
   };
 
-  const calculateTotalPrice = (orderItems) => {
-    return orderItems.reduce((total, item) => total + item.sellerProduct.price * item.quantity, 0);
+  const calculateTotalQuantity = (orderItems) => {
+    return orderItems.reduce((total, item) => total + item.quantity, 0);
   };
 
   return (
@@ -177,19 +182,18 @@ const OrdersPage = () => {
               <Box>
                 <div className="cart-header00">
                   <div className="cart-title0">
-                    Sipariş ({selectedOrderDetails.orderItems.length} Ürün)
+                    Sipariş ({calculateTotalQuantity(selectedOrderDetails.orderItems)} Ürün)
                   </div>
                 </div>
                 <div className="cart-items0">
                   {selectedOrderDetails.orderItems.map((item, idx) => (
                     <Box key={idx} className="cart-itemX0">
-                      <Box className="item-image0">
-                        {console.log(item.sellerProduct.product.productImages)}
+                      <Box className="item-image0" onClick={() => navigate(`/urun/${item.sellerProduct.product.slug}?mg=${item.sellerProduct.seller.slug}`)}>
                         <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
                       </Box>
                       <Box className="item-details00">
                         {console.log(item)}
-                        <Typography className="item-name0">{item.sellerProduct.product.name ? item.sellerProduct.product.name : 'Bilinmiyor'}</Typography>
+                        <Typography className="item-name0" onClick={() => navigate(`/urun/${item.sellerProduct.product.slug}?mg=${item.sellerProduct.seller.slug}`)}>{item.sellerProduct.product.name ? item.sellerProduct.product.name : 'Bilinmiyor'}</Typography>
                         <Box className="item-options0">
                           <Typography className="item-price0">Fiyat: {item.sellerProduct.price} ₺</Typography>
                           <Typography className="item-quantity0">Adet: {item.quantity}</Typography>
@@ -218,7 +222,6 @@ const OrdersPage = () => {
                       <Typography>, {selectedOrderAddress.city}</Typography>
                       <Typography>, {selectedOrderAddress.state}</Typography>
                       <Typography>, {selectedOrderAddress.postal_code}</Typography>
-                      <Typography>, {selectedOrderAddress.country}</Typography>
                     </Box>
                   </Box>
                 </Box>
@@ -232,8 +235,8 @@ const OrdersPage = () => {
               Kapat
             </Button>
           </DialogActions>
-        </Dialog>
-      </ThemeProvider>
+        </Dialog >
+      </ThemeProvider >
     </>
   );
 };

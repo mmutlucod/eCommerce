@@ -13,6 +13,7 @@ const OrderStatus = require('../models/orderStatus');
 const productQuestion = require('../models/productQuestion');
 const { errors } = require('ethers');
 const ProductComment = require('../models/productComment');
+const productImage = require('../models/productImage');
 
 //GİRİŞ
 const login = async (req, res) => {
@@ -309,6 +310,7 @@ const searchAllProducts = async (req, res) => {
     }
 };
 const createProduct = async (req, res) => {
+    const transaction = await Product.sequelize.transaction(); // Transaction başlat
     try {
         const product = await Product.findOne({
             where: {
@@ -319,14 +321,24 @@ const createProduct = async (req, res) => {
         if (product) {
             res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
         } else {
-            await Product.create({
+            const newProduct = await Product.create({
                 approval_status_id: 3,
                 ...req.body,
-            });
+            }, { transaction });
 
-            res.status(200).json({ success: true, message: 'Ürün sisteme eklendi.' });
+            // Dosya isimlerini al ve productImages tablosuna ekle
+            const imagePaths = req.files.map(file => ({
+                product_id: newProduct.product_id,
+                image_path: file.filename
+            }));
+
+            await productImage.bulkCreate(imagePaths, { transaction });
+
+            await transaction.commit();
+            res.status(200).json({ success: true, message: 'Ürün ve resimler sisteme eklendi.' });
         }
     } catch (error) {
+        await transaction.rollback();
         res.status(500).json({ success: false, message: error.message });
     }
 };
@@ -684,10 +696,12 @@ const getQuestions = async (req, res) => {
         if (!seller) {
             return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
         }
-        const questions = await productQuestion.findAll({ where: { seller_id: seller.seller_id, approval_status_id: 1 },
-        include:[
-            {model:Product}
-        ] })
+        const questions = await productQuestion.findAll({
+            where: { seller_id: seller.seller_id, approval_status_id: 1 },
+            include: [
+                { model: Product }
+            ]
+        })
         res.status(200).json(questions);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -697,7 +711,7 @@ const answerQuestion = async (req, res) => {
     try {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
         if (!seller) {
-           return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+            return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
         }
 
         const { questionId } = req.params;
