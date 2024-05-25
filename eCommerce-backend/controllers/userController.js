@@ -840,7 +840,14 @@ const getOrderItems = async (req, res) => {
           model: sellerProduct,
           include: [
             { model: Seller },
-            { model: Product },
+            {
+              model: Product,
+              include: [
+                {
+                  model: productImage
+                }
+              ]
+            },
           ],
         },
         { model: orderStatus },
@@ -2031,9 +2038,14 @@ const getProductsByCategorySlug = async (req, res) => {
         where: { category_id: category.id },
         include: [{
           model: Brand
-        }, {
+        },
+        {
           model: Category
-        }]
+        },
+        {
+          model: productImage
+        }
+        ]
       }],
       order: [['price', 'ASC']]
     });
@@ -2117,7 +2129,7 @@ const getProductsBySeller = async (req, res) => {
       where: { seller_id: seller.seller_id, is_active: 1 },
       include: [{
         model: Product,
-        include: [{ model: Brand }, { model: Category }]
+        include: [{ model: Brand }, { model: Category }, { model: productImage }]
       }],
       order: [['price', 'ASC']]
     });
@@ -2314,7 +2326,7 @@ const getProductsByBrandSlug = async (req, res) => {
       include: [{
         model: Product,
         where: { brand_id: brand.brand_id },
-        include: [{ model: Brand }, { model: Category }]
+        include: [{ model: Brand }, { model: Category }, { model: productImage }]
       }],
       where: { is_active: 1 },
       order: [['price', 'ASC']]
@@ -2481,6 +2493,59 @@ const getPhotos = async (req, res) => {
   }
 }
 
+const commentControl = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const user = await User.findOne({ where: { email: req.user.email } });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Kullanıcının aynı ürüne daha önce yorum yapıp yapmadığını kontrol et
+    const existingComment = await ProductComment.findOne({
+      where: { user_id: user.user_id, seller_product_id: productId }
+    });
+
+    if (existingComment) {
+      return res.status(200).json({ success: true, message: "Bu ürüne daha önce yorum yaptınız." });
+    }
+
+    // Kullanıcının ürünü satın alıp almadığını kontrol et
+    const productQuery = await OrderItem.findOne({
+      include: [
+        {
+          model: Order,
+          include: [
+            {
+              model: User,
+              where: { user_id: user.user_id }
+            }
+          ]
+        },
+        {
+          model: sellerProduct,
+          include: [
+            {
+              model: Product,
+              where: { product_id: productId }
+            }
+          ]
+        }
+      ]
+    });
+
+    if (productQuery) {
+      return res.status(200).json({ success: true, purchased: true });
+    } else {
+      return res.status(200).json({ success: true, purchased: false });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
 
 
 // Kullanıcı adı ve soyadını formatlayan yardımcı fonksiyon
@@ -2511,5 +2576,5 @@ module.exports = {
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug, getProductsBySeller,
   getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart, getSellerProductByProductId,
-  getSellerInfo,
+  getSellerInfo, commentControl
 }

@@ -127,4 +127,6 @@ router.get('/brand/:brandSlug', authOptionalMiddleware, userController.getProduc
 
 router.get('/productPhoto/:productId', authOptionalMiddleware, userController.getPhotos);
 
+router.get('/commentControl/:productId', authMiddleware, userController.commentControl)
+
 module.exports = router;

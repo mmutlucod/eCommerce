@@ -159,7 +159,7 @@ function OtherSellersTab({ product }) {
         <Typography>{product.product.description}</Typography>
       </TabPanel>
       <TabPanel value={tabValue} index={1}>
-        <ReviewsTab productId={product.product.product_id} reviews={reviews} />
+        <ReviewsTab productId={product.product.product_id} sellerProductId={product.seller_product_id} reviews={reviews} />
       </TabPanel>
       <TabPanel value={tabValue} index={2}>
         <QuestionsTab productId={product.product.product_id} questions={questions} seller={product} />

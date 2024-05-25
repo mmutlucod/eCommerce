@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Rating, Grid, Paper, List, Card, CardHeader, Avatar, CardContent, Button, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, Typography, Rating, Grid, Paper, List, Card, CardHeader, Avatar, CardContent, Button, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert } from '@mui/material';
 import api from '../api/api';
 
 function formatUserName(name, isPublic) {
@@ -10,16 +10,18 @@ function formatUserName(name, isPublic) {
   }
 }
 
-function ReviewsTab({ productId }) {
+function ReviewsTab({ productId, sellerProductId }) {
   const [reviews, setReviews] = useState([]);
   const [ratingSummary, setRatingSummary] = useState({});
   const [selectedRating, setSelectedRating] = useState('');
+  const [canReview, setCanReview] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   useEffect(() => {
     const fetchReviews = async () => {
       try {
         const response = await api.get(`user/product-comments/${productId}`);
-        console.log('API Response:', response.data);
         if (response.data) {
           setReviews(response.data.map(item => ({
             id: item.comment_id,
@@ -46,11 +48,49 @@ function ReviewsTab({ productId }) {
       }
     };
 
+    const checkIfCanReview = async () => {
+      try {
+        const response = await api.get(`/user/commentControl/${sellerProductId}`);
+        if (response.status === 404) {
+          setSnackbarMessage('Bu ürüne daha önceden yorum yaptınız.');
+          setSnackbarOpen(true);
+        } else if (response.data.success) {
+          setCanReview(response.data.purchased);
+          if (!response.data.purchased) {
+            setSnackbarMessage('Bu ürüne yorum yapmak için önce ürünü satın almalısınız.');
+            setSnackbarOpen(true);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking purchase:', error);
+        setSnackbarMessage('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.');
+        setSnackbarOpen(true);
+      }
+    };
+
     fetchReviews();
+    checkIfCanReview();
   }, [productId]);
 
   const handleRatingChange = (event) => {
     setSelectedRating(event.target.value);
+  };
+
+  const handleReviewButtonClick = () => {
+    if (canReview) {
+      // Değerlendirme ekleme işlemi burada gerçekleşir
+      alert('Değerlendirme ekleme butonuna tıklandı');
+    } else {
+      setSnackbarMessage('Bu ürünü satın almadığınız için değerlendirme yapamazsınız.');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   const filteredReviews = reviews.filter(review => review.rating.toString().includes(selectedRating));
@@ -71,7 +111,7 @@ function ReviewsTab({ productId }) {
         </Grid>
         <Grid item xs={8}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <FormControl sx={{ width:'70%' }}>
+            <FormControl sx={{ width: '70%' }}>
               <InputLabel id="rating-select-label">Filtrele</InputLabel>
               <Select
                 labelId="rating-select-label"
@@ -92,14 +132,14 @@ function ReviewsTab({ productId }) {
               variant="contained"
               color="secondary"
               sx={{
-                height:56,
+                height: 56,
                 color: 'white',
                 bgcolor: '#f27a1a', // Buton arka plan rengi turuncu
                 '&:hover': {
                   bgcolor: '#f27a1a' // Hover durumu için renk sabit turuncu
                 }
               }}
-              onClick={() => alert('Değerlendirme ekleme butonuna tıklandı')}
+              onClick={handleReviewButtonClick}
             >
               Değerlendirme Ekle
             </Button>
@@ -136,6 +176,11 @@ function ReviewsTab({ productId }) {
           </List>
         </Grid>
       </Grid>
+      <Snackbar open={snackbarOpen} autoHideDuration={1200} onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity="warning" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
