@@ -37,12 +37,12 @@ const ImageCarousel = ({ images }) => {
                 {images && images.length > 0 ? (
                     images.map((img, index) => (
                         <div key={index}>
-                            <Image src={`http://localhost:5000/img/${img || defaultImage}`} alt={`Slide ${index}`} />
+                            <Image src={`http://localhost:5000/public/img/${img || defaultImage}`} alt={`Slide ${index}`} />
                         </div>
                     ))
                 ) : (
                     <div>
-                        <Image src={`http://localhost:5000/img/${defaultImage}`} alt="Default Slide" />
+                        <Image src={`http://localhost:5000/public/img/${defaultImage}`} alt="Default Slide" />
                     </div>
                 )}
             </Slider>

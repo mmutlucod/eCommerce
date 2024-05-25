@@ -17,7 +17,7 @@ import MuiAlert from '@mui/material/Alert';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
+import ClassicEditor from './ckeditor5-custom/build/ckeditor';
 import SellerNavbar from '../components/SellerNavbar';
 import api from '../api/api';
 
@@ -201,6 +201,32 @@ const ProductAdd = () => {
               onChange={handleChange}
               required
             />
+            <Box display="flex" alignItems="center" margin="10px">
+              <Typography variant="body1" gutterBottom marginLeft={1}>
+                Resim seçiniz:
+              </Typography>
+              <input
+                type="file"
+                id="file-upload"
+                multiple
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+              <label htmlFor="file-upload" style={{ marginLeft: '20px' }}>
+                <Button variant="contained" component="span" color="primary">
+                  Dosya Seç
+                </Button>
+              </label>
+              {selectedFiles && (
+                <Box marginLeft={2}>
+                  <Typography variant="body2" color="textSecondary" component="div">
+                    {Array.from(selectedFiles).map((file, index) => (
+                      <div key={index}>{file.name}</div>
+                    ))}
+                  </Typography>
+                </Box>
+              )}
+            </Box>
             <Box margin="normal">
               <Typography variant="body1" gutterBottom>
                 Açıklama
@@ -209,16 +235,6 @@ const ProductAdd = () => {
                 editor={ClassicEditor}
                 data={formData.description}
                 onChange={handleEditorChange}
-              />
-            </Box>
-            <Box margin="normal">
-              <Typography variant="body1" gutterBottom>
-                Resim Yükle
-              </Typography>
-              <input
-                type="file"
-                multiple
-                onChange={handleFileChange}
               />
             </Box>
             <Box display="flex" justifyContent="center" marginTop="20px">
