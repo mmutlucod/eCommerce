@@ -11,89 +11,89 @@ router.post('/register', userController.register);
 // router.get('/listUsers', authMiddleware, roleCheckMiddleware('user'), userController.listUsers);
 
 //PROFİLİM SAYFASI İŞLEMLERİ
-router.get('/my-account', authMiddleware, userController.getUserDetails);
-router.put('/update-account', authMiddleware, userController.updateUserDetail);
+router.get('/my-account', authMiddleware, roleCheckMiddleware('user'), userController.getUserDetails);
+router.put('/update-account', authMiddleware, roleCheckMiddleware('user'), userController.updateUserDetail);
 
 //SEPET - ÜRÜN İŞLEMLERİ
-router.get('/my-basket', authMiddleware, userController.getCartItems);
-router.post('/add-item', authMiddleware, userController.addItem);
-router.post('/update-item', authMiddleware, userController.updateItem);
-router.post('/delete-item', authMiddleware, userController.deleteItem);
-router.post('/clear-cart', authMiddleware, userController.clearCart);
+router.get('/my-basket', authMiddleware, roleCheckMiddleware('user'), userController.getCartItems);
+router.post('/add-item', authMiddleware, roleCheckMiddleware('user'), userController.addItem);
+router.post('/update-item', authMiddleware, roleCheckMiddleware('user'), userController.updateItem);
+router.post('/delete-item', authMiddleware, roleCheckMiddleware('user'), userController.deleteItem);
+router.post('/clear-cart', authMiddleware, roleCheckMiddleware('user'), userController.clearCart);
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //LİSTE İŞLEMLERİ
 
-router.get('/lists', authMiddleware, userController.getLists);
-router.post('/create-list', authMiddleware, userController.createList);
-router.post('/delete-list/:listId', authMiddleware, userController.deleteList);
-router.post('/update-list/:listId', authMiddleware, userController.updateList);
+router.get('/lists', authMiddleware, roleCheckMiddleware('user'), userController.getLists);
+router.post('/create-list', authMiddleware, roleCheckMiddleware('user'), userController.createList);
+router.post('/delete-list/:listId', authMiddleware, roleCheckMiddleware('user'), userController.deleteList);
+router.post('/update-list/:listId', authMiddleware, roleCheckMiddleware('user'), userController.updateList);
 
 //herkese açık liste için özel link erişimi
 router.get('/publicList/:slug', userController.getPublicListItemsBySlug);
 
 //LİSTE - İTEM İŞLEMLERİ
 
-router.get('/lists/:listId/items', authMiddleware, userController.getItemsByListId);
-router.post('/add-Item-to-List', authMiddleware, userController.addItemToList);
-router.post('/remove-Item-to-List', authMiddleware, userController.removeItemFromList);
+router.get('/lists/:listId/items', authMiddleware, roleCheckMiddleware('user'), userController.getItemsByListId);
+router.post('/add-Item-to-List', authMiddleware, roleCheckMiddleware('user'), userController.addItemToList);
+router.post('/remove-Item-to-List', authMiddleware, roleCheckMiddleware('user'), userController.removeItemFromList);
 
 ///////////////////////////////////////////////////////////////////////////////////////
 
 //ADRES İŞLEMLERİ
 
-router.get('/addresses', authMiddleware, userController.getAddresses);
-router.post('/create-address', authMiddleware, userController.createAddress);
-router.put('/addresses/:addressId', authMiddleware, userController.updateAddress);
-router.delete('/addresses/:addressId', authMiddleware, userController.deleteAddress);
+router.get('/addresses', authMiddleware, roleCheckMiddleware('user'), userController.getAddresses);
+router.post('/create-address', authMiddleware, roleCheckMiddleware('user'), userController.createAddress);
+router.put('/addresses/:addressId', authMiddleware, roleCheckMiddleware('user'), userController.updateAddress);
+router.delete('/addresses/:addressId', authMiddleware, roleCheckMiddleware('user'), userController.deleteAddress);
 
 //SİPARİŞ İŞLEMLERİ
 
-router.get('/orders', authMiddleware, userController.getorders);
-router.get('/order/:orderId', authMiddleware, userController.getorder);
-router.get('/orderItems/:orderId', authMiddleware, userController.getOrderItems);
-router.post('/create-order', authMiddleware, userController.createOrder);
-router.post('/cancel-order-item', authMiddleware, userController.cancelOrderItem);
-router.post('/cancel-order', authMiddleware, userController.cancelOrder);
+router.get('/orders', authMiddleware, roleCheckMiddleware('user'), userController.getorders);
+router.get('/order/:orderId', authMiddleware, roleCheckMiddleware('user'), userController.getorder);
+router.get('/orderItems/:orderId', authMiddleware, roleCheckMiddleware('user'), userController.getOrderItems);
+router.post('/create-order', authMiddleware, roleCheckMiddleware('user'), userController.createOrder);
+router.post('/cancel-order-item', authMiddleware, roleCheckMiddleware('user'), userController.cancelOrderItem);
+router.post('/cancel-order', authMiddleware, roleCheckMiddleware('user'), userController.cancelOrder);
 
 //FAVORİ İŞLEMLERİ
 
-router.get('/favorites', authMiddleware, userController.getFavorites);
-router.post('/addFavoriteItem', authMiddleware, userController.addFavoriteItem);
-router.post('/deleteFavoriteItem', authMiddleware, userController.deleteFavoriteItem);
+router.get('/favorites', authMiddleware, roleCheckMiddleware('user'), userController.getFavorites);
+router.post('/addFavoriteItem', authMiddleware, roleCheckMiddleware('user'), userController.addFavoriteItem);
+router.post('/deleteFavoriteItem', authMiddleware, roleCheckMiddleware('user'), userController.deleteFavoriteItem);
 
 // ÜRÜN DEĞERLENDİRME  İŞLEMLERİ
 
 router.get('/product-comments/:productId', authOptionalMiddleware, userController.getProductComments);
-router.get('/my-product-comments', authMiddleware, userController.getProductCommentsByUser);
-router.post('/create-product-comment', authMiddleware, userController.createProductComments);
-router.post('/update-product-comment', authMiddleware, userController.updateProductComments);
-router.post('/delete-product-comment', authMiddleware, userController.deleteProductComments);
+router.get('/my-product-comments', authMiddleware, roleCheckMiddleware('user'), userController.getProductCommentsByUser);
+router.post('/create-product-comment', authMiddleware, roleCheckMiddleware('user'), userController.createProductComments);
+router.post('/update-product-comment', authMiddleware, roleCheckMiddleware('user'), userController.updateProductComments);
+router.post('/delete-product-comment', authMiddleware, roleCheckMiddleware('user'), userController.deleteProductComments);
 
 // SATICI DEĞERLENDİRME İŞLEMLERİ
 
-router.get('/seller-comments/:sellerId', authMiddleware, userController.getSellerComments);
-router.get('/my-seller-comments', authMiddleware, userController.getSellerCommentsByUser);
-router.post('/create-seller-comment', authMiddleware, userController.createSellerComment);
-router.post('/update-seller-comment', authMiddleware, userController.updateSellerComments);
-router.post('/delete-seller-comment', authMiddleware, userController.deleteSellerComments);
+router.get('/seller-comments/:sellerId', authMiddleware, roleCheckMiddleware('user'), userController.getSellerComments);
+router.get('/my-seller-comments', authMiddleware, roleCheckMiddleware('user'), userController.getSellerCommentsByUser);
+router.post('/create-seller-comment', authMiddleware, roleCheckMiddleware('user'), userController.createSellerComment);
+router.post('/update-seller-comment', authMiddleware, roleCheckMiddleware('user'), userController.updateSellerComments);
+router.post('/delete-seller-comment', authMiddleware, roleCheckMiddleware('user'), userController.deleteSellerComments);
 
 // TAKİP İŞLEMLERİ
 
-router.post('/follow', authMiddleware, userController.toggleFollowSeller);
-router.get('/follow-status/:sellerId', authMiddleware, userController.checkFollowStatus);
-router.get('/followed-sellers', authMiddleware, userController.getFollowedSellers);
+router.post('/follow', authMiddleware, roleCheckMiddleware('user'), userController.toggleFollowSeller);
+router.get('/follow-status/:sellerId', authMiddleware, roleCheckMiddleware('user'), userController.checkFollowStatus);
+router.get('/followed-sellers', authMiddleware, roleCheckMiddleware('user'), userController.getFollowedSellers);
 
 // İADE İŞLEMLERİ
 
-router.post('/create-return', authMiddleware, userController.createReturnRequest);
-router.get('/my-returns', authMiddleware, userController.getUserReturnRequests);
-router.post('/cancel-return', authMiddleware, userController.cancelReturnRequest);
+router.post('/create-return', authMiddleware, roleCheckMiddleware('user'), userController.createReturnRequest);
+router.get('/my-returns', authMiddleware, roleCheckMiddleware('user'), userController.getUserReturnRequests);
+router.post('/cancel-return', authMiddleware, roleCheckMiddleware('user'), userController.cancelReturnRequest);
 
 // ÜRÜN SORU İŞLEMLERİ
 
-router.post('/create-product-question', authMiddleware, userController.askQuestion);
-router.get('/my-questions', authMiddleware, userController.listMyQuestions);
+router.post('/create-product-question', authMiddleware, roleCheckMiddleware('user'), userController.askQuestion);
+router.get('/my-questions', authMiddleware, roleCheckMiddleware('user'), userController.listMyQuestions);
 router.get('/products/:productId/answered-questions', userController.getAnsweredQuestionsForProduct); //Lokal işlem
 
 //KATEGORİ İŞLEMLERİ
@@ -128,6 +128,6 @@ router.get('/brand/:brandSlug', authOptionalMiddleware, userController.getProduc
 
 router.get('/productPhoto/:productId', authOptionalMiddleware, userController.getPhotos);
 
-router.get('/commentControl/:productId', authMiddleware, userController.commentControl)
+router.get('/commentControl/:productId', authMiddleware, roleCheckMiddleware('user'), userController.commentControl)
 
 module.exports = router;
