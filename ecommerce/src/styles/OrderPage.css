@@ -14,12 +14,18 @@
     font-weight: bold;
     color: black;
     margin-bottom: 5px;
-}
-
-.cart-title0,
-.cart-title-20 {
+  }
+  
+  .cart-title0 {
     margin: 0;
-}
+  }
+  
+  .cart-title-20 {
+    margin: 0;
+    text-align: right; /* Sağ tarafa yasla */
+    width: 100%; /* Genişlik ayarla */
+  }
+  
 
 .cart-items0 {
     flex-grow: 1;

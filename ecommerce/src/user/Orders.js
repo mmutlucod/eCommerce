@@ -176,11 +176,12 @@ const OrdersPage = () => {
                   {selectedOrderDetails.orderItems.map((item, idx) => (
                     <Box key={idx} className="cart-itemX0">
                       <Box className="item-image0">
-                        <img src={item.product && item.product.productImages && item.product.productImages.length > 0 ? `http://localhost:5000/img/${item.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.product ? item.product.name : 'Bilinmiyor'} />
+                        {console.log(item.sellerProduct.product.productImages)}
+                        <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
                       </Box>
                       <Box className="item-details00">
                         {console.log(item)}
-                        <Typography className="item-name0">{item.product ? item.product.name : 'Bilinmiyor'}</Typography>
+                        <Typography className="item-name0">{item.sellerProduct.product.name ? item.sellerProduct.product.name : 'Bilinmiyor'}</Typography>
                         <Box className="item-options0">
                           <Typography className="item-price0">Fiyat: {item.sellerProduct.price} ₺</Typography>
                           <Typography className="item-quantity0">Adet: {item.quantity}</Typography>
