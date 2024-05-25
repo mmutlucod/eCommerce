@@ -832,6 +832,33 @@ const getorders = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
+
+const getorder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const user = await User.findOne({ where: { email: req.user.email } });
+    const orders = await Order.findAll(
+      {
+        where: { user_id: user.user_id },
+        include: [
+          {
+            model: orderStatus
+          },
+          {
+            model: User
+          },
+          {
+            model: Address
+          }
+        ]
+      });
+
+    return res.status(200).json(orders);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+}
 const getOrderItems = async (req, res) => {
   try {
     const { orderId } = req.params;
@@ -2560,7 +2587,11 @@ const commentControl = async (req, res) => {
       ]
     });
 
-    return res.status(200).json(productQuery);
+    if (productQuery) {
+      return res.status(200).json({ success: true, purchased: true });
+    } else {
+      return res.status(200).json({ success: true, purchased: false, message: 'Değerlendirme yapabilmek için önce ürünü satın almalısınız.' });
+    }
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -2598,5 +2629,5 @@ module.exports = {
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug, getProductsBySeller,
   getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart, getSellerProductByProductId,
-  getSellerInfo, commentControl
+  getSellerInfo, commentControl, getorder
 }

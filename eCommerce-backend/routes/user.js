@@ -50,6 +50,7 @@ router.delete('/addresses/:addressId', authMiddleware, userController.deleteAddr
 //SİPARİŞ İŞLEMLERİ
 
 router.get('/orders', authMiddleware, userController.getorders);
+router.get('/order/:orderId', authMiddleware, userController.getorder);
 router.get('/orderItems/:orderId', authMiddleware, userController.getOrderItems);
 router.post('/create-order', authMiddleware, userController.createOrder);
 router.post('/cancel-order-item', authMiddleware, userController.cancelOrderItem);
