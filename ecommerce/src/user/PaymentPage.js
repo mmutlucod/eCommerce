@@ -241,6 +241,7 @@ const PaymentPage = () => {
                         onCardInputFocus={onCardFormInputFocus}
                         onCardInputBlur={onCardInputBlur}
                         cardCvv={formFieldsRefObj.cardCvv}
+
                     >
                         <Card
                             cardNumber={state.cardNumber}

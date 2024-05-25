@@ -67,6 +67,7 @@ const ProductAdd = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -94,16 +95,30 @@ const ProductAdd = () => {
     setFormData({ ...formData, description: data });
   };
 
+  const handleFileChange = (event) => {
+    setSelectedFiles(event.target.files);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      const response = await api.post('seller/create-product', formData);
-      if (response.data.success) {
-        setSuccessMessage('Ürün başarıyla oluşturuldu.');
-      } else {
-        setErrorMessage('Ürün oluşturulurken bir hata oluştu.');
+    const formDataWithFiles = new FormData();
+    for (const key in formData) {
+      formDataWithFiles.append(key, formData[key]);
+    }
+    if (selectedFiles) {
+      for (let i = 0; i < selectedFiles.length; i++) {
+        formDataWithFiles.append('files', selectedFiles[i]);
       }
+    }
+
+    try {
+      const response = await api.post('/seller/create-product', formDataWithFiles, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      setSuccessMessage('Ürün başarıyla oluşturuldu.');
     } catch (error) {
       setErrorMessage('Ürün oluşturulurken bir hata oluştu.');
       console.error('Ürün oluşturulurken bir hata oluştu:', error);
@@ -194,6 +209,16 @@ const ProductAdd = () => {
                 editor={ClassicEditor}
                 data={formData.description}
                 onChange={handleEditorChange}
+              />
+            </Box>
+            <Box margin="normal">
+              <Typography variant="body1" gutterBottom>
+                Resim Yükle
+              </Typography>
+              <input
+                type="file"
+                multiple
+                onChange={handleFileChange}
               />
             </Box>
             <Box display="flex" justifyContent="center" marginTop="20px">

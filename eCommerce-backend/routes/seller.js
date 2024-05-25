@@ -6,6 +6,7 @@ const { authMiddleware, roleCheckMiddleware } = require('../middlewares/AuthMidd
 const { route } = require('./admin');
 const Seller = require('../models/seller');
 const sellerProduct = require('../models/sellerProduct');
+const upload = require('../upload'); // upload.js dosyasını içe aktarın
 
 router.post('/login', sellerController.login);
 router.post('/register', sellerController.register);
@@ -15,7 +16,7 @@ router.get('/products', authMiddleware, sellerController.getSellerProducts);
 router.get('/products/:id', authMiddleware, sellerController.getSellerProductDetailsById);
 router.get('/searchSellerProducts', authMiddleware, sellerController.searchSellerProducts);
 router.get('/searchAllProducts', authMiddleware, sellerController.searchAllProducts);
-router.post('/create-product', authMiddleware, sellerController.createProduct);
+router.post('/create-product', upload.array('files', 10), sellerController.createProduct);
 router.post('/create-seller-product', authMiddleware, sellerController.createSellerProduct);
 router.put('/products/:id', authMiddleware, sellerController.updateSellerProduct);
 router.put('/activateProduct/:id', authMiddleware, sellerController.activateSellerProduct);
