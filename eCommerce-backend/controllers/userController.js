@@ -899,9 +899,7 @@ const getOrderItems = async (req, res) => {
       message: error.message,
     });
   }
-};
-
-
+}
 const cancelOrderItem = async (req, res) => {
   try {
     const { orderItemId, cancelQuantity } = req.body;
@@ -2429,28 +2427,29 @@ const searchProducts = async (req, res) => {
     });
     const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
 
-
     for (let product of uniqueLowestPriceProducts) {
       const ratingsData = await ProductComment.findAll({
+        where: {
+          '$sellerProduct.product_id$': product.product_id // `sellerProduct` üzerinden `product_id` ile filtreleme
+        },
         include: [{
           model: sellerProduct,
-          attributes: [], // sellerProduct'tan herhangi bir özellik çekmeyeceğiz
+          attributes: [],
           include: [{
             model: Product,
-            where: { product_id: product.product_id },
-            attributes: [] // İç içe include yapısı kullanıyorsak, bu seviyede de attributes boş bırakılmalı
+            attributes: [] // `Product`'a ait özellikler bu seviyede istenmiyor
           }]
         }],
         attributes: [
-          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'], // Ortalama puanı hesapla
-          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount'] // Yorum sayısını hesapla
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
         ],
+        group: ['sellerProduct.product_id'], // Ürün ID'sine göre gruplama yaparak doğru sonuçlar elde et
         raw: true
       });
 
-      // Eğer hiç yorum yoksa, ortalamaRating ve RatingCount 0 olacak şekilde ayarla
-      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
-      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
     }
 
     const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
@@ -2470,6 +2469,7 @@ const searchProducts = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 
 const getPhotos = async (req, res) => {
   const { productId } = req.params;
@@ -2511,5 +2511,5 @@ module.exports = {
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug, getProductsBySeller,
   getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart, getSellerProductByProductId,
-  getSellerInfo
-};
+  getSellerInfo,
+}
