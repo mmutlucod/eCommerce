@@ -831,33 +831,33 @@ const getorders = async (req, res) => {
 }
 const getOrderItems = async (req, res) => {
   try {
-    const { orderId } = req.params; // orderId'yi req.params'dan alıyoruz
+    const { orderId } = req.params;
+
     const orderItems = await OrderItem.findAll({
       where: { order_id: orderId },
       include: [
         {
           model: sellerProduct,
           include: [
-            {
-              model: Seller
-            },
-            {
-              model: Product
-            }
-          ]
+            { model: Seller },
+            { model: Product },
+          ],
         },
-        {
-          model: orderStatus
-        }
-      ]
+        { model: orderStatus },
+      ],
     });
 
     if (orderItems.length === 0) {
-      return res.status(404).json({ success: false, message: "Siparişe ait ürün bulunamadı." });
+      return res.status(404).json({
+        success: false,
+        message: "Siparişe ait ürün bulunamadı.",
+      });
     }
 
     // Eğer siparişin durumu 4 ise, tüm sipariş iptal edilmiş demektir
-    const isOrderCancelled = orderItems[0].orderStatus && orderItems[0].orderStatus.order_status_id === 5;
+    const isOrderCancelled =
+      orderItems[0].orderStatus &&
+      orderItems[0].orderStatus.order_status_id === 5;
 
     let totalRefundAmount = 0;
     let remainingItemsCount = 0;
@@ -880,15 +880,6 @@ const getOrderItems = async (req, res) => {
       });
     }
 
-    // İade bilgilerini getir
-    const returnItems = await ReturnItem.findAll({
-      include: [{
-        model: OrderItem,
-        where: { order_id: orderId }
-      }]
-    });
-
-
     const response = {
       orderItems: orderItems,
       refundInfo: isOrderCancelled
@@ -897,16 +888,19 @@ const getOrderItems = async (req, res) => {
           totalRefundAmount: totalRefundAmount,
           remainingItemsCount: remainingItemsCount,
           canceledItemsCount: orderItems.length - remainingItemsCount,
-          refundMessage: `${remainingItemsCount} ürününüzden ${orderItems.length - remainingItemsCount} tanesi iptal edildi. ${totalRefundAmount} TL iade edilecektir.`
-        }
+          refundMessage: `${remainingItemsCount} ürününüzden ${orderItems.length - remainingItemsCount} tanesi iptal edildi. ${totalRefundAmount} TL iade edilecektir.`,
+        },
     };
 
     return res.status(200).json(response);
-
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
-}
+};
+
 
 const cancelOrderItem = async (req, res) => {
   try {
