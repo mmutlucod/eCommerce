@@ -84,8 +84,8 @@ const OrdersPage = () => {
         api.get(`/user/order/${orderId}`)
       ]);
       setSelectedOrderDetails(itemsResponse.data);
-      {console.log(`adresler:${itemsResponse.data[0]}`)}
-      setSelectedOrderAddress(addressResponse.data.address);
+      console.log(`Adresler: ${JSON.stringify(addressResponse.data.Address)}`);
+      setSelectedOrderAddress(addressResponse.data.Address); // Address key'ini doğru şekilde alın
       setLoadingDetails(false);
     } catch (error) {
       console.error('Sipariş kalemleri alınırken hata oluştu:', error);
@@ -197,22 +197,35 @@ const OrdersPage = () => {
                     </Box>
                   ))}
                 </div>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
+                  <Box sx={{ flex: 1, mr: 2, p: 2, border: '1px solid #ddd', borderRadius: '8px' }}>
+                    <Typography variant="h6">Teslimat Adresi</Typography>
+                    <Box display="flex" flexDirection="row" flexWrap="wrap">
+                      <Typography>{selectedOrderAddress.adres_line}</Typography>
+                      <Typography>, {selectedOrderAddress.street}</Typography>
+                      <Typography>, {selectedOrderAddress.city}</Typography>
+                      <Typography>, {selectedOrderAddress.state}</Typography>
+                      <Typography>, {selectedOrderAddress.postal_code}</Typography>
+                      <Typography>, {selectedOrderAddress.country}</Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ flex: 1, ml: 2, p: 2, border: '1px solid #ddd', borderRadius: '8px' }}>
+                    <Typography variant="h6">Fatura Adresi</Typography>
+                    <Box display="flex" flexDirection="row" flexWrap="wrap">
+                      <Typography>{selectedOrderAddress.adres_line}</Typography>
+                      <Typography>, {selectedOrderAddress.street}</Typography>
+                      <Typography>, {selectedOrderAddress.city}</Typography>
+                      <Typography>, {selectedOrderAddress.state}</Typography>
+                      <Typography>, {selectedOrderAddress.postal_code}</Typography>
+                      <Typography>, {selectedOrderAddress.country}</Typography>
+                    </Box>
+                  </Box>
+                </Box>
                 <Box className="cart-header00">
-                  <Typography variant="h6" className="cart-title-20">
+                  <Typography variant="h6" className="cart-title-20" sx={{ mt: 3 }}>
                     Toplam Tutar: {calculateTotalPrice(selectedOrderDetails.orderItems)} ₺
                   </Typography>
                 </Box>
-                
-                {selectedOrderAddress && (
-
-                  
-                  <Box sx={{ mt: 3 }}>
-                    <Typography variant="h6">Teslimat Adresi</Typography>
-                    <Typography>{selectedOrderAddress.adres_line}</Typography>
-                    <Typography>{`${selectedOrderAddress.street}, ${selectedOrderAddress.city}, ${selectedOrderAddress.state}, ${selectedOrderAddress.postal_code}`}</Typography>
-                    <Typography>{selectedOrderAddress.country}</Typography>
-                  </Box>
-                )}
               </Box>
             ) : (
               <Typography>Detaylar yüklenemedi.</Typography>

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Rating, Grid, Paper, List, Card, CardHeader, Avatar,
-  CardContent, Button, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert
+  CardContent, Button, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert, TextField, Modal
 } from '@mui/material';
+import { purple } from '@mui/material/colors'; // Mor renk import edildi
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -21,6 +22,9 @@ function ReviewsTab({ productId }) {
   const [canReview, setCanReview] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [newRating, setNewRating] = useState(0);
+  const [newComment, setNewComment] = useState('');
 
   const { token } = useAuth();
 
@@ -70,11 +74,11 @@ function ReviewsTab({ productId }) {
 
     try {
       const response = await api.get(`/user/commentControl/${productId}`);
-      console.log(response.data)
       if (response.data.success) {
         if (response.data.purchased) {
           setCanReview(true);
           setSnackbarMessage('Değerlendirme ekleyebilirsiniz.');
+          setModalOpen(true);
         } else {
           setSnackbarMessage('Bu ürüne değerlendirme eklemek için satın almış olmalısınız.');
           setCanReview(false);
@@ -96,6 +100,51 @@ function ReviewsTab({ productId }) {
       return;
     }
     setSnackbarOpen(false);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setNewRating(0);
+    setNewComment('');
+  };
+
+  const handleSaveReview = async () => {
+    try {
+      const response = await api.post('/user/create-seller-comment', {
+        product_id: productId,
+        rating: newRating,
+        comment: newComment,
+        token
+      });
+
+      if (response.data.success) {
+        setSnackbarMessage('Değerlendirmeniz kaydedildi.');
+        setReviews([...reviews, {
+          id: response.data.comment_id,
+          userId: response.data.user_id,
+          title: newComment,
+          content: newComment,
+          rating: newRating,
+          date: new Date().toISOString(),
+          user: {
+            name: formatUserName(response.data.user.name, response.data.is_public),
+            surname: formatUserName(response.data.user.surname, response.data.is_public),
+          },
+          isPublic: response.data.is_public,
+        }]);
+        const newSummary = { ...ratingSummary };
+        newSummary[newRating] = (newSummary[newRating] || 0) + 1;
+        setRatingSummary(newSummary);
+      } else {
+        setSnackbarMessage(response.data.message);
+      }
+      setSnackbarOpen(true);
+      handleModalClose();
+    } catch (error) {
+      console.error('Error saving review:', error);
+      setSnackbarMessage('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.');
+      setSnackbarOpen(true);
+    }
   };
 
   const filteredReviews = reviews.filter(review => review.rating.toString().includes(selectedRating));
@@ -186,6 +235,54 @@ function ReviewsTab({ productId }) {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+      <Modal open={modalOpen} onClose={handleModalClose} aria-labelledby="modal-title" aria-describedby="modal-description">
+        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2 }}>
+          <Typography id="modal-title" variant="h6" component="h2">Değerlendirme Ekle</Typography>
+          <Box sx={{ mt: 2 }}>
+            <Typography component="legend" sx={{ color: purple[500] }}>Puan</Typography>
+            <Rating
+              name="new-rating"
+              value={newRating}
+              onChange={(event, newValue) => {
+                setNewRating(newValue);
+              }}
+            />
+            <TextField
+              label="Yorumunuz"
+              multiline
+              rows={4}
+              value={newComment}
+              onChange={(event) => setNewComment(event.target.value)}
+              variant="outlined"
+              fullWidth
+              sx={{
+                mt: 2,
+                '& .MuiInputLabel-root': { color: purple[500] },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': { borderColor: purple[500] },
+                  '&:hover fieldset': { borderColor: purple[700] },
+                }
+              }}
+            />
+            <Button
+              variant="contained"
+              color="secondary"
+              sx={{
+                mt: 2,
+                width: '100%',
+                color: 'white',
+                bgcolor: '#f27a1a',
+                '&:hover': {
+                  bgcolor: '#f27a1a'
+                }
+              }}
+              onClick={handleSaveReview}
+            >
+              Kaydet
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
     </Box>
   );
 }
