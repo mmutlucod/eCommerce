@@ -104,7 +104,8 @@ const getProducts = async (req, res) => {
                 },
                 {
                     model: ApprovalStatus,
-                }
+                },
+                
             ]
         });
 
