@@ -181,7 +181,7 @@ const AddressesPage = () => {
                       <Card key={index} sx={{ mb: 2 }}>
                         <CardContent>
                           <Typography gutterBottom variant="h6" component="div">
-                            {address.adres_line} {/* Adres başlığı */}
+                            {address.address_line} {/* Adres başlığı */}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             {address.street} {/* Sokak ve numara */}
@@ -252,17 +252,18 @@ const AddressesPage = () => {
             </DialogActions>
           </Dialog>
           <Dialog open={editDialogOpen} onClose={closeEditDialog}>
-            <DialogTitle>Adres Düzenle</DialogTitle>
-            <DialogContent>
-              <form onSubmit={handleEditSubmit}>
+            <DialogTitle >Adres Düzenle</DialogTitle>
+            <DialogContent >
+              <form onSubmit={handleEditSubmit} >
                 <Grid container spacing={2}>
                   <Grid item xs={12}>
                     <TextField
+                      style={{ marginTop: '12px' }}
                       fullWidth
                       label="Adres Satırı"
-                      name="adres_line"
-                      value={addressToEdit?.adres_line || ''}
-                      onChange={e => setAddressToEdit({ ...addressToEdit, adres_line: e.target.value })}
+                      name="address_line"
+                      value={addressToEdit?.address_line || ''}
+                      onChange={e => setAddressToEdit({ ...addressToEdit, address_line: e.target.value })}
                     />
                   </Grid>
                   <Grid item xs={12}>

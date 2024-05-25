@@ -731,7 +731,7 @@ const getAddresses = async (req, res) => {
 
     // Kullanıcıya ait adresleri buluyoruz
     const addresses = await Address.findAll({
-      where: { user_id: user.user_id } // user.id, bulunan kullanıcının ID'sidir
+      where: { user_id: user.user_id, is_deleted: 0 } // user.id, bulunan kullanıcının ID'sidir
     });
 
     // Adresler varsa, dönüyoruz
@@ -754,7 +754,8 @@ const createAddress = async (req, res) => {
     // Yeni adresi oluştur
     const newAddress = await Address.create({
       ...req.body,
-      user_id: user.user_id
+      user_id: user.user_id,
+      is_deleted: 0
     });
 
     return res.status(201).json({ success: true, message: "Adres başarıyla eklendi.", address: newAddress });
@@ -792,21 +793,24 @@ const deleteAddress = async (req, res) => {
 
     // Adresi ve adresin kullanıcıya ait olup olmadığını kontrol et
     const address = await Address.findOne({
-      where: { address_id: addressId, user_id: user.user_id }
+      where: { address_id: addressId, user_id: user.user_id, is_deleted: false }
     });
 
     if (!address) {
       return res.status(404).json({ success: false, message: "Adres bulunamadı veya erişim yetkiniz yok." });
     }
 
-    // Adresi sil
-    await address.destroy();
+    // Adresi silinmiş olarak işaretle
+    address.is_deleted = true;
+    await address.save();
+
     return res.status(200).json({ success: true, message: "Adres başarıyla silindi." });
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 //SİPARİŞ İŞLEMLERİ
 const getorders = async (req, res) => {
   try {

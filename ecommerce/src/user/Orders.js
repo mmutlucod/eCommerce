@@ -70,7 +70,8 @@ const OrdersPage = () => {
   const fetchOrders = async () => {
     try {
       const response = await api.get('/user/orders');
-      setOrders(response.data);
+      const sortedOrders = response.data.sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
+      setOrders(sortedOrders);
     } catch (error) {
       console.error('Siparişler alınırken hata oluştu:', error);
     }
@@ -136,9 +137,9 @@ const OrdersPage = () => {
                             <Typography variant="body2">{new Date(order.order_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</Typography>
                           </Grid>
                           <Grid item xs={12} sm={5}>
-                            <Typography color="textSecondary">Sipariş Özeti</Typography>
-                            <Typography variant="body2">{order.summary}</Typography>
-                            <Typography variant="body2" color="primary">{`Satıcı: ${order.seller ? order.seller.name : 'Bilinmiyor'}`}</Typography>
+                            {/* <Typography color="textSecondary">Sipariş Özeti</Typography>
+                            <Typography variant="body2">{order.summary}</Typography> */}
+                            {/* <Typography variant="body2" color="primary">{`Satıcı: ${order.seller ? order.seller.name : 'Bilinmiyor'}`}</Typography> */}
                           </Grid>
                           <Grid item xs={12} sm={2}>
                             <Typography color="textSecondary">Durum</Typography>
@@ -221,14 +222,9 @@ const OrdersPage = () => {
                     </Box>
                   </Box>
                 </Box>
-                <Box className="cart-header00">
-                  <Typography variant="h6" className="cart-title-20" sx={{ mt: 3 }}>
-                    Toplam Tutar: {calculateTotalPrice(selectedOrderDetails.orderItems)} ₺
-                  </Typography>
-                </Box>
               </Box>
             ) : (
-              <Typography>Detaylar yüklenemedi.</Typography>
+              <Typography>Sipariş detayları bulunamadı</Typography>
             )}
           </DialogContent>
           <DialogActions>

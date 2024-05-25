@@ -62,7 +62,7 @@ const PaymentPage = () => {
     const [addresses, setAddresses] = useState([]);
     const [selectedAddress, setSelectedAddress] = useState('');
     const [isModalOpen, setModalOpen] = useState(false);
-    const [newAddress, setNewAddress] = useState({ adres_line: '', street: '', city: '', state: '', country: '', postal_code: '' });
+    const [newAddress, setNewAddress] = useState({ address_line: '', street: '', city: '', state: '', country: '', postal_code: '' });
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [contractOpen, setContractOpen] = useState(false);
     const [infoAccepted, setInfoAccepted] = useState(false);
@@ -330,8 +330,8 @@ const PaymentPage = () => {
                                         <FormControlLabel
                                             value={address.address_id.toString()}
                                             control={<Radio checked={selectedAddress === address.address_id.toString()} onChange={handleRadioChange} />}
-                                            
-                                            label={<Typography variant="h6">{`${address.adres_line}, ${address.city}`}</Typography>}
+
+                                            label={<Typography variant="h6">{`${address.address_line}, ${address.city}`}</Typography>}
                                             labelPlacement="end"
                                         />
                                         {console.log(address)}
@@ -410,13 +410,13 @@ const PaymentPage = () => {
             </Container>
             <Modal open={isModalOpen} onClose={handleModalClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
                 <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2 }}>
-                    <Typography variant="h6" component="h2">Yeni Adres Ekle</Typography>
+                    <Typography variant="h6" component="h2" style={{ marginBottom: '12px' }}>Yeni Adres Ekle</Typography>
                     <form onSubmit={handleAddressSubmit}>
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
-                                <TextField fullWidth label="Adres Satırı" name="adres_line" value={newAddress.adres_line} onChange={handleInputChange} />
+                                <TextField fullWidth label="Adres Satırı" name="address_line" value={newAddress.address_line} onChange={handleInputChange} />
                             </Grid>
-                           
+
                             <Grid item xs={12}>
                                 <TextField select fullWidth label="Şehir" name="city" value={newAddress.city} onChange={handleInputChange}>
                                     {cities.map((city, index) => <MenuItem key={index} value={city}>{city}</MenuItem>)}
@@ -425,9 +425,9 @@ const PaymentPage = () => {
                             <Grid item xs={12}>
                                 <TextField fullWidth label="İlçe" name="state" value={newAddress.state} onChange={handleInputChange} />
                             </Grid>
-                            <Grid item xs={12}>
+                            {/* <Grid item xs={12}>
                                 <TextField fullWidth label="Ülke" name="country" value={newAddress.country} onChange={handleInputChange} />
-                            </Grid>
+                            </Grid> */}
                             <Grid item xs={12}>
                                 <TextField fullWidth label="Adres Satırı" name="street" value={newAddress.street} onChange={handleInputChange} />
                             </Grid>
