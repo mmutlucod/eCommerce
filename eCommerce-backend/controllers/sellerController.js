@@ -684,7 +684,10 @@ const getQuestions = async (req, res) => {
         if (!seller) {
             return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
         }
-        const questions = await productQuestion.findAll({ where: { seller_id: seller.seller_id, approval_status_id: 1 } })
+        const questions = await productQuestion.findAll({ where: { seller_id: seller.seller_id, approval_status_id: 1 },
+        include:[
+            {model:Product}
+        ] })
         res.status(200).json(questions);
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
@@ -693,9 +696,9 @@ const getQuestions = async (req, res) => {
 const answerQuestion = async (req, res) => {
     try {
         const seller = await Seller.findOne({ where: { username: req.user.username } });
-        // if (seller) {
-        //    return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
-        // }
+        if (!seller) {
+           return res.status(404).json({ success: false, message: 'Satıcı bulunamadı.' });
+        }
 
         const { questionId } = req.params;
 
