@@ -61,7 +61,7 @@ const PaymentPage = () => {
     const [addresses, setAddresses] = useState([]);
     const [selectedAddress, setSelectedAddress] = useState('');
     const [isModalOpen, setModalOpen] = useState(false);
-    const [newAddress, setNewAddress] = useState({ address_line: '', city: '', state: '', postal_code: '' });
+    const [newAddress, setNewAddress] = useState({ adres_line: '', street: '', city: '', state: '', country: '', postal_code: '' });
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [contractOpen, setContractOpen] = useState(false);
     const [infoAccepted, setInfoAccepted] = useState(false);
@@ -165,6 +165,20 @@ const PaymentPage = () => {
     const handleInputChange = event => setNewAddress(prev => ({ ...prev, [event.target.name]: event.target.value }));
     const handleTermsChange = event => setTermsAccepted(event.target.checked);
     const handleInfoChange = event => setInfoAccepted(event.target.checked);
+
+    const handleAddressSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await api.post('/user/create-address', newAddress);
+            setAddresses([...addresses, response.data.address]);
+            setModalOpen(false);
+            setAlertMessage('Adres başarıyla eklendi.');
+        } catch (error) {
+            console.error('Adres eklenirken hata oluştu:', error);
+            setAlertMessage('Adres eklenirken bir hata oluştu.');
+        }
+    };
+
     const handleSubmit = async () => {
         if (!formValid || !termsAccepted || !infoAccepted) {
             setAlertMessage('Lütfen tüm alanları doldurun ve koşulları kabul edin.');
@@ -302,9 +316,11 @@ const PaymentPage = () => {
                                         <FormControlLabel
                                             value={address.address_id.toString()}
                                             control={<Radio checked={selectedAddress === address.address_id.toString()} onChange={handleRadioChange} />}
-                                            label={<Typography variant="h6">{`${address.address_line}, ${address.city}`}</Typography>}
+                                            
+                                            label={<Typography variant="h6">{`${address.adres_line}, ${address.city}`}</Typography>}
                                             labelPlacement="end"
                                         />
+                                        {console.log(address)}
                                         <Typography variant="body2">{`${address.street}, ${address.state}, ${address.postal_code}`}</Typography>
                                     </CardContent>
                                 </MuiCard>
@@ -381,11 +397,12 @@ const PaymentPage = () => {
             <Modal open={isModalOpen} onClose={handleModalClose} aria-labelledby="modal-modal-title" aria-describedby="modal-modal-description">
                 <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2 }}>
                     <Typography variant="h6" component="h2">Yeni Adres Ekle</Typography>
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleAddressSubmit}>
                         <Grid container spacing={2}>
                             <Grid item xs={12}>
-                                <TextField fullWidth label="Adres Satırı" name="address_line" value={newAddress.address_line} onChange={handleInputChange} />
+                                <TextField fullWidth label="Adres Satırı" name="adres_line" value={newAddress.adres_line} onChange={handleInputChange} />
                             </Grid>
+                           
                             <Grid item xs={12}>
                                 <TextField select fullWidth label="Şehir" name="city" value={newAddress.city} onChange={handleInputChange}>
                                     {cities.map((city, index) => <MenuItem key={index} value={city}>{city}</MenuItem>)}
@@ -393,6 +410,12 @@ const PaymentPage = () => {
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField fullWidth label="İlçe" name="state" value={newAddress.state} onChange={handleInputChange} />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="Ülke" name="country" value={newAddress.country} onChange={handleInputChange} />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField fullWidth label="Adres Satırı" name="street" value={newAddress.street} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField fullWidth label="Posta Kodu" name="postal_code" value={newAddress.postal_code} onChange={handleInputChange} />

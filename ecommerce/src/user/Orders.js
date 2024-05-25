@@ -23,6 +23,7 @@ import {
 import Navbar from '../components/UserNavbar';
 import { renderMenuItems } from './RenderMenuItems';
 import api from '../api/api';
+import '../styles/OrderPage.css'; // Eklenen CSS dosyası
 
 const theme = createTheme({
   palette: {
@@ -55,14 +56,13 @@ const theme = createTheme({
 });
 
 const OrdersPage = () => {
-  const [selectedItem, setSelectedItem] = useState('orders'); // Başlangıç değeri olarak 'orders'
-  const [orders, setOrders] = useState([]); // Sipariş listesi için state
-  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null); // Seçili siparişin detayları için state
-  const [loadingDetails, setLoadingDetails] = useState(false); // Detay yükleniyor mu?
-  const [open, setOpen] = useState(false); // Modal açık mı?
+  const [selectedItem, setSelectedItem] = useState('orders');
+  const [orders, setOrders] = useState([]);
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // API'den sipariş verilerini al
     fetchOrders();
   }, []);
 
@@ -88,7 +88,6 @@ const OrdersPage = () => {
   };
 
   const handleOpenModal = (orderId) => {
-    console.log('Opening modal for order ID:', orderId); // orderId'yi kontrol etmek için log ekleyin
     fetchOrderItems(orderId);
     setOpen(true);
   };
@@ -96,6 +95,10 @@ const OrdersPage = () => {
   const handleCloseModal = () => {
     setOpen(false);
     setSelectedOrderDetails(null);
+  };
+
+  const calculateTotalPrice = (orderItems) => {
+    return orderItems.reduce((total, item) => total + item.sellerProduct.price * item.quantity, 0);
   };
 
   return (
@@ -122,19 +125,20 @@ const OrdersPage = () => {
                       <CardContent>
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={3}>
-                            {console.log(order)}
                             <Typography color="textSecondary">Sipariş Tarihi</Typography>
                             <Typography variant="body2">{new Date(order.order_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</Typography>
                           </Grid>
                           <Grid item xs={12} sm={5}>
                             <Typography color="textSecondary">Sipariş Özeti</Typography>
                             <Typography variant="body2">{order.summary}</Typography>
+                            <Typography variant="body2" color="primary">{`Satıcı: ${order.seller ? order.seller.name : 'Bilinmiyor'}`}</Typography>
                           </Grid>
                           <Grid item xs={12} sm={2}>
                             <Typography color="textSecondary">Durum</Typography>
                             <Typography variant="body2">{order.orderStatus.status_name}</Typography>
                           </Grid>
                           <Grid item xs={12} sm={2}>
+                            {console.log(order)}
                             <Typography color="textSecondary">Tutar</Typography>
                             <Typography variant="body2">{`${order.total_price} TL`}</Typography>
                           </Grid>
@@ -161,17 +165,37 @@ const OrdersPage = () => {
               <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: '100px' }}>
                 <CircularProgress />
               </Box>
-            ) : selectedOrderDetails ? (
-              <List>
-                {selectedOrderDetails.map((item, idx) => (
-                  <Box key={idx} sx={{ mb: 2 }}>
-                    <Typography variant="body2">{`Ürün Adı: ${item.product.name}`}</Typography>
-                    <Typography variant="body2">{`Adet: ${item.quantity}`}</Typography>
-                    <Typography variant="body2">{`Fiyat: ${item.price} TL`}</Typography>
-                    <Typography variant="body2">{`Toplam: ${item.total} TL`}</Typography>
-                  </Box>
-                ))}
-              </List>
+            ) : selectedOrderDetails && selectedOrderDetails.orderItems.length > 0 ? (
+              <Box>
+                <div className="cart-header00">
+                  <div className="cart-title0">
+                    Sipariş ({selectedOrderDetails.orderItems.length} Ürün)
+                  </div>
+                </div>
+                <div className="cart-items0">
+                  {selectedOrderDetails.orderItems.map((item, idx) => (
+                    <Box key={idx} className="cart-itemX0">
+                      <Box className="item-image0">
+                        {console.log(item.sellerProduct.product.productImages)}
+                        <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
+                      </Box>
+                      <Box className="item-details00">
+                        {console.log(item)}
+                        <Typography className="item-name0">{item.sellerProduct.product.name ? item.sellerProduct.product.name : 'Bilinmiyor'}</Typography>
+                        <Box className="item-options0">
+                          <Typography className="item-price0">Fiyat: {item.sellerProduct.price} ₺</Typography>
+                          <Typography className="item-quantity0">Adet: {item.quantity}</Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  ))}
+                </div>
+                <Box className="cart-header00">
+                  <Typography variant="h6" className="cart-title-20">
+                    Toplam Tutar: {calculateTotalPrice(selectedOrderDetails.orderItems)} ₺
+                  </Typography>
+                </Box>
+              </Box>
             ) : (
               <Typography>Detaylar yüklenemedi.</Typography>
             )}
