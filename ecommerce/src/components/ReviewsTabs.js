@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Rating, Grid, Paper, List, Card, CardHeader, Avatar, CardContent, Button, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert } from '@mui/material';
+import {
+  Box, Typography, Rating, Grid, Paper, List, Card, CardHeader, Avatar,
+  CardContent, Button, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert
+} from '@mui/material';
 import api from '../api/api';
 
 function formatUserName(name, isPublic) {
@@ -10,7 +13,7 @@ function formatUserName(name, isPublic) {
   }
 }
 
-function ReviewsTab({ productId, sellerProductId }) {
+function ReviewsTab({ productId }) {
   const [reviews, setReviews] = useState([]);
   const [ratingSummary, setRatingSummary] = useState({});
   const [selectedRating, setSelectedRating] = useState('');
@@ -48,41 +51,34 @@ function ReviewsTab({ productId, sellerProductId }) {
       }
     };
 
-    const checkIfCanReview = async () => {
-      try {
-        const response = await api.get(`/user/commentControl/${sellerProductId}`);
-        if (response.status === 404) {
-          setSnackbarMessage('Bu ürüne daha önceden yorum yaptınız.');
-          setSnackbarOpen(true);
-        } else if (response.data.success) {
-          setCanReview(response.data.purchased);
-          if (!response.data.purchased) {
-            setSnackbarMessage('Bu ürüne yorum yapmak için önce ürünü satın almalısınız.');
-            setSnackbarOpen(true);
-          }
-        }
-      } catch (error) {
-        console.error('Error checking purchase:', error);
-        setSnackbarMessage('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.');
-        setSnackbarOpen(true);
-      }
-    };
-
     fetchReviews();
-    checkIfCanReview();
   }, [productId]);
 
   const handleRatingChange = (event) => {
     setSelectedRating(event.target.value);
   };
 
-  const handleReviewButtonClick = () => {
-    if (canReview) {
-      // Değerlendirme ekleme işlemi burada gerçekleşir
-      alert('Değerlendirme ekleme butonuna tıklandı');
-    } else {
-      setSnackbarMessage('Bu ürünü satın almadığınız için değerlendirme yapamazsınız.');
+  const handleReviewButtonClick = async () => {
+    try {
+      const response = await api.get(`/user/commentControl/${productId}`);
+      if (response.data.success && response.data.purchased === true) {
+        setCanReview(true);
+        setSnackbarMessage('Değerlendirme ekleyebilirsiniz.');
+        setSnackbarOpen(true);
+      } else if (response.data.success && response.data.purchased === false) {
+        setSnackbarMessage('Bu ürüne değerlendirme eklemek için satın almış olmalısınız.');
+        setSnackbarOpen(true);
+        setCanReview(false);
+      } else if (response.status === 404) {
+        setSnackbarMessage('Bu ürüne daha önceden yorum yaptınız.');
+        setSnackbarOpen(true);
+        setCanReview(false);
+      }
+    } catch (error) {
+      console.error('Error checking purchase:', error);
+      setSnackbarMessage('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.');
       setSnackbarOpen(true);
+      setCanReview(false);
     }
   };
 
@@ -134,9 +130,9 @@ function ReviewsTab({ productId, sellerProductId }) {
               sx={{
                 height: 56,
                 color: 'white',
-                bgcolor: '#f27a1a', // Buton arka plan rengi turuncu
+                bgcolor: '#f27a1a',
                 '&:hover': {
-                  bgcolor: '#f27a1a' // Hover durumu için renk sabit turuncu
+                  bgcolor: '#f27a1a'
                 }
               }}
               onClick={handleReviewButtonClick}

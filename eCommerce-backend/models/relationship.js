@@ -34,6 +34,10 @@ const Return = require('./return.js');
 Address.belongsTo(User, { foreignKey: 'user_id' }); // Bir adres bir kullanıcıya ait olur
 User.hasMany(Address, { foreignKey: 'user_id' }); // Bir kullanıcının birden fazla adresi olabilir
 
+Order.belongsTo(Address, { foreignKey: 'address_id' }); // Bir adres bir kullanıcıya ait olur
+Address.hasMany(Order, { foreignKey: 'address_id' }); // Bir kullanıcının birden fazla adresi olabilir
+
+
 Brand.belongsTo(ApprovalStatus, { foreignKey: 'approval_status_id' }); // Bir marka onay durumuna ait olur
 ApprovalStatus.hasMany(Brand, { foreignKey: 'approval_status_id' }); // Bir onay durumu birden fazla markaya sahip olabilir
 

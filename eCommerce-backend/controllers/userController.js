@@ -820,6 +820,9 @@ const getorders = async (req, res) => {
           },
           {
             model: User
+          },
+          {
+            model: Address
           }
         ]
       });
@@ -2499,35 +2502,57 @@ const commentControl = async (req, res) => {
     const user = await User.findOne({ where: { email: req.user.email } });
 
     if (!user) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res.status(406).json({ success: false, message: "User not found" });
     }
 
-    // Kullanıcının aynı ürüne daha önce yorum yapıp yapmadığını kontrol et
+    const product = await Product.findOne({ where: { product_id: productId } });
+
+    if (!product) {
+      return res.status(409).json({ success: false, message: 'Ürün bulunamadı' });
+    }
+
     const existingComment = await ProductComment.findOne({
-      where: { user_id: user.user_id, seller_product_id: productId }
+      where: { user_id: user.user_id },
+      include: [
+        {
+          model: sellerProduct,
+          required: true, // sellerProduct modelinin dahil edilmesini zorunlu kılar
+          include: [
+            {
+              model: Product,
+              required: true, // Product modelinin dahil edilmesini zorunlu kılar
+              where: { product_id: productId } // product_id'nin eşleştiği ürünleri getirir
+            }
+          ]
+        }
+      ]
     });
 
+
     if (existingComment) {
-      return res.status(200).json({ success: true, message: "Bu ürüne daha önce yorum yaptınız." });
+      return res.status(403).json({ success: false, message: "Bu ürüne daha önce yorum yaptınız." });
     }
 
-    // Kullanıcının ürünü satın alıp almadığını kontrol et
     const productQuery = await OrderItem.findOne({
       include: [
         {
           model: Order,
+          required: true,
           include: [
             {
               model: User,
+              required: true,
               where: { user_id: user.user_id }
             }
           ]
         },
         {
           model: sellerProduct,
+          required: true,
           include: [
             {
               model: Product,
+              required: true,
               where: { product_id: productId }
             }
           ]
@@ -2535,15 +2560,12 @@ const commentControl = async (req, res) => {
       ]
     });
 
-    if (productQuery) {
-      return res.status(200).json({ success: true, purchased: true });
-    } else {
-      return res.status(200).json({ success: true, purchased: false });
-    }
+    return res.status(200).json(productQuery);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 
 
 
