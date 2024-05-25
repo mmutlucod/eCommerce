@@ -59,6 +59,7 @@ const OrdersPage = () => {
   const [selectedItem, setSelectedItem] = useState('orders');
   const [orders, setOrders] = useState([]);
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
+  const [selectedOrderAddress, setSelectedOrderAddress] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -78,8 +79,13 @@ const OrdersPage = () => {
   const fetchOrderItems = async (orderId) => {
     try {
       setLoadingDetails(true);
-      const response = await api.get(`/user/orderItems/${orderId}`);
-      setSelectedOrderDetails(response.data);
+      const [itemsResponse, addressResponse] = await Promise.all([
+        api.get(`/user/orderItems/${orderId}`),
+        api.get(`/user/order/${orderId}`)
+      ]);
+      setSelectedOrderDetails(itemsResponse.data);
+      {console.log(`adresler:${itemsResponse.data[0]}`)}
+      setSelectedOrderAddress(addressResponse.data.address);
       setLoadingDetails(false);
     } catch (error) {
       console.error('Sipariş kalemleri alınırken hata oluştu:', error);
@@ -95,6 +101,7 @@ const OrdersPage = () => {
   const handleCloseModal = () => {
     setOpen(false);
     setSelectedOrderDetails(null);
+    setSelectedOrderAddress(null);
   };
 
   const calculateTotalPrice = (orderItems) => {
@@ -195,6 +202,17 @@ const OrdersPage = () => {
                     Toplam Tutar: {calculateTotalPrice(selectedOrderDetails.orderItems)} ₺
                   </Typography>
                 </Box>
+                
+                {selectedOrderAddress && (
+
+                  
+                  <Box sx={{ mt: 3 }}>
+                    <Typography variant="h6">Teslimat Adresi</Typography>
+                    <Typography>{selectedOrderAddress.adres_line}</Typography>
+                    <Typography>{`${selectedOrderAddress.street}, ${selectedOrderAddress.city}, ${selectedOrderAddress.state}, ${selectedOrderAddress.postal_code}`}</Typography>
+                    <Typography>{selectedOrderAddress.country}</Typography>
+                  </Box>
+                )}
               </Box>
             ) : (
               <Typography>Detaylar yüklenemedi.</Typography>

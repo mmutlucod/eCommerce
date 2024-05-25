@@ -20,6 +20,7 @@ import {
     MenuItem,
     CssBaseline,
     Checkbox,
+    Snackbar,
     Alert,
     AlertTitle
 } from '@mui/material';
@@ -70,6 +71,8 @@ const PaymentPage = () => {
     const [alertMessage, setAlertMessage] = useState('');
     const [orderSuccess, setOrderSuccess] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
     const navigate = useNavigate();
 
@@ -147,7 +150,9 @@ const PaymentPage = () => {
 
     const handleNext = () => {
         if (activeStep === steps.length - 1 && !formValid) {
+            setSnackbarSeverity('error');
             setAlertMessage('Lütfen eksik alanları doldurunuz.');
+            setSnackbarOpen(true);
         } else {
             setAlertMessage('');
             setActiveStep(prev => prev + 1);
@@ -172,16 +177,22 @@ const PaymentPage = () => {
             const response = await api.post('/user/create-address', newAddress);
             setAddresses([...addresses, response.data.address]);
             setModalOpen(false);
+            setSnackbarSeverity('success');
             setAlertMessage('Adres başarıyla eklendi.');
+            setSnackbarOpen(true);
         } catch (error) {
             console.error('Adres eklenirken hata oluştu:', error);
+            setSnackbarSeverity('error');
             setAlertMessage('Adres eklenirken bir hata oluştu.');
+            setSnackbarOpen(true);
         }
     };
 
     const handleSubmit = async () => {
         if (!formValid || !termsAccepted || !infoAccepted) {
+            setSnackbarSeverity('error');
             setAlertMessage('Lütfen tüm alanları doldurun ve koşulları kabul edin.');
+            setSnackbarOpen(true);
             return;
         }
 
@@ -195,7 +206,9 @@ const PaymentPage = () => {
             setOrderSuccess(true);
             setShowConfetti(true);
 
+            setSnackbarSeverity('success');
             setAlertMessage('Siparişiniz başarıyla oluşturuldu!');
+            setSnackbarOpen(true);
 
             setTimeout(() => {
                 setShowConfetti(false);
@@ -203,8 +216,14 @@ const PaymentPage = () => {
             }, 5000);
         } catch (error) {
             console.error('Error creating order:', error);
+            setSnackbarSeverity('error');
             setAlertMessage('Sipariş oluşturulurken bir hata oluştu.');
+            setSnackbarOpen(true);
         }
+    };
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
     };
 
     const renderPaymentDetails = () => (
@@ -237,11 +256,6 @@ const PaymentPage = () => {
                             cardDateRef={cardElementsRef.cardDate}
                         />
                     </CForm>
-                    {alertMessage && (
-                        <Box sx={{ mt: 2 }}>
-                            <Alert severity={orderSuccess ? 'success' : 'error'}>{alertMessage}</Alert>
-                        </Box>
-                    )}
                 </Box>
             </Grid>
             <Grid item xs={12} md={4}>
@@ -447,15 +461,16 @@ const PaymentPage = () => {
                 </Box>
             </Modal>
             {showConfetti && <Confetti width={window.innerWidth} height={window.innerHeight} />}
-            {orderSuccess && (
-                <Modal open={orderSuccess} onClose={() => setOrderSuccess(false)} aria-labelledby="success-modal-title" aria-describedby="success-modal-description">
-                    <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 2, textAlign: 'center' }}>
-                        <Alert severity="success">
-                            <AlertTitle>Siparişiniz başarıyla oluşturuldu!</AlertTitle>
-                        </Alert>
-                    </Box>
-                </Modal>
-            )}
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            >
+                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
             <UserFooter />
         </ThemeProvider>
     );
