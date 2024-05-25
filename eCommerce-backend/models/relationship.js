@@ -207,4 +207,3 @@ Return.hasMany(ReturnItem, { foreignKey: 'return_id' });// Bir iade birden fazla
 
 ReturnItem.belongsTo(SellerProduct, { foreignKey: 'seller_product_id' });// Her iade detayı belirli bir ürüne aittir
 SellerProduct.hasMany(ReturnItem, { foreignKey: 'seller_product_id' });// Bir ürün birden fazla iade detayı içerebilir (opsiyonel)
-

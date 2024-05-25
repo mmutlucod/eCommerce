@@ -888,6 +888,7 @@ const getOrderItems = async (req, res) => {
       }]
     });
 
+
     const response = {
       orderItems: orderItems,
       refundInfo: isOrderCancelled
@@ -897,8 +898,7 @@ const getOrderItems = async (req, res) => {
           remainingItemsCount: remainingItemsCount,
           canceledItemsCount: orderItems.length - remainingItemsCount,
           refundMessage: `${remainingItemsCount} ürününüzden ${orderItems.length - remainingItemsCount} tanesi iptal edildi. ${totalRefundAmount} TL iade edilecektir.`
-        },
-      returnItems: returnItems // İade bilgilerini yanıta ekle
+        }
     };
 
     return res.status(200).json(response);
