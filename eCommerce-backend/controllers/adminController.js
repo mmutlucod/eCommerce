@@ -11,7 +11,9 @@ const OrderItem = require('../models/orderItem');
 const sellerProduct = require('../models/sellerProduct');
 const Seller = require('../models/seller');
 const saltRounds = 10; // Bcrypt için salt tur sayısı
-const { Sequelize, Op } = require('sequelize')
+const { Sequelize, Op } = require('sequelize');
+const ProductComment = require('../models/productComment');
+const productQuestion = require('../models/productQuestion');
 
 const login = async (req, res) => {
     const { username, password } = req.body;
@@ -93,19 +95,15 @@ const getProducts = async (req, res) => {
             include: [
                 {
                     model: Brand,
-                    attributes: ['brand_name'], // Markanın sadece adını dahil et
                 },
                 {
                     model: Category,
-                    attributes: ['category_name'], // Kategorinin sadece adını dahil et
                 },
                 {
                     model: Admin,
-                    attributes: ['username', 'full_name']
                 },
                 {
                     model: ApprovalStatus,
-                    attributes: ['status_name']
                 }
             ]
         });
@@ -725,8 +723,78 @@ const getApprovalStatusById = async (req, res) => {
 }
 
 //ürün onay, yorum onay, soru cevap onay
+const getProductComments = async (req, res) => {
+    try {
+        const comments = await ProductComment.findAll({
+            include: [
+                {
+                    model: User
+                },
+                {
+                    model: sellerProduct,
+                    include: [
+                        {
+                            model: Product
+                        }
+                    ]
+                },
+                {
+                    model: ApprovalStatus
+                }
+            ]
+        })
 
+        return res.status(200).json(comments);
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
 
+    }
+}
+const getSellerProducts = async (req, res) => {
+    try {
+        const sellerProducts = await sellerProduct.findAll({
+            include: [
+                {
+                    model: Seller
+                },
+                {
+                    model: Product
+                },
+                {
+                    model: ApprovalStatus
+                }
+            ]
+        })
+        return res.status(200).json(sellerProducts);
+
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+const getProductQuestions = async (req, res) => {
+    try {
+        const questions = await productQuestion.findAll({
+            include: [
+                {
+                    model: Product
+                },
+                {
+                    model: Seller
+                },
+                {
+                    model: User
+                },
+                {
+                    model: ApprovalStatus
+                }
+            ]
+        })
+        return res.status(200).json(questions);
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+}
 
 const updateApprovalStatus = async (model, idField, req, res) => {
     try {
@@ -750,6 +818,8 @@ const updateApprovalStatus = async (model, idField, req, res) => {
 };
 
 
+
+
 module.exports = {
     login, register, listAdmins,
     getProducts, getProductsById, createProduct, editProduct, deleteProduct, searchProduct,
@@ -758,6 +828,6 @@ module.exports = {
     getOrders, getOrderDetailsById, updateOrder,
     getSellers, getSellerById, createSeller, editSeller, deleteSeller,
     getBrands, getBrandById, createBrand, editBrand, deleteBrand, getApprovalStatuses, getApprovalStatusById,
-    updateApprovalStatus
+    updateApprovalStatus, getProductComments, getProductQuestions, getSellerProducts
 
 };

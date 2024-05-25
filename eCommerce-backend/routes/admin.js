@@ -12,24 +12,24 @@ router.post('/login', adminController.login);
 router.post('/register', adminController.register);
 router.get('/listAdmins', authMiddleware, roleCheckMiddleware('admin'), adminController.listAdmins);
 
-router.get('/products', authMiddleware, adminController.getProducts)
-router.get('/products/:id', authMiddleware, adminController.getProductsById);
-router.post('/create-product', authMiddleware, adminController.createProduct);
-router.put('/products/:id', authMiddleware, adminController.editProduct);
-router.delete('/products/:id', authMiddleware, adminController.deleteProduct);
-router.get('/searchProduct', authMiddleware, adminController.searchProduct);
+router.get('/products', authMiddleware, roleCheckMiddleware('admin'), adminController.getProducts)
+router.get('/products/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.getProductsById);
+router.post('/create-product', authMiddleware, roleCheckMiddleware('admin'), adminController.createProduct);
+router.put('/products/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.editProduct);
+router.delete('/products/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.deleteProduct);
+router.get('/searchProduct', authMiddleware, roleCheckMiddleware('admin'), adminController.searchProduct);
 
-router.get('/categories', adminController.getCategories)
-router.get('/categories/:id', authMiddleware, adminController.getCategoriesById);
-router.post('/create-category', adminController.createCategory);
-router.put('/categories/:id', adminController.editCategory);
-router.delete('/categories/:id', adminController.deleteCategory);
+router.get('/categories', authMiddleware, roleCheckMiddleware('admin'), adminController.getCategories)
+router.get('/categories/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.getCategoriesById);
+router.post('/create-category', authMiddleware, roleCheckMiddleware('admin'), adminController.createCategory);
+router.put('/categories/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.editCategory);
+router.delete('/categories/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.deleteCategory);
 
-router.get('/users', authMiddleware, adminController.getUsers);
-router.get('/users/:id', authMiddleware, adminController.getUsersById);
-router.post('/create-user', authMiddleware, adminController.createUser);
-router.put('/users/:id', authMiddleware, adminController.editUser);
-router.delete('/users/:id', authMiddleware, adminController.deleteUser);
+router.get('/users', authMiddleware, roleCheckMiddleware('admin'), adminController.getUsers);
+router.get('/users/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.getUsersById);
+router.post('/create-user', authMiddleware, roleCheckMiddleware('admin'), adminController.createUser);
+router.put('/users/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.editUser);
+router.delete('/users/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.deleteUser);
 
 // router.get('/moderators', authMiddleware, adminController.getModerators)
 // router.get('/moderators/:id', authMiddleware, adminController.getModeratorsById);
@@ -37,46 +37,51 @@ router.delete('/users/:id', authMiddleware, adminController.deleteUser);
 // router.put('/moderators/:id', authMiddleware, adminController.editModerator);
 // router.delete('/moderators/:id', authMiddleware, adminController.deleteModerator);
 
-router.get('/orders', authMiddleware, adminController.getOrders);
-router.get('/orders/:id', authMiddleware, adminController.getOrderDetailsById);
-router.put('/orders/:id', authMiddleware, adminController.updateOrder);
+router.get('/orders', authMiddleware, roleCheckMiddleware('admin'), adminController.getOrders);
+router.get('/orders/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.getOrderDetailsById);
+router.put('/orders/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.updateOrder);
 
-router.get('/sellers', authMiddleware, adminController.getSellers);
-router.get('/sellers/:id', authMiddleware, adminController.getSellerById);
-router.post('/create-seller', authMiddleware, adminController.createSeller);
-router.put('/sellers/:id', authMiddleware, adminController.editSeller);
-router.delete('/sellers/:id', authMiddleware, adminController.deleteSeller);
+router.get('/sellers', authMiddleware, roleCheckMiddleware('admin'), adminController.getSellers);
+router.get('/sellers/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.getSellerById);
+router.post('/create-seller', authMiddleware, roleCheckMiddleware('admin'), adminController.createSeller);
+router.put('/sellers/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.editSeller);
+router.delete('/sellers/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.deleteSeller);
 
-router.get('/brands', authMiddleware, adminController.getBrands);
-router.get('/brands/:id', authMiddleware, adminController.getBrandById);
-router.post('/create-brand', authMiddleware, adminController.createBrand);
-router.put('/brands/:id', authMiddleware, adminController.editBrand);
-router.delete('/brands/:id', authMiddleware, adminController.deleteBrand);
+router.get('/brands', authMiddleware, roleCheckMiddleware('admin'), adminController.getBrands);
+router.get('/brands/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.getBrandById);
+router.post('/create-brand', authMiddleware, roleCheckMiddleware('admin'), adminController.createBrand);
+router.put('/brands/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.editBrand);
+router.delete('/brands/:id', authMiddleware, roleCheckMiddleware('admin'), adminController.deleteBrand);
 
 router.get('/approvalstatuses', adminController.getApprovalStatuses);
 router.get('/approvalstatuses/:id', adminController.getApprovalStatusById);
 
 
 // Ürün onayı
-router.put('/approve/product/:id/:approval_status_id', authMiddleware, async (req, res) => {
+router.put('/approve/product/:id/:approval_status_id', authMiddleware, roleCheckMiddleware('admin'), async (req, res) => {
     await adminController.updateApprovalStatus(Product, 'product_id', req, res);
 });
 
 // Yorum onayı
-router.put('/approve/comment/:id/:approval_status_id', authMiddleware, async (req, res) => {
+router.put('/approve/comment/:id/:approval_status_id', authMiddleware, roleCheckMiddleware('admin'), async (req, res) => {
     await adminController.updateApprovalStatus(ProductComment, 'comment_id', req, res);
 });
 
 // Satıcı ürün onayı
-router.put('/approve/seller-product/:id/:approval_status_id', authMiddleware, async (req, res) => {
+router.put('/approve/seller-product/:id/:approval_status_id', authMiddleware, roleCheckMiddleware('admin'), async (req, res) => {
     await adminController.updateApprovalStatus(sellerProduct, 'seller_product_id', req, res);
 });
 
 // Soru cevap onayı
-router.put('/approve/question/:id/:approval_status_id', authMiddleware, async (req, res) => {
+router.put('/approve/question/:id/:approval_status_id', authMiddleware, roleCheckMiddleware('admin'), async (req, res) => {
     await adminController.updateApprovalStatus(productQuestion, 'question_id', req, res);
 });
 
+
+router.get('/getProducts', authMiddleware, roleCheckMiddleware('admin'), adminController.getProducts);
+router.get('/getSellerProducts', authMiddleware, roleCheckMiddleware('admin'), adminController.getSellerProducts);
+router.get('/getProductComments', authMiddleware, roleCheckMiddleware('admin'), adminController.getProductComments);
+router.get('/getProductQuestions', authMiddleware, roleCheckMiddleware('admin'), adminController.getProductQuestions);
 
 
 module.exports = router;

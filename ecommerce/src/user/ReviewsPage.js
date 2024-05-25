@@ -90,27 +90,20 @@ const ReviewsPage = () => {
                                             <Grid item key={review.id} xs={12}>
                                                 <Card>
                                                     <CardContent>
-                                                        <Typography gutterBottom variant="h6" component="div">
-                                                            Ürün Adı: <Link to={'/urun/' + review.sellerProduct.product.slug} style={{ textDecoration: 'none', fontWeight: 'bold' }}>{review.sellerProduct.product.name}</Link>
+                                                        <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                            <Typography gutterBottom variant="h6" component="div" marginLeft={'30%'}>
+                                                                Ürün Adı: <Link to={'/urun/' + review.sellerProduct.product.slug} style={{ textDecoration: 'none', fontWeight: 'bold' }}>{review.sellerProduct.product.name}</Link>
+                                                            </Typography>
+                                                            <Typography variant="body2" component="p" sx={{ fontWeight: 'bold', color: getApprovalColor(review.approval_status_id) }}>
+                                                                {getApprovalText(review.approval_status_id)}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Typography variant="body2" color="textSecondary" component="p">
+                                                            {review.comment}
                                                         </Typography>
-                                                        {review.approval_status_id === 1 ? (
-                                                            <>
-                                                                <Typography variant="body2" color="textSecondary" component="p">
-                                                                    {review.comment}
-                                                                </Typography>
-                                                                <Box sx={{ mt: 1 }}>
-                                                                    <Rating value={review.rating} readOnly />
-                                                                </Box>
-                                                            </>
-                                                        ) : review.approval_status_id === 2 ? (
-                                                            <Typography variant="body2" color="error" component="p">
-                                                                Yorumunuz reddedildi
-                                                            </Typography>
-                                                        ) : (
-                                                            <Typography variant="body2" color="textSecondary" component="p">
-                                                                Onay Bekliyor
-                                                            </Typography>
-                                                        )}
+                                                        <Box sx={{ mt: 1 }}>
+                                                            <Rating value={review.rating} readOnly />
+                                                        </Box>
                                                         <Typography variant="body2" color="textSecondary" component="p" sx={{ mt: 1 }}>
                                                             Tarih: {new Date(review.comment_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
                                                         </Typography>
@@ -129,6 +122,28 @@ const ReviewsPage = () => {
             </ThemeProvider>
         </>
     );
+};
+
+const getApprovalText = (approvalStatusId) => {
+    switch (approvalStatusId) {
+        case 1:
+            return 'Onaylandı';
+        case 2:
+            return 'Moderatör tarafından reddedildi.';
+        default:
+            return 'Moderatör onayı bekleniyor.';
+    }
+};
+
+const getApprovalColor = (approvalStatusId) => {
+    switch (approvalStatusId) {
+        case 1:
+            return 'green';
+        case 2:
+            return 'red';
+        default:
+            return 'gray';
+    }
 };
 
 export default ReviewsPage;
