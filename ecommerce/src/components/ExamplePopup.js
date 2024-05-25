@@ -58,8 +58,8 @@ const ExamplePopup = ({ results, width, searchLeftMargin }) => {
                 flexDirection: 'row'
             }}
         >
-            {results.map((result, index) => (
-                <Card key={index} sx={{ borderRadius: 0, flexDirection: 'column', display: 'flex', mb: 1, cursor: 'pointer', width: '120px', height: '200px', marginLeft: '18px' }} onClick={() => window.location.href = `/urun/${result.product.slug}`}>
+            {results.slice(0, 6).map((result, index) => (
+                <Card key={index} sx={{ borderRadius: '4.5px', flexDirection: 'column', display: 'flex', mb: 1, cursor: 'pointer', width: '120px', height: '200px', marginLeft: '18px' }} onClick={() => window.location.href = `/urun/${result.product.slug}`}>
                     <CardMedia
                         component="img"
                         sx={{ objectFit: 'contain', width: '120px', height: '100px' }}

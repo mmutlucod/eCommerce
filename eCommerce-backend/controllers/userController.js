@@ -161,6 +161,12 @@ const updateUserDetail = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Mevcut şifre yanlış.' });
       }
 
+      // Yeni şifre mevcut şifre ile aynı mı kontrolü
+      const isSameAsCurrentPassword = await bcrypt.compare(newPassword, user.password);
+      if (isSameAsCurrentPassword) {
+        return res.status(400).json({ success: false, message: 'Yeni şifre eski şifreniz olamaz.' });
+      }
+
       // Yeni şifreler uyuşuyor mu kontrolü
       if (newPassword !== confirmPassword) {
         return res.status(400).json({ success: false, message: 'Yeni şifreler eşleşmiyor.' });
@@ -2094,7 +2100,7 @@ const getProductsByCategorySlug = async (req, res) => {
 
 //Satıcıya göre ürünleri çekme
 const getProductsBySeller = async (req, res) => {
-  const { productId } = req.params;
+  const { sellerSlug } = req.params;
 
   try {
     let user = null;

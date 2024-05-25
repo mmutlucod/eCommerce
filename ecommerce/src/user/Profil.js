@@ -90,7 +90,7 @@ const UserProfile = () => {
         });
         setOriginalUserInfo({ name, surname, email, phone });
       } catch (error) {
-        console.error('Profil bilgileri alınırken hata oluştu:', error);
+
       }
     };
 
@@ -117,7 +117,9 @@ const UserProfile = () => {
       (key) => userInfo[key] !== originalUserInfo[key]
     );
 
-    if (!isUserInfoChanged) {
+    const isPasswordChanged = userInfo.currentPassword || userInfo.newPassword || userInfo.confirmPassword;
+
+    if (!isUserInfoChanged && !isPasswordChanged) {
       setAlertMessage('Hiçbir değişiklik yapılmadı.');
       setAlertSeverity('info');
       setAlertOpen(true);
@@ -151,6 +153,13 @@ const UserProfile = () => {
           email: userInfo.email,
           phone: userInfo.phone,
         });
+        // Şifre alanlarını temizle
+        setUserInfo((prevState) => ({
+          ...prevState,
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: '',
+        }));
       } else {
         setAlertMessage(response.data.message || 'Güncelleme işlemi sırasında bir hata oluştu. Lütfen tekrar deneyin.');
         setAlertSeverity('error');

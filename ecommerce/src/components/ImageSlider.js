@@ -5,7 +5,6 @@ import "slick-carousel/slick/slick-theme.css";
 import '../styles/ImageSlider.css';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
 
-
 const NextArrow = (props) => {
     const { onClick } = props;
     return (
@@ -15,7 +14,6 @@ const NextArrow = (props) => {
     );
 };
 
-// Sol ok bileşeni
 const PrevArrow = (props) => {
     const { onClick } = props;
     return (
@@ -27,7 +25,7 @@ const PrevArrow = (props) => {
 
 const ImageSlider = ({ images }) => {
     const settings = {
-        dots: false, // Dots'u kaldırmak için false yapıldı
+        dots: false,
         infinite: true,
         speed: 500,
         slidesToShow: 1,
@@ -40,7 +38,7 @@ const ImageSlider = ({ images }) => {
     };
 
     return (
-        <div className="slider-container0" style={{ margin: '20px 40px' }}>
+        <div className="slider-container0">
             <Slider {...settings}>
                 {images.map((img, index) => (
                     <div key={index} className="slider-image-container0">

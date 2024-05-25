@@ -9,8 +9,8 @@ const CategoriesBar = () => {
   const [subCategories, setSubCategories] = useState([]);
   const [anchorPosition, setAnchorPosition] = useState(null);
   const barRef = useRef(null);
-  const [menuOpen, setMenuOpen] = useState(false); // Menü açılış durumunu izlemek için state ekledik
-  const menuCloseTimeout = useRef(null); // Menü kapanma zamanlayıcısı için ref ekledik
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuCloseTimeout = useRef(null);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -47,7 +47,7 @@ const CategoriesBar = () => {
       top: barRect.bottom,
       left: event.currentTarget.getBoundingClientRect().left,
     });
-    setMenuOpen(true); // Menü açıldı
+    setMenuOpen(true);
   };
 
   const handleMouseLeave = () => {
@@ -56,7 +56,7 @@ const CategoriesBar = () => {
       setActiveCategory(null);
       setSubCategories([]);
       setAnchorPosition(null);
-    }, 200); // 200ms gecikme ile menüyü kapat, bu süre içinde mouse tekrar menüye girerse kapanmaz
+    }, 200);
   };
 
   const handleMenuEnter = () => {
@@ -64,64 +64,79 @@ const CategoriesBar = () => {
       clearTimeout(menuCloseTimeout.current);
       menuCloseTimeout.current = null;
     }
-    setMenuOpen(true); // Menü üzerinde dururken kapanmamasını sağlar
+    setMenuOpen(true);
   };
 
   const handleMenuLeave = () => {
-    setMenuOpen(false); // Menüden ayrılınca kapanmasını sağlar
+    setMenuOpen(false);
     setTimeout(() => {
       if (menuOpen) {
         setActiveCategory(null);
         setSubCategories([]);
         setAnchorPosition(null);
       }
-    }, 10); // 200ms gecikme ile menüyü kapat, bu süre içinde mouse tekrar menüye girerse kapanmaz
+    }, 10);
   };
 
   return (
     <Box ref={barRef} sx={{
       display: 'flex',
-      justifyContent: 'space-around', // Sağdan ve soldan eşit boşluk sağlar
+      justifyContent: 'center',
       alignItems: 'center',
-      flexWrap: 'nowrap', // Kategorilerin tek satırda kalmasını sağlar
+      flexWrap: 'wrap', // Kategorilerin satır bazında kalmasını sağlar
       backgroundColor: '#f0f0f0',
-      overflowX: 'hidden', // İçeriğin taşmasını engeller
-      whiteSpace: 'nowrap', // Öğelerin alt satıra geçmesini engeller
-      paddingX: 24
+      overflowX: 'hidden',
+      paddingX: 24,
+      '& .category-box': {
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '55px',
+        flex: 1,
+        textAlign: 'center',
+        margin: 0,
+        '&:hover': {
+          backgroundColor: 'white',
+        },
+      },
+      '& .category-link': {
+        textDecoration: 'none',
+        color: '#333',
+        fontWeight: 'bold',
+        fontSize: '14px',
+        display: 'block',
+        marginX: 0,
+        whiteSpace: 'normal',
+        '&:hover': {
+          color: '#4B0082',
+        }
+      },
+      '@media (max-width: 600px)': {
+        '& .category-box': {
+          flex: '0 0 50%', // En küçük ekranlarda yan yana 2 kategori elemanı
+        }
+      },
+      '@media (min-width: 601px) and (max-width: 960px)': {
+        '& .category-box': {
+          flex: '0 0 33.33%', // Orta boyutlu ekranlarda yan yana 3 kategori elemanı
+        }
+      },
+      '@media (min-width: 961px)': {
+        '& .category-box': {
+          flex: '0 0 10%', // Büyük ekranlarda yan yana 5 kategori elemanı
+        }
+      },
     }}>
       {categories.map((category, index) => (
         <React.Fragment key={category.id}>
           <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              minHeight: '55px',
-              flex: 1,
-              textAlign: 'center',
-              margin: 0,
-              backgroundColor: activeCategory === category && menuOpen ? 'white' : 'transparent', // Açılır menü açıksa beyaz yap
-              '&:hover': {
-                backgroundColor: 'white', // Fareyle üzerine gelindiğinde arka planı beyaz yapar
-              },
-            }}
+            className="category-box"
             onMouseEnter={(event) => handleMouseEnter(category, event)}
             onMouseLeave={handleMouseLeave}
           >
             <Link
               href={`/kategori/${category.slug}`}
-              sx={{
-                textDecoration: 'none',
-                color: activeCategory === category && menuOpen ? '#4B0082' : '#333', // Açılır menü açıksa beyaz yap
-                fontWeight: 'bold',
-                fontSize: '14px',
-                display: 'block',
-                marginX: 0,
-                whiteSpace: 'normal', // Allow text to wrap to next line
-                '&:hover': {
-                  color: '#4B0082',
-                }
-              }}
+              className="category-link"
             >
               {category.category_name}
             </Link>
@@ -133,8 +148,8 @@ const CategoriesBar = () => {
           )}
           {activeCategory === category && anchorPosition && (
             <Paper
-              onMouseEnter={handleMenuEnter} // Alt menünün üzerine gelindiğinde menünün kapanmasını engeller
-              onMouseLeave={handleMenuLeave} // Alt menüden ayrılınca menüyü kapatır
+              onMouseEnter={handleMenuEnter}
+              onMouseLeave={handleMenuLeave}
               sx={{
                 position: 'fixed',
                 top: `${anchorPosition.top}px`,

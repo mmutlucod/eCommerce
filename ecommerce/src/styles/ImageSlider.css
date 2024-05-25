@@ -1,8 +1,28 @@
+.slider-container0 {
+    margin: 20px 40px;
+    overflow: hidden; /* Kayarken köşelerin yuvarlak kalmasını sağlamak için */
+    border-radius: 12px; /* Kayarken köşelerin yuvarlak kalmasını sağlamak için */
+}
+
+.slider-image-container0 {
+    position: relative;
+    overflow: hidden; /* Kayarken köşelerin yuvarlak kalmasını sağlamak için */
+    border-radius: 12px; /* Resimlerin köşelerini yuvarlamak için */
+}
+
+.slider-image0 {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover; 
+    border-radius: 12px; /* Resimlerin köşelerini yuvarlamak için */
+}
+
 .slick-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    border-radius: 50%;
+    border-radius: 12px;
     padding: 10px;
     cursor: pointer;
     z-index: 1000;
@@ -14,12 +34,4 @@
 
 .slick-prev0 {
     left: 10px;
-}
-
-.slider-image0 {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: fill; 
-    border-radius: 12px;
 }

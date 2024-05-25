@@ -107,6 +107,9 @@ function App() {
             <Route path="/arama/:query" element={<UserSearchProducts />} />
             <Route path="/satici/:sellerSlug" element={<UserSellerPage />} />
 
+            <Route path="/hata404" element={<UserErrorPage />} />
+            <Route path="*" element={<UserErrorPage />} />
+
           </Routes>
         </Router>
 
