@@ -831,7 +831,7 @@ const getorders = async (req, res) => {
 }
 const getOrderItems = async (req, res) => {
   try {
-    const { orderId } = req.params;
+    const { orderId } = req.params; // orderId'yi req.params'dan alıyoruz
     const orderItems = await OrderItem.findAll({
       where: { order_id: orderId },
       include: [
@@ -888,7 +888,6 @@ const getOrderItems = async (req, res) => {
       }]
     });
 
-
     const response = {
       orderItems: orderItems,
       refundInfo: isOrderCancelled
@@ -908,6 +907,7 @@ const getOrderItems = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 const cancelOrderItem = async (req, res) => {
   try {
     const { orderItemId, cancelQuantity } = req.body;
@@ -2435,29 +2435,28 @@ const searchProducts = async (req, res) => {
     });
     const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
 
+
     for (let product of uniqueLowestPriceProducts) {
       const ratingsData = await ProductComment.findAll({
-        where: {
-          '$sellerProduct.product_id$': product.product_id // `sellerProduct` üzerinden `product_id` ile filtreleme
-        },
         include: [{
           model: sellerProduct,
-          attributes: [],
+          attributes: [], // sellerProduct'tan herhangi bir özellik çekmeyeceğiz
           include: [{
             model: Product,
-            attributes: [] // `Product`'a ait özellikler bu seviyede istenmiyor
+            where: { product_id: product.product_id },
+            attributes: [] // İç içe include yapısı kullanıyorsak, bu seviyede de attributes boş bırakılmalı
           }]
         }],
         attributes: [
-          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
-          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'], // Ortalama puanı hesapla
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount'] // Yorum sayısını hesapla
         ],
-        group: ['sellerProduct.product_id'], // Ürün ID'sine göre gruplama yaparak doğru sonuçlar elde et
         raw: true
       });
 
-      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
-      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
+      // Eğer hiç yorum yoksa, ortalamaRating ve RatingCount 0 olacak şekilde ayarla
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "No ratings";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "No comments";
     }
 
     const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
@@ -2477,7 +2476,6 @@ const searchProducts = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
-
 
 const getPhotos = async (req, res) => {
   const { productId } = req.params;

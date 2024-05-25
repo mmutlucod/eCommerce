@@ -78,9 +78,7 @@ const OrdersPage = () => {
   const fetchOrderItems = async (orderId) => {
     try {
       setLoadingDetails(true);
-      const response = await api.get(`/user/orderItems`, {
-        params: { orderId }
-      });
+      const response = await api.get(`/user/orderItems/${orderId}`);
       setSelectedOrderDetails(response.data);
       setLoadingDetails(false);
     } catch (error) {
@@ -88,9 +86,9 @@ const OrdersPage = () => {
       setLoadingDetails(false);
     }
   };
-  
 
   const handleOpenModal = (orderId) => {
+    console.log('Opening modal for order ID:', orderId); // orderId'yi kontrol etmek için log ekleyin
     fetchOrderItems(orderId);
     setOpen(true);
   };
@@ -124,6 +122,7 @@ const OrdersPage = () => {
                       <CardContent>
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={3}>
+                            {console.log(order)}
                             <Typography color="textSecondary">Sipariş Tarihi</Typography>
                             <Typography variant="body2">{new Date(order.order_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</Typography>
                           </Grid>
@@ -142,7 +141,7 @@ const OrdersPage = () => {
                         </Grid>
                       </CardContent>
                       <CardActions>
-                        <Button size="small" color="primary" onClick={() => handleOpenModal(order.id)}>
+                        <Button size="small" color="primary" onClick={() => handleOpenModal(order.order_id)}>
                           Sipariş Detayı
                         </Button>
                       </CardActions>
