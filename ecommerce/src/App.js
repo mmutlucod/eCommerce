@@ -102,8 +102,8 @@ function App() {
             <Route path="/sorularim" element={<PrivateRoute element={<QuestionsPage />} />} />
             <Route path="/urun/:productSlug" element={< UserProductPage />} />
             <Route path="/sepetim/odeme" element={<PrivateRoute element={< MultiStepForm />} />} />
-            <Route path="marka/:brandSlug" element={<UserSearchPage />} />
-            <Route path="kategori/:categorySlug" element={<UserCategorySearch />} />
+            <Route path="/marka/:brandSlug" element={<UserSearchPage />} />
+            <Route path="/kategori/:categorySlug" element={<UserCategorySearch />} />
             <Route path="/arama/:query" element={<UserSearchProducts />} />
             <Route path="/satici/:sellerSlug" element={<UserSellerPage />} />
 
