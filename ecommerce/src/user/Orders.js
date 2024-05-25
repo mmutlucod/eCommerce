@@ -114,6 +114,7 @@ const OrdersPage = () => {
                   orders.map((order, index) => (
                     <Card key={index} variant="outlined" sx={{ marginBottom: 2 }}>
                       <CardContent>
+                        {console.log(order)}
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={3}>
                             <Typography color="textSecondary">Sipariş Tarihi</Typography>
