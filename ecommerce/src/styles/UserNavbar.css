@@ -10,7 +10,7 @@
     transform: translateX(-50%);
     background-color: white;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    z-index: 1;
+    z-index: 10000;
     display: flex;
     flex-direction: column;
     width: 180px; /* Menü genişliği */
@@ -32,6 +32,7 @@
 .profile-menu .profile-menu-user {
     padding: 6px 2px; /* Kullanıcı adı için padding */
     text-align: center; /* Kullanıcı adının sola hizalanması */
+    z-index: 10000;
 }
 
 .profile-menu .profile-menu-item {

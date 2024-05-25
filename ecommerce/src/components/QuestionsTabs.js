@@ -4,6 +4,7 @@ import {
   Dialog, DialogContent, DialogTitle, Link, Checkbox, FormControlLabel, Snackbar, Alert
 } from '@mui/material';
 import api from '../api/api';
+import { useAuth } from '../context/AuthContext';
 
 function QuestionsTab({ productId, seller }) {
   const [questions, setQuestions] = useState([]);
@@ -16,6 +17,8 @@ function QuestionsTab({ productId, seller }) {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // Snackbar türü için state
 
+  const { token } = useAuth();
+
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -26,8 +29,10 @@ function QuestionsTab({ productId, seller }) {
       }
     };
 
-    fetchUserId();
-  }, []);
+    if (token) {
+      fetchUserId();
+    }
+  }, [token]);
 
   useEffect(() => {
     const fetchQuestions = async () => {
@@ -120,7 +125,7 @@ function QuestionsTab({ productId, seller }) {
   return (
     <Box sx={{ p: 2, maxWidth: 800, margin: 'auto', bgcolor: '#f9f9f9', position: 'relative' }}>
       <Typography variant="h6">Sorular & Cevaplar</Typography>
-      <Button
+      {token && (<Button
         variant="contained"
         color="secondary"
         onClick={handleOpenModal}
@@ -136,7 +141,7 @@ function QuestionsTab({ productId, seller }) {
         }}
       >
         Soru Sor
-      </Button>
+      </Button>)}
 
       <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md">
         <DialogTitle>Soru Sor</DialogTitle>

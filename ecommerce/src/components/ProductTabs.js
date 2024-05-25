@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Typography, Paper, Button, Avatar, Table, TableBody, TableCell, TableContainer, TableRow, Link, AppBar, Tabs, Tab, Alert } from '@mui/material';
+import { Box, Typography, Paper, Button, Avatar, Table, TableBody, TableCell, TableContainer, TableRow, Link, AppBar, Tabs, Tab, Alert, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import StarIcon from '@mui/icons-material/Star';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,7 @@ import { addItem, updateItem } from '../redux/cartSlice';
 import api from '../api/api';
 import ReviewsTab from '../components/ReviewsTabs';
 import QuestionsTab from '../components/QuestionsTabs';
+import { useAuth } from '../context/AuthContext';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -36,15 +37,16 @@ function OtherSellersTab({ product }) {
   const [newQuestion, setNewQuestion] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("warning");
   const cartItems = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchSellers = async () => {
       try {
         const response = await api.get(`user/sellerProducts/${product.product.product_id}/${product.seller_product_id}`);
-        console.log(response.data)
         setSellers(response.data);
       } catch (error) {
         console.error('Satıcılar getirilirken hata oluştu:', error);
@@ -79,8 +81,6 @@ function OtherSellersTab({ product }) {
     }
   };
 
-
-
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
   };
@@ -90,45 +90,54 @@ function OtherSellersTab({ product }) {
   };
 
   const handleAddToCart = useCallback((sellerProduct) => {
-    console.log('Adding to cart:', sellerProduct);
+    if (!token) {
+      setAlertMessage('Lütfen önce giriş yapınız.');
+      setAlertSeverity('warning');
+      setAlertOpen(true);
+      setTimeout(() => {
+        navigate('/giris-yap');
+      }, 2000);
+      return;
+    }
+
     if (!cartItems || !sellerProduct) {
       console.warn('Cart items or product not yet loaded. Please wait a moment.');
       return;
     }
 
     const existingItem = cartItems.find(item => item.sellerProductId === sellerProduct.seller_product_id);
-    console.log('Existing item:', existingItem);
     const newQuantity = existingItem ? existingItem.quantity + 1 : 1;
-
-    console.log('New quantity:', newQuantity);
 
     if (newQuantity > sellerProduct.product.max_buy) {
       setAlertMessage(`Sepete maksimum ${sellerProduct.product.max_buy} adet ürün ekleyebilirsiniz.`);
+      setAlertSeverity('warning');
       setAlertOpen(true);
       return;
     } else if (newQuantity > sellerProduct.stock) {
       setAlertMessage(`Yeterli stok yok. Maksimum alım limiti: ${sellerProduct.stock}`);
+      setAlertSeverity('warning');
       setAlertOpen(true);
       return;
     }
 
     if (existingItem) {
-      console.log('Updating item in cart');
       dispatch(updateItem({
         sellerProductId: sellerProduct.seller_product_id,
         quantity: newQuantity,
         price: sellerProduct.product.price
       }));
     } else {
-      console.log('Adding new item to cart');
       dispatch(addItem({
         sellerProductId: sellerProduct.seller_product_id,
         quantity: 1,
         price: sellerProduct.product.price
       }));
     }
-  }, [cartItems, dispatch]);
-  console.log(sellers)
+  }, [cartItems, dispatch, token, navigate]);
+
+  const handleCloseAlert = () => {
+    setAlertOpen(false);
+  };
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -199,11 +208,11 @@ function OtherSellersTab({ product }) {
           </TableContainer>
         </Box>
       </TabPanel>
-      {alertOpen && (
-        <Alert severity="warning" onClose={() => setAlertOpen(false)} sx={{ mt: 2 }}>
+      <Snackbar open={alertOpen} autoHideDuration={800} onClose={handleCloseAlert}>
+        <Alert onClose={handleCloseAlert} severity={alertSeverity}>
           {alertMessage}
         </Alert>
-      )}
+      </Snackbar>
     </Box>
   );
 }

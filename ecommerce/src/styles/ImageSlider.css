@@ -1,11 +1,25 @@
-/* ImageSlider.css */
-.slick-dots li button:before {
-    font-size: 12px; /* Nokta boyutunu ayarla */
-    color: #000; /* İçinde bulunmadığınız resimlerin dot rengi (koyu) */
-    opacity: 0.75; /* Opaklık vererek görünürlüğünü azalt */
+.slick-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    z-index: 1000;
 }
 
-.slick-dots li.slick-active button:before {
-    color: #fff; /* İçinde bulunduğunuz resmin dot rengi (beyaz) */
-    opacity: 1; /* Opaklık tam */
+.slick-next0 {
+    right: 10px;
+}
+
+.slick-prev0 {
+    left: 10px;
+}
+
+.slider-image0 {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: fill; 
+    border-radius: 12px;
 }

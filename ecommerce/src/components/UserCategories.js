@@ -139,7 +139,7 @@ const CategoriesBar = () => {
                 position: 'fixed',
                 top: `${anchorPosition.top}px`,
                 left: `${anchorPosition.left}px`,
-                zIndex: 1000,
+                zIndex: 1000000,
                 padding: '10px',
                 backgroundColor: 'white',
                 boxShadow: '0 2px 5px rgba(0,0,0,0.15)',

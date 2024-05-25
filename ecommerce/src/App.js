@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchCart } from './redux/cartSlice';
+import PrivateRoute from './components/PrivateRoute'; // PrivateRoute bileşeninizi doğru yoldan içe aktarın
+
 
 import './App.css';
 import Login from './admin/login';
@@ -83,29 +85,28 @@ function App() {
             <Route path="/seller/product" element={<SellerProduct />} />
             <Route path="/seller/urun-ekle" element={<SellerProductAdd />} />
             <Route path="/urun-ekle" element={<SellerSellerProductAdd />} />
-            <Route path="/seller/orders" element={<SellerOrders/>} />
-            <Route path="/seller/question" element={<SellerQuestion/>} />
+            <Route path="/seller/orders" element={<SellerOrders />} />
+            <Route path="/seller/question" element={<SellerQuestion />} />
 
 
             <Route path="/anasayfa" element={< UserMainPage />} />
             <Route path="/giris-yap" element={< UserRegister />} />
             <Route path="/kayit-ol" element={< UserRegister />} />
-            <Route path="/profilim" element={< UserProfil />} />
-            <Route path="/siparislerim" element={< UserOrders />} />
-            <Route path="/adreslerim" element={< UserAddress />} />
-            <Route path="/adres-ekle" element={< UserAddressAdd />} />
-            <Route path="/favorilerim" element={< UserFavorites />} />
-            <Route path="/sepetim" element={< UserCart />} />
-            <Route path="/degerlendirmelerim" element={< ReviewsPage />} />
-            <Route path="/sorularim" element={< QuestionsPage />} />
+            <Route path="/profilim" element={<PrivateRoute element={<UserProfil />} />} />
+            <Route path="/siparislerim" element={<PrivateRoute element={<UserOrders />} />} />
+            <Route path="/adreslerim" element={<PrivateRoute element={<UserAddress />} />} />
+            <Route path="/adres-ekle" element={<PrivateRoute element={<UserAddressAdd />} />} />
+            <Route path="/favorilerim" element={<PrivateRoute element={<UserFavorites />} />} />
+            <Route path="/sepetim" element={<PrivateRoute element={<UserCart />} />} />
+            <Route path="/degerlendirmelerim" element={<PrivateRoute element={<ReviewsPage />} />} />
+            <Route path="/sorularim" element={<PrivateRoute element={<QuestionsPage />} />} />
             <Route path="/urun/:productSlug" element={< UserProductPage />} />
-            <Route path="/sepetim/odeme" element={< MultiStepForm />} />
+            <Route path="/sepetim/odeme" element={<PrivateRoute element={< MultiStepForm />} />} />
             <Route path="marka/:brandSlug" element={<UserSearchPage />} />
             <Route path="kategori/:categorySlug" element={<UserCategorySearch />} />
             <Route path="/arama/:query" element={<UserSearchProducts />} />
             <Route path="/satici/:sellerSlug" element={<UserSellerPage />} />
-            <Route path="/hata404" element={<UserErrorPage />} />
-            <Route path="*" element={<UserErrorPage />} />
+
           </Routes>
         </Router>
 
