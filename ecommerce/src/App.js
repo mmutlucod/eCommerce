@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchCart } from './redux/cartSlice';
 import PrivateRoute from './components/PrivateRoute'; // PrivateRoute bileşeninizi doğru yoldan içe aktarın
-
-
 import './App.css';
+
+
 import Login from './admin/login';
 import MainPage from './admin/MainPage';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
@@ -16,6 +16,10 @@ import Brands from './admin/Brands'
 import Categories from './admin/Categories'
 import Products from './admin/Products'
 import ProductAdd from './admin/ProductAdd'
+import CommentApprove from './admin/CommentApprove'
+import QuestionApprove from './admin/QuestionApprove'
+import ProductSellerApprove from './admin/ProductSellerApprove'
+import ProductApprove from './admin/ProductApprove'
 
 // Adjust the names here
 import SellerLogin from './seller/Login';
@@ -77,6 +81,10 @@ function App() {
             <Route path="/admin/categories" element={<Categories />} />
             <Route path="/admin/products" element={<Products />} />
             <Route path="/admin/productadd" element={<ProductAdd />} />
+            <Route path="/admin/yorumonay" element={<CommentApprove />} />
+            <Route path="/admin/soruonay" element={<QuestionApprove />} />
+            <Route path="/admin/urunonay" element={<ProductApprove />} />
+            <Route path="/admin/satıcıurunonay" element={<ProductSellerApprove />} />
 
             {/* SELLER */}
             <Route path="/seller" element={<SellerLogin />} />
