@@ -838,9 +838,9 @@ const getorder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const user = await User.findOne({ where: { email: req.user.email } });
-    const orders = await Order.findAll(
+    const orders = await Order.findOne(
       {
-        where: { user_id: user.user_id },
+        where: { order_id: orderId },
         include: [
           {
             model: orderStatus
@@ -2557,7 +2557,7 @@ const commentControl = async (req, res) => {
 
 
     if (existingComment) {
-      return res.status(403).json({ success: false, message: "Bu ürüne daha önce yorum yaptınız." });
+      return res.status(200).json({ success: false, message: "Bu ürüne daha önce yorum yaptınız." });
     }
 
     const productQuery = await OrderItem.findOne({
