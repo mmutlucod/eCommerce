@@ -66,13 +66,10 @@ const SellerPage = () => {
         <Paper elevation={3} sx={{ p: 3 }}>
           <Box display="flex" alignItems="center" mb={3}>
             <Avatar sx={{ width: 120, height: 120, fontSize: 48, marginRight: 2, bgcolor: '#3f51b5' }}>
-              {seller?.name?.charAt(0)}
+              {seller?.username?.charAt(0)}
             </Avatar>
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{seller?.name}</Typography>
-              <Typography variant="body1">Takipçi: {seller?.followersCount}</Typography>
-              <Typography variant="body1">Ürün: {seller?.productsCount}</Typography>
-              <Typography variant="body1">Değerlendirme: {seller?.reviewsCount}</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 'bold' }}>{seller?.username}</Typography>
             </Box>
           </Box>
           <AppBar position="static" color="default" sx={{ mb: 3 }}>
