@@ -4,6 +4,7 @@ import {
   CardContent, Button, FormControl, InputLabel, Select, MenuItem, Snackbar, Alert
 } from '@mui/material';
 import api from '../api/api';
+import { useAuth } from '../context/AuthContext';
 
 function formatUserName(name, isPublic) {
   if (isPublic === 1) {
@@ -20,6 +21,8 @@ function ReviewsTab({ productId }) {
   const [canReview, setCanReview] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -59,6 +62,12 @@ function ReviewsTab({ productId }) {
   };
 
   const handleReviewButtonClick = async () => {
+    if (!token) {
+      setSnackbarMessage('Değerlendirme ekleyebilmek için giriş yapmalısınız.');
+      setSnackbarOpen(true);
+      return;
+    }
+
     try {
       const response = await api.get(`/user/commentControl/${productId}`);
       console.log(response.data)
