@@ -14,7 +14,11 @@ import {
   CssBaseline,
   ThemeProvider,
   createTheme,
-  Collapse
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  CircularProgress
 } from '@mui/material';
 import Navbar from '../components/UserNavbar';
 import { renderMenuItems } from './RenderMenuItems';
@@ -53,7 +57,9 @@ const theme = createTheme({
 const OrdersPage = () => {
   const [selectedItem, setSelectedItem] = useState('orders'); // Başlangıç değeri olarak 'orders'
   const [orders, setOrders] = useState([]); // Sipariş listesi için state
-  const [selectedOrderDetails, setSelectedOrderDetails] = useState({}); // Seçili siparişin detayları için state
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null); // Seçili siparişin detayları için state
+  const [loadingDetails, setLoadingDetails] = useState(false); // Detay yükleniyor mu?
+  const [open, setOpen] = useState(false); // Modal açık mı?
 
   useEffect(() => {
     // API'den sipariş verilerini al
@@ -71,25 +77,27 @@ const OrdersPage = () => {
 
   const fetchOrderItems = async (orderId) => {
     try {
-      const response = await api.get(`/user/orderItems?orderId=${orderId}`);
-      setSelectedOrderDetails((prevDetails) => ({
-        ...prevDetails,
-        [orderId]: response.data
-      }));
+      setLoadingDetails(true);
+      const response = await api.get(`/user/orderItems`, {
+        params: { orderId }
+      });
+      setSelectedOrderDetails(response.data);
+      setLoadingDetails(false);
     } catch (error) {
       console.error('Sipariş kalemleri alınırken hata oluştu:', error);
+      setLoadingDetails(false);
     }
   };
+  
 
-  const toggleOrderDetails = (orderId) => {
-    if (selectedOrderDetails[orderId]) {
-      setSelectedOrderDetails((prevDetails) => ({
-        ...prevDetails,
-        [orderId]: null
-      }));
-    } else {
-      fetchOrderItems(orderId);
-    }
+  const handleOpenModal = (orderId) => {
+    fetchOrderItems(orderId);
+    setOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+    setSelectedOrderDetails(null);
   };
 
   return (
@@ -114,7 +122,6 @@ const OrdersPage = () => {
                   orders.map((order, index) => (
                     <Card key={index} variant="outlined" sx={{ marginBottom: 2 }}>
                       <CardContent>
-                        {console.log(order)}
                         <Grid container spacing={2}>
                           <Grid item xs={12} sm={3}>
                             <Typography color="textSecondary">Sipariş Tarihi</Typography>
@@ -135,28 +142,10 @@ const OrdersPage = () => {
                         </Grid>
                       </CardContent>
                       <CardActions>
-                        <Button size="small" color="primary" onClick={() => toggleOrderDetails(order.id)}>
+                        <Button size="small" color="primary" onClick={() => handleOpenModal(order.id)}>
                           Sipariş Detayı
                         </Button>
                       </CardActions>
-                      <Collapse in={!!selectedOrderDetails[order.id]} timeout="auto" unmountOnExit>
-                        <CardContent>
-                          {selectedOrderDetails[order.id] ? (
-                            <List>
-                              {selectedOrderDetails[order.id].map((item, idx) => (
-                                <Box key={idx} sx={{ mb: 2 }}>
-                                  <Typography variant="body2">{`Ürün Adı: ${item.product.name}`}</Typography>
-                                  <Typography variant="body2">{`Adet: ${item.quantity}`}</Typography>
-                                  <Typography variant="body2">{`Fiyat: ${item.price} TL`}</Typography>
-                                  <Typography variant="body2">{`Toplam: ${item.total} TL`}</Typography>
-                                </Box>
-                              ))}
-                            </List>
-                          ) : (
-                            <Typography>Kalemler yükleniyor...</Typography>
-                          )}
-                        </CardContent>
-                      </Collapse>
                     </Card>
                   ))
                 ) : (
@@ -166,6 +155,34 @@ const OrdersPage = () => {
             </Box>
           </Grid>
         </Container>
+        <Dialog open={open} onClose={handleCloseModal} maxWidth="md" fullWidth>
+          <DialogTitle>Sipariş Detayları</DialogTitle>
+          <DialogContent>
+            {loadingDetails ? (
+              <Box display="flex" justifyContent="center" alignItems="center" sx={{ height: '100px' }}>
+                <CircularProgress />
+              </Box>
+            ) : selectedOrderDetails ? (
+              <List>
+                {selectedOrderDetails.map((item, idx) => (
+                  <Box key={idx} sx={{ mb: 2 }}>
+                    <Typography variant="body2">{`Ürün Adı: ${item.product.name}`}</Typography>
+                    <Typography variant="body2">{`Adet: ${item.quantity}`}</Typography>
+                    <Typography variant="body2">{`Fiyat: ${item.price} TL`}</Typography>
+                    <Typography variant="body2">{`Toplam: ${item.total} TL`}</Typography>
+                  </Box>
+                ))}
+              </List>
+            ) : (
+              <Typography>Detaylar yüklenemedi.</Typography>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseModal} color="primary">
+              Kapat
+            </Button>
+          </DialogActions>
+        </Dialog>
       </ThemeProvider>
     </>
   );
