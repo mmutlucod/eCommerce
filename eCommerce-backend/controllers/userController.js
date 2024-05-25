@@ -1154,7 +1154,7 @@ const getProductCommentsByUser = async (req, res) => {
     const productComments = await ProductComment.findAll({
       where: {
         user_id: user.user_id,
-        is_deleted: 0 // Silinmemiş yorumları filtrele
+        is_deleted: 0,
       },
       include: [
         {
@@ -1206,7 +1206,8 @@ const getProductComments = async (req, res) => {
 
     const productComments = await ProductComment.findAll({
       where: {
-        is_deleted: 0 // Silinmemiş yorumları filtrele
+        is_deleted: 0,
+        approval_status_id: 1
       },
       include: [
         {
@@ -2600,8 +2601,6 @@ const commentControl = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
-
 
 
 

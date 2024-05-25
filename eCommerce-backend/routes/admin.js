@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const { authMiddleware, roleCheckMiddleware } = require('../middlewares/AuthMiddleware');
+const ProductComment = require('../models/productComment');
+const Product = require('../models/product');
+const sellerProduct = require('../models/sellerProduct');
+const productQuestion = require('../models/productQuestion');
 
 
 router.post('/login', adminController.login);
@@ -51,5 +55,28 @@ router.delete('/brands/:id', authMiddleware, adminController.deleteBrand);
 
 router.get('/approvalstatuses', adminController.getApprovalStatuses);
 router.get('/approvalstatuses/:id', adminController.getApprovalStatusById);
+
+
+// Ürün onayı
+router.put('/approve/product/:id/:approval_status_id', authMiddleware, async (req, res) => {
+    await adminController.updateApprovalStatus(Product, 'product_id', req, res);
+});
+
+// Yorum onayı
+router.put('/approve/comment/:id/:approval_status_id', authMiddleware, async (req, res) => {
+    await adminController.updateApprovalStatus(ProductComment, 'comment_id', req, res);
+});
+
+// Satıcı ürün onayı
+router.put('/approve/seller-product/:id/:approval_status_id', authMiddleware, async (req, res) => {
+    await adminController.updateApprovalStatus(sellerProduct, 'seller_product_id', req, res);
+});
+
+// Soru cevap onayı
+router.put('/approve/question/:id/:approval_status_id', authMiddleware, async (req, res) => {
+    await adminController.updateApprovalStatus(productQuestion, 'question_id', req, res);
+});
+
+
 
 module.exports = router;

@@ -726,6 +726,30 @@ const getApprovalStatusById = async (req, res) => {
 
 //ürün onay, yorum onay, soru cevap onay
 
+
+
+const updateApprovalStatus = async (model, idField, req, res) => {
+    try {
+        const { id, approval_status_id } = req.params;
+
+        const admin = await Admin.findOne({ where: { username: req.user.username } });
+        const record = await model.findOne({ where: { [idField]: id } });
+
+        if (!record) {
+            return res.status(404).json({ success: false, message: "Kayıt bulunamadı." });
+        }
+
+        record.approval_status_id = approval_status_id;
+        record.admin_id = admin.admin_id;
+        await record.save();
+
+        return res.status(200).json({ success: true, message: "Onay durumu başarıyla güncellendi." });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
 module.exports = {
     login, register, listAdmins,
     getProducts, getProductsById, createProduct, editProduct, deleteProduct, searchProduct,
@@ -733,6 +757,7 @@ module.exports = {
     getUsers, getUsersById, createUser, editUser, deleteUser,
     getOrders, getOrderDetailsById, updateOrder,
     getSellers, getSellerById, createSeller, editSeller, deleteSeller,
-    getBrands, getBrandById, createBrand, editBrand, deleteBrand, getApprovalStatuses, getApprovalStatusById
+    getBrands, getBrandById, createBrand, editBrand, deleteBrand, getApprovalStatuses, getApprovalStatusById,
+    updateApprovalStatus
 
 };

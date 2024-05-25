@@ -51,15 +51,17 @@ const theme = createTheme({
 const ReviewsPage = () => {
     const [selectedItem, setSelectedItem] = useState('reviews'); // Yan menüde seçili öğe
     const [reviews, setReviews] = useState([]); // Kullanıcı yorumları listesi
+    const [loading, setLoading] = useState(true); // Yükleniyor durumu
 
     useEffect(() => {
-        // API'den kullanıcı yorumlarını çekme işlemi
         const fetchReviews = async () => {
             try {
                 const response = await api.get('/user/my-product-comments');
                 setReviews(response.data); // Kullanıcı yorumlarının state'e atanması
+                setLoading(false); // Yükleniyor durumu kapatılır
             } catch (error) {
                 console.error('Yorumlar alınırken hata oluştu:', error);
+                setLoading(false); // Yükleniyor durumu kapatılır hata durumunda da
             }
         };
 
@@ -79,33 +81,48 @@ const ReviewsPage = () => {
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={9}>
-                            {/* Burada kullanıcı yorumları listelenir */}
-                            <Grid container spacing={2}>
-                                {reviews.length > 0 ? (
-                                    reviews.map((review) => (
-                                        <Grid item key={review.id} xs={12}>
-                                            <Card>
-                                                <CardContent>
-                                                    <Typography gutterBottom variant="h6" component="div">
-                                                        Ürün Adı:  <Link to={'/urun/' + review.sellerProduct.product.slug} style={{ textDecoration: 'none', fontWeight: 'bold' }}>{review.sellerProduct.product.name}</Link>
-                                                    </Typography>
-                                                    <Typography variant="body2" color="textSecondary" component="p">
-                                                        {review.comment}
-                                                    </Typography>
-                                                    <Box sx={{ mt: 1 }}>
-                                                        <Rating value={review.rating} readOnly />
-                                                    </Box>
-                                                    <Typography variant="body2" color="textSecondary" component="p" sx={{ mt: 1 }}>
-                                                        Tarih: {new Date(review.comment_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                                                    </Typography>
-                                                </CardContent>
-                                            </Card>
-                                        </Grid>
-                                    ))
-                                ) : (
-                                    <Typography marginLeft={'40%'} marginTop={'15px'} variant="h6">Henüz yorumunuz yok.</Typography>
-                                )}
-                            </Grid>
+                            {loading ? (
+                                <Typography align="center" variant="h6">Yükleniyor...</Typography>
+                            ) : (
+                                <Grid container spacing={2}>
+                                    {reviews.length > 0 ? (
+                                        reviews.map((review) => (
+                                            <Grid item key={review.id} xs={12}>
+                                                <Card>
+                                                    <CardContent>
+                                                        <Typography gutterBottom variant="h6" component="div">
+                                                            Ürün Adı: <Link to={'/urun/' + review.sellerProduct.product.slug} style={{ textDecoration: 'none', fontWeight: 'bold' }}>{review.sellerProduct.product.name}</Link>
+                                                        </Typography>
+                                                        {review.approval_status_id === 1 ? (
+                                                            <>
+                                                                <Typography variant="body2" color="textSecondary" component="p">
+                                                                    {review.comment}
+                                                                </Typography>
+                                                                <Box sx={{ mt: 1 }}>
+                                                                    <Rating value={review.rating} readOnly />
+                                                                </Box>
+                                                            </>
+                                                        ) : review.approval_status_id === 2 ? (
+                                                            <Typography variant="body2" color="error" component="p">
+                                                                Yorumunuz reddedildi
+                                                            </Typography>
+                                                        ) : (
+                                                            <Typography variant="body2" color="textSecondary" component="p">
+                                                                Onay Bekliyor
+                                                            </Typography>
+                                                        )}
+                                                        <Typography variant="body2" color="textSecondary" component="p" sx={{ mt: 1 }}>
+                                                            Tarih: {new Date(review.comment_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                                        </Typography>
+                                                    </CardContent>
+                                                </Card>
+                                            </Grid>
+                                        ))
+                                    ) : (
+                                        <Typography align="center" variant="h6">Henüz yorumunuz yok.</Typography>
+                                    )}
+                                </Grid>
+                            )}
                         </Grid>
                     </Grid>
                 </Container>
