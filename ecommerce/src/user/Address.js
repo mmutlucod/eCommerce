@@ -20,7 +20,8 @@ import {
   DialogTitle,
   CssBaseline,
   ThemeProvider,
-  createTheme, TextField
+  createTheme, TextField,
+  Snackbar, Alert
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import Navbar from '../components/UserNavbar';
@@ -77,6 +78,9 @@ const AddressesPage = () => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [addressToDelete, setAddressToDelete] = useState(null);
   const [addressToEdit, setAddressToEdit] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   useEffect(() => {
     // API'den adres verilerini al
@@ -118,6 +122,9 @@ const AddressesPage = () => {
         );
         // Dialog penceresini kapat
         closeDeleteDialog();
+        setSnackbarMessage('Adres başarıyla silindi');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error('Adres silinirken hata oluştu:', error);
@@ -132,11 +139,21 @@ const AddressesPage = () => {
         // Adres listesini güncelleyin veya yeniden fetch edin
         fetchAddresses();
         closeEditDialog();
+        setSnackbarMessage('Adres başarıyla güncellendi');
+        setSnackbarSeverity('success');
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error('Adres güncellenirken hata oluştu:', error);
       closeEditDialog();
     }
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
 
@@ -307,9 +324,17 @@ const AddressesPage = () => {
               </Button>
             </DialogActions>
           </Dialog>
-
         </Container>
       </ThemeProvider>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

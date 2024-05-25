@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { enqueueSnackbar } from 'notistack';
 import api from '../api/api';  // API'nizi import edin
 
 const initialState = {
@@ -144,12 +145,9 @@ const cartSlice = createSlice({
                 const existingItemIndex = state.items.findIndex(item => item.id === id);
 
                 if (quantity === 0) {
-                    // Eğer güncellenen miktar sıfırsa, ürünü sepette bulunan ürünler arasından kaldır
                     if (existingItemIndex !== -1) {
                         const deletedItem = state.items[existingItemIndex];
-
                         if (deletedItem) {
-                            console.log('Deleted Item Price:', deletedItem.sellerProduct.price);
                             state.totalAmount -= deletedItem.sellerProduct.price * deletedItem.quantity;
                             state.totalQuantity -= deletedItem.quantity; // Total quantity
                             state.items.splice(existingItemIndex, 1);
@@ -157,9 +155,7 @@ const cartSlice = createSlice({
                     }
                 } else {
                     if (existingItemIndex !== -1) {
-                        // Eğer ürün zaten sepette ise miktarını güncelle
                         const existingItem = state.items[existingItemIndex];
-
                         if (existingItem) {
                             state.totalAmount -= existingItem.sellerProduct.price * existingItem.quantity; // Önceki miktarı toplam tutardan çıkar
                             state.totalQuantity -= existingItem.quantity; // Total quantity
@@ -168,12 +164,14 @@ const cartSlice = createSlice({
                             state.totalQuantity += quantity; // Total quantity
                         }
                     } else {
-                        // Eğer ürün sepette değilse yeni ürün olarak ekle
                         state.items.push({ ...action.payload, sellerProduct: { ...sellerProduct, price } });
                         state.totalAmount += price * quantity;
                         state.totalQuantity += quantity; // Total quantity
                     }
                 }
+                enqueueSnackbar('Ürün başarıyla güncellendi.', { variant: 'success', autoHideDuration: 1200 });
+            })
+            .addCase(updateItem.rejected, (state, action) => {
             })
             .addCase(addItem.fulfilled, (state, action) => {
                 const { sellerProductId, quantity, sellerProduct, price } = action.payload;
@@ -181,7 +179,6 @@ const cartSlice = createSlice({
 
                 if (existingItemIndex !== -1) {
                     const existingItem = state.items[existingItemIndex];
-
                     if (existingItem) {
                         state.totalAmount -= existingItem.sellerProduct.price * existingItem.quantity;
                         state.totalQuantity -= existingItem.quantity;
@@ -194,6 +191,9 @@ const cartSlice = createSlice({
                     state.totalAmount += price * quantity;
                     state.totalQuantity += quantity;
                 }
+                enqueueSnackbar('Ürün sepete eklendi.', { variant: 'success', autoHideDuration: 1200 });
+            })
+            .addCase(addItem.rejected, (state, action) => {
             })
             .addCase(deleteItem.fulfilled, (state, action) => {
                 const { cartItemId } = action.payload;
@@ -207,11 +207,17 @@ const cartSlice = createSlice({
                 }
 
                 state.items = updatedItems;
+                enqueueSnackbar('Ürün sepetten kaldırıldı.', { variant: 'success', autoHideDuration: 1200 });
+            })
+            .addCase(deleteItem.rejected, (state, action) => {
             })
             .addCase(clearCartAPI.fulfilled, (state) => {
                 state.items = [];
                 state.totalAmount = 0;
                 state.totalQuantity = 0; // Total quantity
+                enqueueSnackbar('Sepet temizlendi.', { variant: 'success', autoHideDuration: 1200 });
+            })
+            .addCase(clearCartAPI.rejected, (state, action) => {
             });
     }
 });

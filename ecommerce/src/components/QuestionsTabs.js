@@ -62,6 +62,13 @@ function QuestionsTab({ productId, seller }) {
   };
 
   const handleOpenModal = () => {
+    if (!token) {
+      setSnackbarMessage('Soru sormak için giriş yapmalısınız.');
+      setSnackbarSeverity('warning');
+      setSnackbarOpen(true);
+      return;
+    }
+
     const hasPendingQuestion = questions.some(question => question.userId === userId && !question.answerContent);
     if (hasPendingQuestion) {
       setSnackbarMessage('Sorunuz henüz yanıtlanmadı. Lütfen yanıtlanmasını bekleyin.');
@@ -125,7 +132,7 @@ function QuestionsTab({ productId, seller }) {
   return (
     <Box sx={{ p: 2, maxWidth: 800, margin: 'auto', bgcolor: '#f9f9f9', position: 'relative' }}>
       <Typography variant="h6">Sorular & Cevaplar</Typography>
-      {token && (<Button
+      <Button
         variant="contained"
         color="secondary"
         onClick={handleOpenModal}
@@ -141,7 +148,7 @@ function QuestionsTab({ productId, seller }) {
         }}
       >
         Soru Sor
-      </Button>)}
+      </Button>
 
       <Dialog open={openModal} onClose={handleCloseModal} maxWidth="md">
         <DialogTitle>Soru Sor</DialogTitle>
@@ -219,7 +226,7 @@ function QuestionsTab({ productId, seller }) {
         </DialogContent>
       </Dialog>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={1000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+      <Snackbar open={snackbarOpen} autoHideDuration={1000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
         <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%', backgroundColor: 'pistachio', color: 'black' }}>
           {snackbarMessage}
         </Alert>
@@ -238,17 +245,12 @@ function QuestionsTab({ productId, seller }) {
               {question.answerContent && (
                 <Paper elevation={2} sx={{ mt: 2, p: 2, backgroundColor: '#e0f7fa' }}>
                   <Typography variant="body1">
-                    Cevap: {question.answerContent}
+                    <span style={{ fontWeight: 'bold' }}>Cevap:</span> {question.answerContent}
                   </Typography>
-                  <Typography variant="caption" sx={{ display: 'block', mt: 1 }}>
+                  <Typography variant="body2" sx={{ mt: 1, color: 'text.secondary' }}>
                     Cevaplandığı Tarih: {new Date(question.dateAnswered).toLocaleDateString()}
                   </Typography>
                 </Paper>
-              )}
-              {!question.answerContent && (
-                <Typography variant="body1" sx={{ mt: 2 }}>
-                  Bu soru henüz cevaplanmamıştır.
-                </Typography>
               )}
             </Paper>
           </ListItem>

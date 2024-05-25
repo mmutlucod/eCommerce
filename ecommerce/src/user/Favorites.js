@@ -15,7 +15,9 @@ import {
   CssBaseline,
   Container,
   List,
-  Paper
+  Paper,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { renderMenuItems } from './RenderMenuItems';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -94,6 +96,7 @@ const theme = createTheme({
 const FavoritesPage = () => {
   const [selectedItem, setSelectedItem] = useState('favorites'); // Yan menüde seçili öğe
   const [favorites, setFavorites] = useState([]); // Favori ürünler listesi
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // Snackbar açık/kapalı durumu
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -118,6 +121,8 @@ const FavoritesPage = () => {
       if (response.status === 200) {
         // Favoriler listesinden ürünü çıkar
         setFavorites(prevFavorites => prevFavorites.filter(item => item.product.product_id !== productId));
+        // Snackbar'ı aç
+        setSnackbarOpen(true);
       }
     } catch (error) {
       console.error('Ürün favorilerden kaldırılırken hata oluştu:', error);
@@ -133,6 +138,13 @@ const FavoritesPage = () => {
     };
 
     dispatch(addItem(itemData));
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   return (
@@ -198,6 +210,15 @@ const FavoritesPage = () => {
             </Grid>
           </Grid>
         </Container>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={handleSnackbarClose}
+        >
+          <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
+            Ürün favorilerden çıkarıldı.
+          </Alert>
+        </Snackbar>
       </ThemeProvider>
     </>
   );

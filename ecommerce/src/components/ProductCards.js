@@ -70,6 +70,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 const ProductCards = ({ products = [] }) => {
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [alertSeverity, setAlertSeverity] = useState('warning');
   const dispatch = useDispatch();
   const cartItems = useSelector(state => state.cart.items);
 
@@ -84,10 +85,12 @@ const ProductCards = ({ products = [] }) => {
 
     if (newQuantity > product.product.max_buy) {
       setAlertMessage(`Sepete maksimum ${product.product.max_buy} adet ürün ekleyebilirsiniz.`);
+      setAlertSeverity('warning');
       setAlertOpen(true);
       return;
     } else if (newQuantity > product.stock) {
       setAlertMessage(`Yeterli stok yok. Maksimum alım limiti: ${product.stock}`);
+      setAlertSeverity('warning');
       setAlertOpen(true);
       return;
     }
@@ -105,6 +108,8 @@ const ProductCards = ({ products = [] }) => {
         price: product.price
       }));
     }
+
+
   }, [cartItems, dispatch]);
 
   const handleCloseAlert = () => {
@@ -117,8 +122,8 @@ const ProductCards = ({ products = [] }) => {
 
   return (
     <>
-      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert}>
-        <Alert onClose={handleCloseAlert} severity="warning">
+      <Snackbar open={alertOpen} autoHideDuration={6000} onClose={handleCloseAlert} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}>
+        <Alert onClose={handleCloseAlert} severity={alertSeverity}>
           {alertMessage}
         </Alert>
       </Snackbar>
