@@ -61,23 +61,23 @@ function ReviewsTab({ productId }) {
   const handleReviewButtonClick = async () => {
     try {
       const response = await api.get(`/user/commentControl/${productId}`);
-      if (response.data.success && response.data.purchased === true) {
-        setCanReview(true);
-        setSnackbarMessage('Değerlendirme ekleyebilirsiniz.');
-        setSnackbarOpen(true);
-      } else if (response.data.success && response.data.purchased === false) {
-        setSnackbarMessage('Bu ürüne değerlendirme eklemek için satın almış olmalısınız.');
-        setSnackbarOpen(true);
-        setCanReview(false);
-      } else if (response.status === 404) {
-        setSnackbarMessage('Bu ürüne daha önceden yorum yaptınız.');
-        setSnackbarOpen(true);
+      console.log(response.data)
+      if (response.data.success) {
+        if (response.data.purchased) {
+          setCanReview(true);
+          setSnackbarMessage('Değerlendirme ekleyebilirsiniz.');
+        } else {
+          setSnackbarMessage('Bu ürüne değerlendirme eklemek için satın almış olmalısınız.');
+          setCanReview(false);
+        }
+      } else {
+        setSnackbarMessage(response.data.message);
         setCanReview(false);
       }
+      setSnackbarOpen(true);
     } catch (error) {
       console.error('Error checking purchase:', error);
       setSnackbarMessage('Bir hata oluştu, lütfen daha sonra tekrar deneyiniz.');
-      setSnackbarOpen(true);
       setCanReview(false);
     }
   };

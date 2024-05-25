@@ -2557,7 +2557,7 @@ const commentControl = async (req, res) => {
 
 
     if (existingComment) {
-      return res.status(403).json({ success: false, message: "Bu ürüne daha önce yorum yaptınız." });
+      return res.status(200).json({ success: false, message: "Bu ürüne daha önce yorum yaptınız." });
     }
 
     const productQuery = await OrderItem.findOne({
