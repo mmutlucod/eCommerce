@@ -84,7 +84,7 @@ function App() {
             <Route path="/admin/yorumonay" element={<CommentApprove />} />
             <Route path="/admin/soruonay" element={<QuestionApprove />} />
             <Route path="/admin/urunonay" element={<ProductApprove />} />
-            <Route path="/admin/satıcıurunonay" element={<ProductSellerApprove />} />
+            <Route path="/admin/saticiurunonay" element={<ProductSellerApprove />} />
 
             {/* SELLER */}
             <Route path="/seller" element={<SellerLogin />} />
