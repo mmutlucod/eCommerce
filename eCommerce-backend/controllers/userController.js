@@ -880,15 +880,6 @@ const getOrderItems = async (req, res) => {
       });
     }
 
-    // İade bilgilerini getir
-    const returnItems = await ReturnItem.findAll({
-      include: [{
-        model: OrderItem,
-        where: { order_id: orderId }
-      }]
-    });
-
-
     const response = {
       orderItems: orderItems,
       refundInfo: isOrderCancelled
@@ -898,8 +889,7 @@ const getOrderItems = async (req, res) => {
           remainingItemsCount: remainingItemsCount,
           canceledItemsCount: orderItems.length - remainingItemsCount,
           refundMessage: `${remainingItemsCount} ürününüzden ${orderItems.length - remainingItemsCount} tanesi iptal edildi. ${totalRefundAmount} TL iade edilecektir.`
-        },
-      returnItems: returnItems // İade bilgilerini yanıta ekle
+        }
     };
 
     return res.status(200).json(response);
@@ -908,6 +898,7 @@ const getOrderItems = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 const cancelOrderItem = async (req, res) => {
   try {
     const { orderItemId, cancelQuantity } = req.body;
