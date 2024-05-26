@@ -1,3 +1,4 @@
+/* global CKEDITOR */
 import React, { useState, useEffect, useRef } from 'react';
 import { Container, TextField, Paper, Typography, Snackbar, CircularProgress, Box, Button, MenuItem, Select, InputLabel, FormControl, Grid } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
@@ -82,28 +83,31 @@ const ProductAdd = () => {
 
   useEffect(() => {
     const loadCKEditor = async () => {
-      if (!editorRef.current) return;
-
       await new Promise((resolve) => {
-        const script = document.createElement('script');
-        script.src = 'https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js';
-        script.onload = resolve;
-        document.body.appendChild(script);
+        if (window.CKEDITOR) {
+          resolve();
+        } else {
+          const script = document.createElement('script');
+          script.src = 'https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js';
+          script.onload = resolve;
+          document.body.appendChild(script);
+        }
       });
 
       if (window.CKEDITOR) {
-        CKEDITOR.replace(editorRef.current, {
+        CKEDITOR.replace('editor1', {
           extraAllowedContent: 'div(*){*}[*]; p(*){*}[*]', // Gelişmiş HTML etiketlerini ve stillerini etkinleştir
         });
-        CKEDITOR.instances.editor1.on('change', function () {
-          const data = CKEDITOR.instances.editor1.getData();
+
+        CKEDITOR.instances.editor1.on('change', function (event) {
+          const data = event.editor.getData();
           setFormData((prevFormData) => ({ ...prevFormData, description: data }));
         });
       }
     };
 
     loadCKEditor();
-  }, [editorRef]);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -116,6 +120,13 @@ const ProductAdd = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // CKEditor içeriğini al
+    if (window.CKEDITOR) {
+      const editorData = CKEDITOR.instances.editor1.getData();
+      setFormData((prevFormData) => ({ ...prevFormData, description: editorData }));
+    }
+
     const formDataWithFiles = new FormData();
     for (const key in formData) {
       formDataWithFiles.append(key, formData[key]);
@@ -139,6 +150,11 @@ const ProductAdd = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEditorChange = (event, editor) => {
+    const data = editor.getData();
+    setFormData({ ...formData, description: data });
   };
 
   const handleCloseSnackbar = () => {
@@ -228,16 +244,23 @@ const ProductAdd = () => {
                     type="file"
                     hidden
                     multiple
+                    accept="image/*"
                     onChange={handleFileChange}
                   />
                 </UploadButton>
               </Grid>
+              <Grid item>
+                <Typography variant="body1" gutterBottom margin={3}>
+                  {selectedFiles ? `${selectedFiles.length} adet resim seçildi.` : 'Dosya seçilmedi'}
+                </Typography>
+              </Grid>
             </Grid>
+
             <Box margin="normal">
               <Typography variant="body1" gutterBottom>
                 Açıklama
               </Typography>
-              <textarea ref={editorRef} name="description" id="editor1" />
+              <textarea ref={editorRef} name="description" id="editor1" onChange={handleEditorChange} />
             </Box>
             <Box display="flex" justifyContent="center" marginTop="20px">
               <CustomButton type="submit" variant="contained" disabled={loading}>

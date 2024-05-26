@@ -156,7 +156,9 @@ function OtherSellersTab({ product }) {
         </Tabs>
       </AppBar>
       <TabPanel value={tabValue} index={0}>
-        <Typography>{product.product.description}</Typography>
+        <Typography component="div">
+          <div dangerouslySetInnerHTML={{ __html: product.product.description }} />
+        </Typography>
       </TabPanel>
       <TabPanel value={tabValue} index={1}>
         <ReviewsTab productId={product.product.product_id} sellerProductId={product.seller_product_id} reviews={reviews} />
