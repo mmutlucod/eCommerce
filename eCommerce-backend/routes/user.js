@@ -16,6 +16,7 @@ router.put('/update-account', authMiddleware, roleCheckMiddleware('user'), userC
 
 //SEPET - ÜRÜN İŞLEMLERİ
 router.get('/my-basket', authMiddleware, roleCheckMiddleware('user'), userController.getCartItems);
+router.get('/topselling', authMiddleware, roleCheckMiddleware('user'), userController.getTopSellingProducts);
 router.post('/add-item', authMiddleware, roleCheckMiddleware('user'), userController.addItem);
 router.post('/update-item', authMiddleware, roleCheckMiddleware('user'), userController.updateItem);
 router.post('/delete-item', authMiddleware, roleCheckMiddleware('user'), userController.deleteItem);
