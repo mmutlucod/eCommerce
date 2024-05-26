@@ -64,8 +64,8 @@ const ExamplePopup = ({ results, width, searchLeftMargin }) => {
                         component="img"
                         sx={{ objectFit: 'contain', width: '120px', height: '100px' }}
                         src={result.product.productImages.length === 0 ?
-                            'http://localhost:5000/img/empty.jpg' :
-                            'http://localhost:5000/img/' + result.product.productImages[0].image_path}
+                            'http://localhost:5000/public/img/empty.jpg' :
+                            'http://localhost:5000/public/img/' + result.product.productImages[0].image_path}
                         alt={result.name}
                     />
                     <Typography sx={{ textAlign: 'center', fontSize: '12px', mt: '12px', fontWeight: '600' }}>{result.product.Brand.brand_name + ' ' + result.product.name}</Typography>

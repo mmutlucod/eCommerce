@@ -11,7 +11,7 @@ const OrderItem = require('../models/orderItem');
 const sellerProduct = require('../models/sellerProduct');
 const Seller = require('../models/seller');
 const saltRounds = 10; // Bcrypt için salt tur sayısı
-const { Sequelize, Op } = require('sequelize');
+const { Sequelize, Op, where } = require('sequelize');
 const ProductComment = require('../models/productComment');
 const productQuestion = require('../models/productQuestion');
 const productImage = require('../models/productImage');
@@ -106,7 +106,7 @@ const getProducts = async (req, res) => {
                 {
                     model: ApprovalStatus,
                 },
-                
+
             ]
         });
 
@@ -160,42 +160,43 @@ const getProductsById = async (req, res) => {
 
 const createProduct = async (req, res) => {
     const transaction = await Product.sequelize.transaction(); // Transaction başlat
-  try {
-    const product = await Product.findOne({
-      where: {
-        stock_code: req.body.stock_code
-      }
-    });
+    try {
+        const product = await Product.findOne({
+            where: {
+                stock_code: req.body.stock_code
+            }
+        });
 
-    if (product) {
-      res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
-    } else {
-      const sanitizedDescription = sanitizeHtml(req.body.description, {
-        allowedTags: [], // Hiçbir HTML etiketiye izin verilmez
-        allowedAttributes: {}, // Hiçbir HTML özelliğine izin verilmez
-      });
+        if (product) {
+            res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
+        } else {
+            const sanitizedDescription = sanitizeHtml(req.body.description, {
+                allowedTags: [], // Hiçbir HTML etiketiye izin verilmez
+                allowedAttributes: {}, // Hiçbir HTML özelliğine izin verilmez
+            });
 
-      const newProduct = await Product.create({
-        ...req.body,
-        description: sanitizedDescription,
-        approval_status_id: 3,
-      }, { transaction });
+            const newProduct = await Product.create({
+                ...req.body,
+                description: sanitizedDescription,
+                approval_status_id: 1,
+                max_buy: 5,
+            }, { transaction });
 
-      // Dosya isimlerini al ve productImages tablosuna ekle
-      const imagePaths = req.files.map(file => ({
-        product_id: newProduct.product_id,
-        image_path: file.filename
-      }));
+            // Dosya isimlerini al ve productImages tablosuna ekle
+            const imagePaths = req.files.map(file => ({
+                product_id: newProduct.product_id,
+                image_path: file.filename
+            }));
 
-      await productImage.bulkCreate(imagePaths, { transaction });
+            await productImage.bulkCreate(imagePaths, { transaction });
 
-      await transaction.commit();
-      res.status(200).json({ success: true, message: 'Ürün ve resimler sisteme eklendi.' });
+            await transaction.commit();
+            res.status(200).json({ success: true, message: 'Ürün ve resimler sisteme eklendi.' });
+        }
+    } catch (error) {
+        await transaction.rollback();
+        res.status(500).json({ success: false, message: error.message });
     }
-  } catch (error) {
-    await transaction.rollback();
-    res.status(500).json({ success: false, message: error.message });
-  }
 };
 
 const editProduct = async (req, res) => {
@@ -336,10 +337,12 @@ const getCategoriesById = async (req, res) => {
 }
 const createCategory = async (req, res) => {
     try {
+        const admin = await Admin.findOne({ where: { username: req.user.username } });
         // Kategoriyi veritabanına ekle
         const category = await Category.create({
             ...req.body,
-            approval_status_id: 1
+            approval_status_id: 1,
+            admin_id: admin.admin_id
         });
 
         // Kategori başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön

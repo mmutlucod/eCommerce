@@ -22,8 +22,8 @@ const SimpleImageSlider = ({ images }) => {
 
   // Resim URL'lerini API'dan gelen yapıya göre düzenleyin
   const imageUrl = images.length > 0
-    ? `http://localhost:5000/img/${images[currentIndex]}`
-    : `http://localhost:5000/img/empty.jpg`;
+    ? `http://localhost:5000/public/img/${images[currentIndex]}`
+    : `http://localhost:5000/public/img/empty.jpg`;
 
   return (
     <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', marginX: 8 }}>
@@ -85,7 +85,7 @@ const SimpleImageSlider = ({ images }) => {
               }}
             >
               <img
-                src={`http://localhost:5000/img/${image}`}
+                src={`http://localhost:5000/public/img/${image}`}
                 alt={`Thumbnail ${index + 1}`}
                 style={{
                   width: '30px',
