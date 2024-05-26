@@ -1,25 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  TextField,
-  Paper,
-  Typography,
-  Snackbar,
-  CircularProgress,
-  Box,
-  Button,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-} from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Container, TextField, Paper, Typography, Snackbar, CircularProgress, Box, Button, MenuItem, Select, InputLabel, FormControl, Grid } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
-import SellerNavbar from '../components/SellerNavbar';
 import api from '../api/api';
+import SellerNavbar from '../components/SellerNavbar';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -35,12 +20,12 @@ const CustomTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {
     '& fieldset': {
       borderColor: '#9c27b0',
-    },
-    '&:hover fieldset': {
-      borderColor: '#9c27b0',
-    },
-    '&.Mui-focused fieldset': {
-      borderColor: '#9c27b0',
+      '&:hover fieldset': {
+        borderColor: '#9c27b0',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#9c27b0',
+      },
     },
   },
 }));
@@ -50,6 +35,14 @@ const CustomButton = styled(Button)(({ theme }) => ({
   color: 'white',
   '&:hover': {
     backgroundColor: '#7b1fa2',
+  },
+}));
+
+const UploadButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#2196f3',
+  color: 'white',
+  '&:hover': {
+    backgroundColor: '#1976d2',
   },
 }));
 
@@ -69,6 +62,7 @@ const ProductAdd = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState(null);
   const navigate = useNavigate();
+  const editorRef = useRef(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -86,13 +80,33 @@ const ProductAdd = () => {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const loadCKEditor = async () => {
+      if (!editorRef.current) return;
+
+      await new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.ckeditor.com/4.16.1/standard/ckeditor.js';
+        script.onload = resolve;
+        document.body.appendChild(script);
+      });
+
+      if (window.CKEDITOR) {
+        CKEDITOR.replace(editorRef.current, {
+          extraAllowedContent: 'div(*){*}[*]; p(*){*}[*]', // Gelişmiş HTML etiketlerini ve stillerini etkinleştir
+        });
+        CKEDITOR.instances.editor1.on('change', function () {
+          const data = CKEDITOR.instances.editor1.getData();
+          setFormData((prevFormData) => ({ ...prevFormData, description: data }));
+        });
+      }
+    };
+
+    loadCKEditor();
+  }, [editorRef]);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleEditorChange = (event, editor) => {
-    const data = editor.getData();
-    setFormData({ ...formData, description: data });
   };
 
   const handleFileChange = (event) => {
@@ -201,25 +215,29 @@ const ProductAdd = () => {
               onChange={handleChange}
               required
             />
+            <Grid container spacing={2} alignItems="center">
+              <Grid item>
+                <Typography variant="body1" gutterBottom margin={3}>
+                  Resim Yükle
+                </Typography>
+              </Grid>
+              <Grid item>
+                <UploadButton variant="contained" component="label">
+                  Dosya Seç
+                  <input
+                    type="file"
+                    hidden
+                    multiple
+                    onChange={handleFileChange}
+                  />
+                </UploadButton>
+              </Grid>
+            </Grid>
             <Box margin="normal">
               <Typography variant="body1" gutterBottom>
                 Açıklama
               </Typography>
-              <CKEditor
-                editor={ClassicEditor}
-                data={formData.description}
-                onChange={handleEditorChange}
-              />
-            </Box>
-            <Box margin="normal">
-              <Typography variant="body1" gutterBottom>
-                Resim Yükle
-              </Typography>
-              <input
-                type="file"
-                multiple
-                onChange={handleFileChange}
-              />
+              <textarea ref={editorRef} name="description" />
             </Box>
             <Box display="flex" justifyContent="center" marginTop="20px">
               <CustomButton type="submit" variant="contained" disabled={loading}>
@@ -229,12 +247,12 @@ const ProductAdd = () => {
           </form>
         </Paper>
       </Container>
-      <Snackbar open={Boolean(successMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+      <Snackbar open={Boolean(successMessage)} autoHideDuration={6000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity="success">
           {successMessage}
         </Alert>
       </Snackbar>
-      <Snackbar open={Boolean(errorMessage)} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+      <Snackbar open={Boolean(errorMessage)} autoHideDuration={6000} onClose={handleCloseSnackbar}>
         <Alert onClose={handleCloseSnackbar} severity="error">
           {errorMessage}
         </Alert>
