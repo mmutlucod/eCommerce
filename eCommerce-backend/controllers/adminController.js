@@ -178,7 +178,7 @@ const createProduct = async (req, res) => {
             const newProduct = await Product.create({
                 ...req.body,
                 description: sanitizedDescription,
-                approval_status_id: 3,
+                approval_status_id: 1,
                 max_buy: 5,
             }, { transaction });
 
