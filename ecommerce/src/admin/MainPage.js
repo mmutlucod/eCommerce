@@ -82,7 +82,7 @@ function MainPage() {
         <Toolbar />
         <Container sx={{ py: 2 }}>
           <Grid container spacing={2}>
-          
+
             <Grid item xs={12} md={6}>
               <Typography variant="h6" gutterBottom sx={{ bgcolor: '#f5f5dc', color: '#3a3a3a', p: 2, borderRadius: '8px' }}>
                 <IconButton component={Link} to="/orders" sx={{ color: '#3a3a3a' }}>
@@ -94,15 +94,15 @@ function MainPage() {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell>Sipariş ID</TableCell>
+                      <TableCell>Sipariş Tarihi</TableCell>
                       <TableCell>Tutar</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {latestOrders.map((order, index) => (
                       <TableRow key={index}>
-                        <TableCell>{order.order_date}</TableCell>
-                        <TableCell>{order.total_price}</TableCell>
+                        <TableCell>{new Date(order.order_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}</TableCell>
+                        <TableCell>{order.total_price} ₺</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -127,7 +127,7 @@ function MainPage() {
                   <TableBody>
                     {latestUsers.map((user, index) => (
                       <TableRow key={index}>
-                        <TableCell>{user.name}</TableCell>
+                        <TableCell>{user.name === null ? ('Yeni Kullanıcı') : (user.name + ' ' + user.surname)} </TableCell>
                         <TableCell>{user.email}</TableCell>
                       </TableRow>
                     ))}
