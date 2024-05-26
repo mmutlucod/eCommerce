@@ -11,7 +11,7 @@ const OrderItem = require('../models/orderItem');
 const sellerProduct = require('../models/sellerProduct');
 const Seller = require('../models/seller');
 const saltRounds = 10; // Bcrypt için salt tur sayısı
-const { Sequelize, Op } = require('sequelize');
+const { Sequelize, Op, where } = require('sequelize');
 const ProductComment = require('../models/productComment');
 const productQuestion = require('../models/productQuestion');
 const productImage = require('../models/productImage');
@@ -337,10 +337,12 @@ const getCategoriesById = async (req, res) => {
 }
 const createCategory = async (req, res) => {
     try {
+        const admin = await Admin.findOne({ where: { username: req.user.username } });
         // Kategoriyi veritabanına ekle
         const category = await Category.create({
             ...req.body,
-            approval_status_id: 1
+            approval_status_id: 1,
+            admin_id: admin.admin_id
         });
 
         // Kategori başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön
