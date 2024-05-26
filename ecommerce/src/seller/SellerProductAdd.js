@@ -237,7 +237,7 @@ const ProductAdd = () => {
               <Typography variant="body1" gutterBottom>
                 Açıklama
               </Typography>
-              <textarea ref={editorRef} name="description" />
+              <textarea ref={editorRef} name="description" id="editor1" />
             </Box>
             <Box display="flex" justifyContent="center" marginTop="20px">
               <CustomButton type="submit" variant="contained" disabled={loading}>
