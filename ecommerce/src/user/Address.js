@@ -190,7 +190,7 @@ const AddressesPage = () => {
                             {address.neighborhood} {/* Mahalle veya semt */}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
-                            {address.city}, {address.state} {address.zipCode} {/* Şehir, eyalet ve posta kodu */}
+                            {address.city}, {address.state} {address.postal_code} {/* Şehir, eyalet ve posta kodu */}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             {address.country} {/* Ülke */}
@@ -308,9 +308,9 @@ const AddressesPage = () => {
                     <TextField
                       fullWidth
                       label="Posta Kodu"
-                      name="zipCode"
+                      name="postal_code"
                       value={addressToEdit?.postal_code || ''}
-                      onChange={e => setAddressToEdit({ ...addressToEdit, zipCode: e.target.value })}
+                      onChange={e => setAddressToEdit({ ...addressToEdit, postal_code: e.target.value })}
                     />
                   </Grid>
 

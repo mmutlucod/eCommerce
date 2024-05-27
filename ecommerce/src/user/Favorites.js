@@ -165,8 +165,8 @@ const FavoritesPage = () => {
                 {favorites.length > 0 ? (
                   favorites.map((product) => {
                     const productImage = product.product.productImages && product.product.productImages.length > 0
-                      ? `http://localhost:5000/img/${product.product.productImages[0].image_path}`
-                      : 'http://localhost:5000/img/empty.jpg';
+                      ? `http://localhost:5000/public/img/${product.product.productImages[0].image_path}`
+                      : 'http://localhost:5000/public/img/empty.jpg';
 
                     return (
                       <Grid item key={product.id} xs={12} sm={6} md={4}>

@@ -189,7 +189,7 @@ const OrdersPage = () => {
                   {selectedOrderDetails.orderItems.map((item, idx) => (
                     <Box key={idx} className="cart-itemX0">
                       <Box className="item-image0" onClick={() => navigate(`/urun/${item.sellerProduct.product.slug}?mg=${item.sellerProduct.seller.slug}`)}>
-                        <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/img/empty.jpg'} alt={item.sellerProduct.product.name} />
+                        <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/public/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/public/img/empty.jpg'} alt={item.sellerProduct.product.name} />
                       </Box>
                       <Box className="item-details00">
                         {console.log(item)}

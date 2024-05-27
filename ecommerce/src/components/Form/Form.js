@@ -74,7 +74,6 @@ export default function CForm({
                             label="Kart Numarası"
                             variant="standard"
                             fullWidth
-
                             name="cardNumber"
                             onChange={onCardNumberChange}
                             inputRef={cardNumberRef}
@@ -94,6 +93,8 @@ export default function CForm({
                             inputRef={cardHolderRef}
                             onFocus={(e) => onCardInputFocus(e, 'cardHolder')}
                             onBlur={onCardInputBlur}
+                            inputProps={{ pattern: '[A-Za-z\s]*' }} // Yalnızca harf karakterlerine ve boşluklara izin ver
+                            type='text'
                         />
                     </Grid>
                     <Grid item xs={6}>
@@ -145,7 +146,7 @@ export default function CForm({
                             onFocus={onCvvFocus}
                             onBlur={onCvvBlur}
                             inputRef={cardCvv}
-                            inputProps={{ maxLength: 3 }} // Max 4 karakter
+                            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 3 }}
                         />
                     </Grid>
                 </Grid>
