@@ -14,6 +14,8 @@ const productQuestion = require('../models/productQuestion');
 const { errors } = require('ethers');
 const ProductComment = require('../models/productComment');
 const productImage = require('../models/productImage');
+const sanitizeHtml = require('sanitize-html');
+
 
 //GİRİŞ
 const login = async (req, res) => {
@@ -321,9 +323,20 @@ const createProduct = async (req, res) => {
         if (product) {
             res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
         } else {
+            const currentDateTime = new Date(); // Geçerli tarih ve saat bilgisini al
+            const slugDatePart = `${(currentDateTime.getMonth() + 1).toString().padStart(2, '0')}${currentDateTime.getDate().toString().padStart(2, '0')}`; // YYYYMMDD formatında tarih kısmını oluştur
+            const slugTimePart = `${currentDateTime.getMinutes().toString().padStart(2, '0')}${currentDateTime.getSeconds().toString().padStart(2, '0')}`; // HHMMSS formatında saat kısmını oluştur
+            const slug = slugify(`${req.body.name}-${slugDatePart}-x-${slugTimePart}`, {
+                replacement: '-',  // Boşlukları '-' ile değiştir
+                lower: true,       // Küçük harfe çevir
+                remove: /[*+~.()'"!:@]/g // Slug oluştururken kaldırılacak karakterler
+            });
+
+
             const newProduct = await Product.create({
                 approval_status_id: 3,
                 max_buy: 5,
+                slug: slug,
                 ...req.body,
             }, { transaction });
 
@@ -343,6 +356,7 @@ const createProduct = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 // MARKA
 const getAllBrands = async (req, res) => {
@@ -383,9 +397,19 @@ const createBrand = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Bu marka zaten sistemde mevcut.' });
         }
 
+        const currentDateTime = new Date(); // Geçerli tarih ve saat bilgisini al
+        const slugDatePart = `${(currentDateTime.getMonth() + 1).toString().padStart(2, '0')}${currentDateTime.getDate().toString().padStart(2, '0')}`; // YYYYMMDD formatında tarih kısmını oluştur
+        const slugTimePart = `${currentDateTime.getMinutes().toString().padStart(2, '0')}${currentDateTime.getSeconds().toString().padStart(2, '0')}`; // HHMMSS formatında saat kısmını oluştur
+        const slug = slugify(`${req.body.name}-${slugDatePart}-x-${slugTimePart}`, {
+            replacement: '-',  // Boşlukları '-' ile değiştir
+            lower: true,       // Küçük harfe çevir
+            remove: /[*+~.()'"!:@]/g // Slug oluştururken kaldırılacak karakterler
+        });
+
         await Brand.create({
             seller_id: seller.seller_id,
             approval_status_id: 3,
+            slug: slug,
             ...req.body
         });
 
