@@ -3,7 +3,7 @@ import { Container, TextField, Button, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; // Sayfa yönlendirmek için
 import { useAuth } from '../context/AuthContext'; // AuthContext'i içe aktar
 import api from '../api/api'; // API istekleri için özelleştirilmiş axios örneğini içe aktar
-import SellerFooter from '../components/SellerFooter';
+
 function SellerLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
