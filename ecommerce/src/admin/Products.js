@@ -188,12 +188,14 @@ function ProductsAdmin() {
                       {products.map((product) => (
                         <TableRow key={product.product_id}>
                           <TableCell component="th" scope="row">{product.name}</TableCell>
+            {console.log(product)}
+
                           <TableCell align="right">{product.stock_code}</TableCell>
                           <TableCell align="right">{product.category?.category_name || 'Bilinmiyor'}</TableCell>
                           <TableCell align="right">{product.Brand?.brand_name || 'Bilinmiyor'}</TableCell>
                           <TableCell align="right">{product.price}</TableCell>
                           <TableCell align="right">{product.ApprovalStatus?.status_name || 'Bilinmiyor'}</TableCell>
-                          <TableCell align="right">{product.Admin?.full_name || 'Bilinmiyor'}</TableCell>
+                          <TableCell align="right">{product.Admin?.username || 'Bilinmiyor'}</TableCell>
                           <TableCell align="right">{product.approver}</TableCell>
                           <TableCell>
                             <IconButton aria-label="settings" onClick={(event) => handleMenuClick(event, product)}>

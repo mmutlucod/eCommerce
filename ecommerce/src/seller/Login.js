@@ -30,6 +30,7 @@ function SellerLogin() {
   };
 
   return (
+    <>
     <Container component="main" maxWidth="xs">
       <Paper elevation={6} style={{ padding: '20px', marginTop: '20vh' }}>
         <Typography component="h1" variant="h5" style={{ marginBottom: '20px' }}>
@@ -70,6 +71,9 @@ function SellerLogin() {
         </form>
       </Paper>
     </Container>
+   
+    </>
+    
   );
 }
 

@@ -64,10 +64,10 @@ function MainPage() {
           { text: 'Satıcılar', icon: <AccountCircleIcon />, link: '/admin/sellers' },
           { text: 'Kategoriler', icon: <CategoryIcon />, link: '/admin/categories' },
           { text: 'Ürünler', icon: <CategoryIcon />, link: '/admin/products' },
-          { text: 'Yorum Onay', icon: <CommentIcon />, link: '/admin/review-approval' },
-          { text: 'Soru Onay', icon: <QuestionAnswerIcon />, link: '/admin/question-approval' },
-          { text: 'Ürün Onay', icon: <CheckCircleIcon />, link: '/admin/product-approval' },
-          { text: 'Satıcı Onay', icon: <CheckCircleIcon />, link: '/admin/seller-approval' },
+          { text: 'Yorum Onay', icon: <CommentIcon />, link: '/admin/yorumonay' },
+          { text: 'Soru Onay', icon: <QuestionAnswerIcon />, link: '/admin/soruonay' },
+          { text: 'Ürün Onay', icon: <CheckCircleIcon />, link: '/admin/urunonay' },
+          { text: 'Satıcı Onay', icon: <CheckCircleIcon />, link: '/admin/saticiurunonay' },
           ].map((item, index) => (
             <ListItem button key={item.text} component={Link} to={item.link} sx={{ '&:hover': { backgroundColor: '#1565c0' } }}>
               <ListItemIcon sx={{ color: '#fff' }}>

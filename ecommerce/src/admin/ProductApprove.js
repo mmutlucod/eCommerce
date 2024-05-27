@@ -110,9 +110,9 @@ function ProductSellerApprove() {
                 <TableRow key={product.product_id}>
                   <TableCell>{product.product_id}</TableCell>
                   {console.log(product)}
-                  <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.Brand.brand_name}</TableCell>
-                  <TableCell>{product.category.category_name}</TableCell>
+                  <TableCell>{product.name || "Bilinmiyor"}</TableCell>
+                  <TableCell>{product.Brand?.brand_name || "Bilinmiyor"}</TableCell>
+                  <TableCell>{product.category?.category_name || "Bilinmiyor"}</TableCell>
                   <TableCell>{product.seller ? product.seller.name : 'Bilinmiyor'}</TableCell>
                   <TableCell>{product.price}</TableCell>
                   <TableCell>{product.ApprovalStatus.status_name}</TableCell>

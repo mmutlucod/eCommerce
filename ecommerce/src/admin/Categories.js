@@ -35,10 +35,10 @@ function Categories() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [newCategory, setNewCategory] = useState({
-    name: '',
+    category_name: '',
     description: '',
-    categoryNumber: '',
-    status: ''
+
+    
   });
   const [editCategory, setEditCategory] = useState(null);
 
@@ -143,8 +143,8 @@ function Categories() {
                     <TableHead>
                       <TableRow>
                         <TableCell> Kategori Adı</TableCell>
-                        <TableCell> Kategori Açıklaması</TableCell>
-                        <TableCell> Kategori Numarası</TableCell>
+                        <TableCell>  Onaylayan Admin</TableCell>
+                        <TableCell> Kategorinin Alt Kategorileri</TableCell>
                         <TableCell> Kategori Durumu</TableCell>
                         <TableCell align="right">
                           <Tooltip title="Kategori Ekle">
@@ -163,8 +163,9 @@ function Categories() {
                           sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                         >
                           <TableCell>{category.category_name}</TableCell>
-                          <TableCell>{category.description}</TableCell>
-                          <TableCell>{category.category_id}</TableCell>
+                          {console.log(category)}
+                          <TableCell>{category.Admin?.username}</TableCell>
+                          <TableCell>{category.SubCategories?.category_name || 'bilinmiyor'}</TableCell>
                           <TableCell>{category.ApprovalStatus.status_name}</TableCell>
                           <TableCell align="right">
                             <IconButton aria-label="edit" onClick={() => handleEdit(category)}>
@@ -219,7 +220,7 @@ function AddEditCategoryDialog({ open, onClose, handleChange, handleSubmit, hand
         <TextField
           autoFocus
           margin="dense"
-          name="name"
+          name="category_name"
           label="Kategori Adı"
           type="text"
           fullWidth
@@ -237,26 +238,8 @@ function AddEditCategoryDialog({ open, onClose, handleChange, handleSubmit, hand
           value={isEditMode ? editCategory.description : newCategory.description}
           onChange={isEditMode ? handleEditChange : handleChange}
         />
-        <TextField
-          margin="dense"
-          name="categoryNumber"
-          label="Kategori Numarası"
-          type="text"
-          fullWidth
-          variant="standard"
-          value={isEditMode ? editCategory.id : newCategory.categoryNumber}
-          onChange={isEditMode ? handleEditChange : handleChange}
-        />
-        <TextField
-          margin="dense"
-          name="status"
-          label="Kategori Durumu"
-          type="text"
-          fullWidth
-          variant="standard"
-          value={isEditMode ? editCategory.status : newCategory.status}
-          onChange={isEditMode ? handleEditChange : handleChange}
-        />
+   
+     
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>İptal</Button>

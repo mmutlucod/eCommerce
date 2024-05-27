@@ -2616,6 +2616,81 @@ function formatUserName(name, isPublic) {
   }
 }
 
+const getTopSellingProducts = async (req, res) => {
+  try {
+    let favoriteProductsIds = [];
+    if (req.user && req.user.email) {
+      const user = await User.findOne({ where: { email: req.user.email } });
+      if (user) {
+        favoriteProductsIds = await UserFavoriteProduct.findAll({
+          where: { user_id: user.user_id },
+          attributes: ['product_id']
+        }).then(favs => favs.map(fav => fav.product_id));
+      }
+    }
+
+    const products = await sellerProduct.findAll({
+      where: { is_active: 1 },
+      include: [
+        {
+          model: Product,
+          include: [
+            { model: Brand },
+            { model: Category },
+            { model: productImage }
+          ]
+        }
+      ],
+     order: [['created_at', 'DESC']],
+      limit: 10
+    });
+
+    const uniqueProductsMap = new Map();
+    products.forEach(product => {
+      const productId = product.product.product_id;
+      if (product.stock > 0 && (!uniqueProductsMap.has(productId) || product.price < uniqueProductsMap.get(productId).price)) {
+        uniqueProductsMap.set(productId, product);
+      }
+    });
+    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
+
+    for (let product of uniqueLowestPriceProducts) {
+      const ratingsData = await ProductComment.findAll({
+        where: { '$sellerProduct.product_id$': product.product.product_id },
+        include: [{
+          model: sellerProduct,
+          attributes: [],
+          include: [{ model: Product, attributes: [] }]
+        }],
+        attributes: [
+          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
+          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
+        ],
+        group: ['sellerProduct.product_id'],
+        raw: true
+      });
+
+      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
+      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
+    }
+
+    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
+      const isFavorite = favoriteProductsIds.includes(product.product.product_id);
+      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
+      return {
+        ...product.toJSON(),
+        isFavorite,
+        stockStatus,
+        commentAvg: product.dataValues.commentAvg,
+        commentCount: product.dataValues.commentCount
+      };
+    });
+
+    return res.status(200).json(productsWithFavoritesAndPrice);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 module.exports = {
   login, register, listUsers, getUserDetails, updateUserDetail,
@@ -2634,5 +2709,5 @@ module.exports = {
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug, getProductsBySeller,
   getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart, getSellerProductByProductId,
-  getSellerInfo, commentControl, getorder
+  getSellerInfo, commentControl, getorder,getTopSellingProducts
 }

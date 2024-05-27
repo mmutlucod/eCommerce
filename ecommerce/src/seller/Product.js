@@ -55,6 +55,7 @@ function Products() {
   }, []);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
       const response = await api.get('/seller/products');
       setProducts(response.data);
@@ -77,7 +78,7 @@ function Products() {
 
   const handleSubmit = async (event, sellerProductId) => {
     if (event.key === 'Enter') {
-      event.preventDefault(); // Formun yeniden yüklenmesini önle
+      event.preventDefault();
       const product = products.find(product => product.seller_product_id === sellerProductId);
       setUpdateLoading(true);
       try {
@@ -90,9 +91,7 @@ function Products() {
         setErrorMessage('Fiyat güncellenirken bir hata oluştu.');
         console.error('Fiyat güncellenirken bir hata oluştu:', error);
       } finally {
-        setTimeout(() => {
-          setUpdateLoading(false);
-        }, 2000);
+        setUpdateLoading(false);
       }
     }
   };
@@ -119,15 +118,17 @@ function Products() {
       await api.put(`/seller/products/${sellerProductId}`, {
         is_active: shouldBeListed ? 1 : 0,
       });
-      fetchProducts();
+      setProducts(prevProducts =>
+        prevProducts.map(product =>
+          product.seller_product_id === sellerProductId ? { ...product, is_active: shouldBeListed ? 1 : 0 } : product
+        )
+      );
       setSuccessMessage(shouldBeListed ? 'Ürün başarıyla listelendi.' : 'Ürün başarıyla listeden kaldırıldı.');
     } catch (error) {
       setErrorMessage('Ürün durumu güncellenirken bir hata oluştu.');
       console.error('Ürün durumu güncellenirken bir hata oluştu:', error);
     } finally {
-      setTimeout(() => {
-        setUpdateLoading(false);
-      }, 2000);
+      setUpdateLoading(false);
       handleClose();
     }
   };
@@ -158,9 +159,7 @@ function Products() {
       setErrorMessage('Ürün güncellenirken bir hata oluştu.');
       console.error('Ürün güncellenirken bir hata oluştu:', error);
     } finally {
-      setTimeout(() => {
-        setUpdateLoading(false);
-      }, 2000);
+      setUpdateLoading(false);
     }
   };
 
@@ -219,6 +218,7 @@ function Products() {
                       />
                       {console.log(product)}
                     </td>
+                    {console.log(product)}
                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formatDate(product.updatedAt)}</td>
                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>{product.stock}</td>
                     <td style={{ border: '1px solid #ddd', padding: '8px' }}>
@@ -227,12 +227,22 @@ function Products() {
                           <MoreVertIcon />
                         </IconButton>
                       </Tooltip>
-                      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-                        <MenuItem onClick={handleEdit}>
-                          <EditIcon fontSize="small" /> Düzenle
-                        </MenuItem>
-                        <MenuItem onClick={() => handleListStatusChange(product.seller_product_id, !product.is_active)}>
-                          <DeleteIcon fontSize="small" /> {product.is_active ? 'Pasif Et' : 'Aktif Et'}
+                      <Menu
+                        anchorEl={anchorEl}
+                        keepMounted
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                      >
+                        <MenuItem onClick={handleEdit}>Düzenle</MenuItem>
+                        <MenuItem
+                          onClick={() =>
+                            handleListStatusChange(
+                              selectedProductId,
+                              !products.find(product => product.seller_product_id === selectedProductId).is_active
+                            )
+                          }
+                        >
+                          {products.find(product => product.seller_product_id === selectedProductId)?.is_active ? 'Pasif Et' : 'Aktif Et'}
                         </MenuItem>
                       </Menu>
                     </td>

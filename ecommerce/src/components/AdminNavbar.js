@@ -36,21 +36,9 @@ const AdminNavbar = () => {
       <Toolbar>
         <Grid container alignItems="center">
           <Grid item xs>
-            <IconButton color="inherit">
-              <MenuIcon />
-            </IconButton>
+           
           </Grid>
-          <Grid item xs={8}>
-            <Search>
-              <IconButton type="submit" sx={{ p: '10px', color: 'inherit' }}>
-                <SearchIcon />
-              </IconButton>
-              <StyledInputBase
-                placeholder="Ara…"
-                inputProps={{ 'aria-label': 'search' }}
-              />
-            </Search>
-          </Grid>
+         
           <Grid item xs display="flex" justifyContent="flex-end">
           <Button color="inherit" onClick={logoutAdmin}>Çıkış</Button>
           </Grid>
