@@ -718,6 +718,7 @@ const removeItemFromList = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 //ADRES İŞLEMLERİ
 const getAddresses = async (req, res) => {
   try {
