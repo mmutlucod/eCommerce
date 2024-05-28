@@ -16,6 +16,10 @@ const ProductComment = require('../models/productComment');
 const productQuestion = require('../models/productQuestion');
 const productImage = require('../models/productImage');
 const sanitizeHtml = require('sanitize-html');
+const slugify = require('slugify');
+
+
+
 const login = async (req, res) => {
     const { username, password } = req.body;
 
@@ -161,6 +165,7 @@ const getProductsById = async (req, res) => {
 const createProduct = async (req, res) => {
     const transaction = await Product.sequelize.transaction(); // Transaction başlat
     try {
+        const admin = await Admin.findOne({ where: { username: req.user.username } });
         const product = await Product.findOne({
             where: {
                 stock_code: req.body.stock_code
@@ -170,16 +175,22 @@ const createProduct = async (req, res) => {
         if (product) {
             res.status(409).json({ success: false, message: 'Bu ürün zaten sistemde mevcut.' });
         } else {
-            const sanitizedDescription = sanitizeHtml(req.body.description, {
-                allowedTags: [], // Hiçbir HTML etiketiye izin verilmez
-                allowedAttributes: {}, // Hiçbir HTML özelliğine izin verilmez
+
+            const currentDateTime = new Date(); // Geçerli tarih ve saat bilgisini al
+            const slugDatePart = `${(currentDateTime.getMonth() + 1).toString().padStart(2, '0')}${currentDateTime.getDate().toString().padStart(2, '0')}`; // YYYYMMDD formatında tarih kısmını oluştur
+            const slugTimePart = `${currentDateTime.getMinutes().toString().padStart(2, '0')}${currentDateTime.getSeconds().toString().padStart(2, '0')}`; // HHMMSS formatında saat kısmını oluştur
+            const slug = slugify(`${req.body.name}-${slugDatePart}-x-${slugTimePart}`, {
+                replacement: '-',  // Boşlukları '-' ile değiştir
+                lower: true,       // Küçük harfe çevir
+                remove: /[*+~.()'"!:@]/g // Slug oluştururken kaldırılacak karakterler
             });
 
             const newProduct = await Product.create({
                 ...req.body,
-                description: sanitizedDescription,
                 approval_status_id: 1,
                 max_buy: 5,
+                slug: slug,
+                admin_id: admin.admin_id
             }, { transaction });
 
             // Dosya isimlerini al ve productImages tablosuna ekle
@@ -339,10 +350,34 @@ const createCategory = async (req, res) => {
     try {
         const admin = await Admin.findOne({ where: { username: req.user.username } });
         // Kategoriyi veritabanına ekle
+
+        const currentDateTime = new Date(); // Geçerli tarih ve saat bilgisini al
+        const slugDatePart = `${(currentDateTime.getMonth() + 1).toString().padStart(2, '0')}${currentDateTime.getDate().toString().padStart(2, '0')}`; // YYYYMMDD formatında tarih kısmını oluştur
+        const slugTimePart = `${currentDateTime.getMinutes().toString().padStart(2, '0')}${currentDateTime.getSeconds().toString().padStart(2, '0')}`; // HHMMSS formatında saat kısmını oluştur
+        const slug = slugify(`${req.body.name}-${slugDatePart}-x-${slugTimePart}`, {
+            replacement: '-',  // Boşlukları '-' ile değiştir
+            lower: true,       // Küçük harfe çevir
+            remove: /[*+~.()'"!:@]/g // Slug oluştururken kaldırılacak karakterler
+        });
+
+        const control = await Category.findOne({
+            where: Sequelize.where(
+                Sequelize.fn('LOWER', Sequelize.col('category_name')),
+                Sequelize.fn('LOWER', req.body.category_name)
+            )
+        });
+
+        if (control) {
+            return res.status(404).json({ success: false, message: 'Bu kategori zaten sistemde mevcut.' });
+        }
+
+
+
         const category = await Category.create({
             ...req.body,
             approval_status_id: 1,
-            admin_id: admin.admin_id
+            admin_id: admin.admin_id,
+            slug: slug
         });
 
         // Kategori başarıyla oluşturulduysa, ürün bilgisini içeren bir yanıt dön
@@ -691,9 +726,34 @@ const getBrandById = async (req, res) => {
 }
 const createBrand = async (req, res) => {
     try {
+
+        const admin = await Admin.findOne({ where: { username: req.user.username } });
+
+        const currentDateTime = new Date(); // Geçerli tarih ve saat bilgisini al
+        const slugDatePart = `${(currentDateTime.getMonth() + 1).toString().padStart(2, '0')}${currentDateTime.getDate().toString().padStart(2, '0')}`; // YYYYMMDD formatında tarih kısmını oluştur
+        const slugTimePart = `${currentDateTime.getMinutes().toString().padStart(2, '0')}${currentDateTime.getSeconds().toString().padStart(2, '0')}`; // HHMMSS formatında saat kısmını oluştur
+        const slug = slugify(`${req.body.name}-${slugDatePart}-x-${slugTimePart}`, {
+            replacement: '-',  // Boşlukları '-' ile değiştir
+            lower: true,       // Küçük harfe çevir
+            remove: /[*+~.()'"!:@]/g // Slug oluştururken kaldırılacak karakterler
+        });
+
+        const control = await Brand.findOne({
+            where: Sequelize.where(
+                Sequelize.fn('LOWER', Sequelize.col('brand_name')),
+                Sequelize.fn('LOWER', req.body.brand_name)
+            )
+        });
+
+        if (control) {
+            return res.status(404).json({ success: false, message: 'Bu marka zaten sistemde mevcut.' });
+        }
+
         const brand = await Brand.create({
             ...req.body,
+            slug: slug,
             approval_status_id: 1,
+            admin_id: admin.admin_id
         });
 
         return res.status(201).json({ success: true, message: 'Marka eklendi.', brand });

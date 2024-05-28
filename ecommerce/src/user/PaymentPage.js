@@ -46,7 +46,18 @@ const theme = createTheme({
 });
 
 const steps = ['Adresler', 'Ödeme'];
-const cities = ["Ankara", "İstanbul", "İzmir", "Antalya"];
+const cities = [
+    "Adana", "Adıyaman", "Afyonkarahisar", "Ağrı", "Amasya", "Ankara", "Antalya", "Artvin",
+    "Aydın", "Balıkesir", "Bilecik", "Bingöl", "Bitlis", "Bolu", "Burdur", "Bursa",
+    "Çanakkale", "Çankırı", "Çorum", "Denizli", "Diyarbakır", "Edirne", "Elazığ", "Erzincan",
+    "Erzurum", "Eskişehir", "Gaziantep", "Giresun", "Gümüşhane", "Hakkâri", "Hatay", "Isparta",
+    "İçel (Mersin)", "İstanbul", "İzmir", "Kars", "Kastamonu", "Kayseri", "Kırklareli", "Kırşehir",
+    "Kocaeli", "Konya", "Kütahya", "Malatya", "Manisa", "Kahramanmaraş", "Mardin", "Muğla",
+    "Muş", "Nevşehir", "Niğde", "Ordu", "Rize", "Sakarya", "Samsun", "Siirt", "Sinop", "Sivas",
+    "Tekirdağ", "Tokat", "Trabzon", "Tunceli", "Şanlıurfa", "Uşak", "Van", "Yozgat", "Zonguldak",
+    "Aksaray", "Bayburt", "Karaman", "Kırıkkale", "Batman", "Şırnak", "Bartın", "Ardahan",
+    "Iğdır", "Yalova", "Karabük", "Kilis", "Osmaniye", "Düzce"
+];
 
 const StepIconComponent = props => {
     const { active, completed } = props;
@@ -433,7 +444,7 @@ const PaymentPage = () => {
                                 <TextField fullWidth label="Adres Satırı" name="street" value={newAddress.street} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12}>
-                                <TextField fullWidth label="Posta Kodu" name="postal_code" value={newAddress.postal_code} onChange={handleInputChange} />
+                                <TextField fullWidth label="Posta Kodu" type='number' name="postal_code" value={newAddress.postal_code} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12}>
                                 <Button type="submit" variant="contained" color="primary" fullWidth sx={{ bgcolor: '#f27a1a', color: '#fff' }}>Adres Ekle</Button>

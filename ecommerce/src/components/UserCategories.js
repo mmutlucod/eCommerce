@@ -127,7 +127,7 @@ const CategoriesBar = () => {
         }
       },
     }}>
-      {categories.map((category, index) => (
+      {categories.slice(0, 9).map((category, index) => (
         <React.Fragment key={category.id}>
           <Box
             className="category-box"
@@ -141,7 +141,7 @@ const CategoriesBar = () => {
               {category.category_name}
             </Link>
           </Box>
-          {index < categories.length - 1 && (
+          {index < categories.slice(0, 9).length - 1 && (
             <Typography color="gray" sx={{ mx: 0 }}>
               |
             </Typography>

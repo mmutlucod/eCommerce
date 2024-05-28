@@ -54,10 +54,10 @@ const Card = ({
     const outlineElementStyle = (element) => {
         return element
             ? {
-                  width: `${element.offsetWidth}px`,
-                  height: `${element.offsetHeight}px`,
-                  transform: `translateX(${element.offsetLeft}px) translateY(${element.offsetTop}px)`
-              }
+                width: `${element.offsetWidth}px`,
+                height: `${element.offsetHeight}px`,
+                transform: `translateX(${element.offsetLeft}px) translateY(${element.offsetTop}px)`
+            }
             : null;
     };
 
@@ -85,9 +85,8 @@ const Card = ({
         <div className={'card-item ' + (isCardFlipped ? '-active' : '')}>
             <div className="card-item__side -front">
                 <div
-                    className={`card-item__focus ${
-                        currentFocusedElm ? `-active` : ``
-                    }`}
+                    className={`card-item__focus ${currentFocusedElm ? `-active` : ``
+                        }`}
                     style={style}
                 />
                 <div className="card-item__cover">
@@ -174,6 +173,7 @@ const Card = ({
                                                     timeout={250}
                                                     classNames="slide-fade-right"
                                                     key={index}
+
                                                 >
                                                     <span className="card-item__nameItem">
                                                         {val}
@@ -190,7 +190,7 @@ const Card = ({
                             ref={cardDateRef}
                         >
                             <label className="card-item__dateTitle">
-                               Ay/Yıl
+                                Ay/Yıl
                             </label>
                             <label className="card-item__dateItem">
                                 <SwitchTransition in-out>
@@ -220,8 +220,8 @@ const Card = ({
                                             {!cardYear
                                                 ? 'YY'
                                                 : cardYear
-                                                      .toString()
-                                                      .substr(-2)}
+                                                    .toString()
+                                                    .substr(-2)}
                                         </span>
                                     </CSSTransition>
                                 </SwitchTransition>
