@@ -59,7 +59,7 @@ const CartDropdown = () => {
             </div>
             <div className="buttons-container">
                 <Link to="/sepetim" className="view-cart-button button">Sepete Git</Link>
-                <Link to="/siparisi-tamamla" className="checkout-button button">Siparişi Tamamla</Link>
+                <Link to="/sepetim/odeme" className="checkout-button button">Siparişi Tamamla</Link>
             </div>
         </div>
     );
