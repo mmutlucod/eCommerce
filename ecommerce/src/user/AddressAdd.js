@@ -136,7 +136,7 @@ const AddAddressPage = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Sokak"
+                    label="Sokak/Cadde"
                     name="street"
                     value={addressDetails.street}
                     onChange={handleChange}

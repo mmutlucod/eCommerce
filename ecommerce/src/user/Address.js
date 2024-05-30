@@ -269,7 +269,7 @@ const AddressesPage = () => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Sokak"
+                      label="Sokak/Cadde"
                       name="street"
                       value={addressToEdit?.street || ''}
                       onChange={e => setAddressToEdit({ ...addressToEdit, street: e.target.value })}
