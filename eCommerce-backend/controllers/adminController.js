@@ -182,7 +182,7 @@ const createProduct = async (req, res) => {
             const slug = slugify(`${req.body.name}-${slugDatePart}-x-${slugTimePart}`, {
                 replacement: '-',  // Boşlukları '-' ile değiştir
                 lower: true,       // Küçük harfe çevir
-                remove: /[*+~.()'"!:@]/g // Slug oluştururken kaldırılacak karakterler
+                remove: /[*+~.()'"!:@/]/g // Slug oluştururken kaldırılacak karakterler
             });
 
             const newProduct = await Product.create({

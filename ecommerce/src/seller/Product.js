@@ -182,7 +182,7 @@ function Products() {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr>
-                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ürün Foto</th>
+                  <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ürün ID</th>
                   <th style={{ border: '1px solid #ddd', padding: '8px' }}>Ürün Adı</th>
                   <th style={{ border: '1px solid #ddd', padding: '8px' }}>Kategori</th>
                   <th style={{ border: '1px solid #ddd', padding: '8px' }}>Onay Durumu</th>
@@ -271,7 +271,7 @@ function Products() {
         <DialogContent>
           {editProduct && (
             <form>
-             
+
               <TextField
                 fullWidth
                 margin="normal"

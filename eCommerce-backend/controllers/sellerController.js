@@ -302,6 +302,9 @@ const searchAllProducts = async (req, res) => {
                 },
                 {
                     model: Category
+                },
+                {
+                    model: productImage
                 }
             ]
         });

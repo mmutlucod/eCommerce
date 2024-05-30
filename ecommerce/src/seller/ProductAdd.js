@@ -11,12 +11,14 @@ import {
   CardActions,
   CardContent,
   Button,
+  Tooltip
 } from '@mui/material';
 import MuiAlert from '@mui/material/Alert';
 import { styled } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import SellerNavbar from '../components/SellerNavbar';
 import api from '../api/api';
+import ImageCarousel from '../components/ImageCarousel';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -40,7 +42,7 @@ const CustomCard = styled(Card)(({ theme }) => ({
 const CustomCardContent = styled(CardContent)({
   textAlign: 'left',
   padding: '15px',
-  height: '110px',
+  height: '250px',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
@@ -154,13 +156,16 @@ const ProductAdd = () => {
             <CustomCard key={product.product_id}>
               <CustomCardContent>
                 <Box display="flex" justifyContent="start" alignItems="center">
-                  <CustomTypography variant="subtitle1" noWrap>
+                  <CustomTypography variant="subtitle1">
                     {product.Brand.brand_name || 'Unknown Brand'}
                   </CustomTypography>
-                  <ProductNameTypography variant="subtitle1" noWrap>
-                    {product.name}
-                  </ProductNameTypography>
+                  <Tooltip title={product.name}>
+                    <ProductNameTypography variant="subtitle1" noWrap>
+                      {product.name}
+                    </ProductNameTypography>
+                  </Tooltip>
                 </Box>
+                <ImageCarousel images={product.productImages.map(img => img.image_path)} /> {/* Resim carousel'i ekliyoruz */}
                 <CustomTypography variant="h6" mt={1}>
                   Stok Kodu: {product.stock_code}
                 </CustomTypography>
