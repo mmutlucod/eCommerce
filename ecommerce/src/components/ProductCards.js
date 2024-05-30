@@ -140,7 +140,7 @@ const ProductCards = ({ products = [] }) => {
             </Link>
             <CustomCardContent>
               <Box display="flex" justifyContent="start" alignItems="center">
-                <Link style={{ textDecoration: 'none', overflow: 'hidden' }} to={'/marka/' + product.product.Brand.slug}>
+                <Link style={{ textDecoration: 'none' }} to={'/marka/' + product.product.Brand.slug}>
                   <CustomTypography variant="subtitle1" noWrap>
                     {product.product.Brand.brand_name || 'Unknown Brand'}
                   </CustomTypography>

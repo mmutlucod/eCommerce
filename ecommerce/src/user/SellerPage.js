@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { Box, Typography, Paper, AppBar, Tabs, Tab, CircularProgress, Grid, Avatar } from '@mui/material';
 import NavBar from '../components/UserNavbar';
 import Footer from '../components/UserFooter';
@@ -13,6 +13,8 @@ const SellerPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [tabValue, setTabValue] = useState(0);
+  const [navigate, setNavigate] = useState(false);
+
 
   const calculateTimeOnPlatform = (createdAt) => {
     const now = dayjs();
@@ -29,6 +31,7 @@ const SellerPage = () => {
         const sellerResponse = await api.get(`user/sellerInfo/${sellerSlug}`);
         setSeller(sellerResponse.data);
       } catch (err) {
+        setNavigate(true); // 404 sayfasına yönlendirme için state güncellemesi
         setError('Satıcı bilgileri yüklenirken bir hata oluştu: ' + err.message);
       }
     };
@@ -46,6 +49,9 @@ const SellerPage = () => {
     setTabValue(newValue);
   };
 
+  if (navigate) {
+    return <Navigate to="/hata" />;
+  }
   if (loading) return <Box display="flex" justifyContent="center" alignItems="center" height="100vh"><CircularProgress /></Box>;
   if (error) return <Typography variant="h6" color="error">Hata: {error}</Typography>;
 

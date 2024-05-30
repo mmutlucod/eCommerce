@@ -58,8 +58,8 @@ function CartItem({ item }) {
     };
 
     const productImage = item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0
-        ? `http://localhost:5000/img/${item.sellerProduct.product.productImages[0].image_path}`
-        : 'http://localhost:5000/img/empty.jpg';
+        ? `http://localhost:5000/public/img/${item.sellerProduct.product.productImages[0].image_path}`
+        : 'http://localhost:5000/public/img/empty.jpg';
 
     return (
         <div className="item-body">

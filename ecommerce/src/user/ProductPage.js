@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { Box, Grid, Typography, Button, Rating, Paper, IconButton, Snackbar } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import NavBar from '../components/UserNavbar';
@@ -16,7 +16,6 @@ import { useAuth } from '../context/AuthContext';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import { Tooltip } from '@mui/material';
-
 
 const theme = createTheme({
   palette: {
@@ -61,20 +60,25 @@ const ProductPage = () => {
   const cartItems = useSelector(state => state.cart.items);
   const { token } = useAuth();
   const [favorites, setFavorites] = useState([]);
+  const [navigate, setNavigate] = useState(false);
 
   useEffect(() => {
     const fetchProductAndSellers = async () => {
       setLoading(true);
       try {
+        let response;
         if (sellerSlug) {
-          const response = await api.get(`/user/products/${productSlug}?mg=${sellerSlug}`);
-          setProduct(response.data[0]);
+          response = await api.get(`/user/products/${productSlug}?mg=${sellerSlug}`);
         } else {
-          const response = await api.get(`/user/product/${productSlug}`);
-          setProduct(response.data);
+          response = await api.get(`/user/product/${productSlug}`);
         }
+        if (response.data && response.data.length === 0) {
+          throw new Error('Ürün bulunamadı');
+        }
+        setProduct(response.data[0] || response.data);
       } catch (err) {
-        setError('Satıcı bilgileri yüklenirken bir hata oluştu: ' + err.message);
+        setError('Ürün bulunamadı: ' + err.message);
+        setNavigate(true); // 404 sayfasına yönlendirme için state güncellemesi
       } finally {
         setLoading(false);
       }
@@ -177,6 +181,10 @@ const ProductPage = () => {
   const handleCloseAlert = () => {
     setAlertOpen(false);
   };
+
+  if (navigate) {
+    return <Navigate to="/hata" />;
+  }
 
   if (loading) {
     return <Typography>Loading...</Typography>;

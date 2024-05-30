@@ -441,7 +441,7 @@ const PaymentPage = () => {
                                 <TextField fullWidth label="Ülke" name="country" value={newAddress.country} onChange={handleInputChange} />
                             </Grid> */}
                             <Grid item xs={12}>
-                                <TextField fullWidth label="Adres Satırı" name="street" value={newAddress.street} onChange={handleInputChange} />
+                                <TextField fullWidth label="Sokak/Cadde" name="street" value={newAddress.street} onChange={handleInputChange} />
                             </Grid>
                             <Grid item xs={12}>
                                 <TextField fullWidth label="Posta Kodu" type='number' name="postal_code" value={newAddress.postal_code} onChange={handleInputChange} />

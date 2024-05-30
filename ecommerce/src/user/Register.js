@@ -15,12 +15,13 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Navbar from '../components/UserNavbar';
 import Footer from '../components/UserFooter';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../api/api';
 import { useAuth } from '../context/AuthContext';
 
 function AuthPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [tabValue, setTabValue] = useState('login');
   const { login } = useAuth();
   const [loginData, setLoginData] = useState({
@@ -36,6 +37,14 @@ function AuthPage() {
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [loginErrors, setLoginErrors] = useState({});
   const [registerErrors, setRegisterErrors] = useState({});
+
+  useEffect(() => {
+    if (location.pathname === '/kayit-ol') {
+      setTabValue('register');
+    } else if (location.pathname === '/giris-yap') {
+      setTabValue('login');
+    }
+  }, [location.pathname]);
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
@@ -136,7 +145,6 @@ function AuthPage() {
       setError(error.response.data.message || 'Kayıt sırasında bir hata oluştu.');
     }
   };
-
 
   // useEffect to automatically close alerts after 5 seconds
   useEffect(() => {

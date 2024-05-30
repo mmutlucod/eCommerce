@@ -185,16 +185,15 @@ const OrdersPage = () => {
                     Sipariş ({calculateTotalQuantity(selectedOrderDetails.orderItems)} Ürün)
                   </div>
                 </div>
-                <div className="cart-items0">
+                <div className="cart-items0" style={{ maxHeight: '350px' }}>
                   {selectedOrderDetails.orderItems.map((item, idx) => (
                     <Box key={idx} className="cart-itemX0">
                       <Box className="item-image0" onClick={() => navigate(`/urun/${item.sellerProduct.product.slug}?mg=${item.sellerProduct.seller.slug}`)}>
                         <img src={item.sellerProduct.product.productImages && item.sellerProduct.product.productImages.length > 0 ? `http://localhost:5000/public/img/${item.sellerProduct.product.productImages[0].image_path}` : 'http://localhost:5000/public/img/empty.jpg'} alt={item.sellerProduct.product.name} />
                       </Box>
-                      <Box className="item-details00">
-                        {console.log(item)}
-                        <Typography className="item-name0" onClick={() => navigate(`/urun/${item.sellerProduct.product.slug}?mg=${item.sellerProduct.seller.slug}`)}>{item.sellerProduct.product.name ? item.sellerProduct.product.name : 'Bilinmiyor'}</Typography>
-                        <Box className="item-options0">
+                      <Box className="item-details00" sx={{ padding: '5px' }}>
+                        <Typography sx={{ padding: '10px', minHeight: '36px' }} className="item-name0" onClick={() => navigate(`/urun/${item.sellerProduct.product.slug}?mg=${item.sellerProduct.seller.slug}`)}>{item.sellerProduct.product.name ? item.sellerProduct.product.name : 'Bilinmiyor'}</Typography>
+                        <Box className="item-options0" >
                           <Typography className="item-price0">Fiyat: {item.sellerProduct.price} ₺</Typography>
                           <Typography className="item-quantity0">Adet: {item.quantity}</Typography>
                         </Box>

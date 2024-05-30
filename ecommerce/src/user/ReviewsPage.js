@@ -91,7 +91,7 @@ const ReviewsPage = () => {
                                                 <Card>
                                                     <CardContent>
                                                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                            <Typography gutterBottom variant="h6" component="div" marginLeft={'30%'}>
+                                                            <Typography gutterBottom variant="h6" component="div">
                                                                 Ürün Adı: <Link to={'/urun/' + review.sellerProduct.product.slug} style={{ textDecoration: 'none', fontWeight: 'bold' }}>{review.sellerProduct.product.name}</Link>
                                                             </Typography>
                                                             <Typography variant="body2" component="p" sx={{ fontWeight: 'bold', color: getApprovalColor(review.approval_status_id) }}>
@@ -105,7 +105,7 @@ const ReviewsPage = () => {
                                                             <Rating value={review.rating} readOnly />
                                                         </Box>
                                                         <Typography variant="body2" color="textSecondary" component="p" sx={{ mt: 1 }}>
-                                                            Tarih: {new Date(review.comment_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                                                            Tarih: {new Date(review.comment_date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                                                         </Typography>
                                                     </CardContent>
                                                 </Card>

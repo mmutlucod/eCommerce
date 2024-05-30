@@ -156,7 +156,7 @@ function OtherSellersTab({ product }) {
         </Tabs>
       </AppBar>
       <TabPanel value={tabValue} index={0}>
-        <Typography component="div">
+        <Typography component="div" sx={{ width: '100%', wordWrap: 'break-word', whiteSpace: 'normal', overflowX: 'clip' }}>
           <div dangerouslySetInnerHTML={{ __html: product.product.description }} />
         </Typography>
       </TabPanel>

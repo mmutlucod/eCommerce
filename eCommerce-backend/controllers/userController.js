@@ -1787,7 +1787,7 @@ const getProducts = async (req, res) => {
     }
 
     let products = await sellerProduct.findAll({
-      where: { is_active: 1 },
+      where: { is_active: 1, approval_status_id: 1 },
       include: [{
         model: Seller
       },
@@ -2245,6 +2245,7 @@ const getSellerProductByProductId = async (req, res) => {
     let products = await sellerProduct.findAll({
       where: {
         is_active: 1,
+        approval_status_id: 1,
         ...(sellerProductId && { seller_product_id: { [Op.ne]: sellerProductId } })
       },
       include: [
@@ -2642,7 +2643,7 @@ const getTopSellingProducts = async (req, res) => {
           ]
         }
       ],
-     order: [['created_at', 'DESC']],
+      order: [['created_at', 'DESC']],
       limit: 10
     });
 
@@ -2710,5 +2711,5 @@ module.exports = {
   askQuestion, listMyQuestions, getAnsweredQuestionsForProduct,
   getProductsBySellerSlug, getProductsBySlug, getProductsByCategorySlug, getProductsByBrandSlug, getProductsBySeller,
   getCategories, getSubCategoriesById, searchProducts, getPhotos, clearCart, getSellerProductByProductId,
-  getSellerInfo, commentControl, getorder,getTopSellingProducts
+  getSellerInfo, commentControl, getorder, getTopSellingProducts
 }
