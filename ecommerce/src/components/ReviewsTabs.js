@@ -217,7 +217,7 @@ function ReviewsTab({ productId, sellerProductId }) {
                     </Avatar>
                   }
                   title={`${review.user.name} ${review.user.surname}`}
-                  subheader={new Date(review.date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  subheader={new Date(review.date).toLocaleString('tr-TR', { year: 'numeric', month: '2-digit', day: '2-digit' })}
                   titleTypographyProps={{ variant: 'subtitle2' }}
                   subheaderTypographyProps={{ variant: 'caption' }}
                 />
@@ -225,10 +225,10 @@ function ReviewsTab({ productId, sellerProductId }) {
                   <Typography variant="body2" color="text.secondary">
                     {review.content}
                   </Typography>
-                  <Rating value={review.rating} readOnly sx={{ mt: 1 }} />
-                  <Button variant="text" size="small" sx={{ mt: 1 }}>
+                  <Rating value={review.rating} readOnly sx={{ mt: 1, mb: 2 }} />
+                  {/* <Button variant="text" size="small" sx={{ mt: 1 }}>
                     Bildir
-                  </Button>
+                  </Button> */}
                 </CardContent>
               </Card>
             )) : (
