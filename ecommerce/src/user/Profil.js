@@ -138,12 +138,11 @@ const UserProfile = () => {
       };
 
       const response = await api.put('/user/update-account', data);
-
       if (response.status === 200) {
-        const newToken = response.data.token;
-        if (newToken) {
-          localStorage.setItem('token', newToken);
-        }
+        // const newToken = response.data.token;
+        // if (newToken) {
+        //   localStorage.setItem('token', newToken);
+        // }
         setAlertMessage('Profil bilgileriniz başarıyla güncellendi.');
         setAlertSeverity('success');
         setAlertOpen(true);

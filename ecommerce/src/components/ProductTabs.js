@@ -46,7 +46,7 @@ function OtherSellersTab({ product }) {
   useEffect(() => {
     const fetchSellers = async () => {
       try {
-        const response = await api.get(`user/sellerProducts/${product.product.product_id}/${product.seller_product_id}`);
+        const response = await api.get(`/user/sellerProducts/${product.product.product_id}/${product.seller_product_id}`);
         setSellers(response.data);
       } catch (error) {
         console.error('Satıcılar getirilirken hata oluştu:', error);
@@ -176,16 +176,18 @@ function OtherSellersTab({ product }) {
                   <TableRow key={index}>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Avatar alt={seller.seller.username} src="" sx={{ width: 56, height: 56, mr: 2 }} onClick={() => handleSellerClick(seller.seller.slug)} style={{ cursor: 'pointer' }} />
+                        <Avatar alt={seller.seller.username} src="" sx={{ width: 56, height: 56, mr: 2, color: 'blue' }} onClick={() => handleSellerClick(seller.seller.slug)} style={{ cursor: 'pointer' }} >
+                          {seller?.seller.username?.charAt(0).toUpperCase()}
+                        </Avatar>
                         <Box>
                           <div style={{ fontSize: '18px', color: '#4b0082', cursor: 'pointer' }} onClick={() => handleSellerClick(seller.seller.slug)}>
                             {seller.seller.username.toUpperCase()}
                           </div>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                            <StarIcon sx={{ color: '#FFD700', fontSize: 16 }} />
-                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#4CAF50', ml: 0.5 }}>
-                              {seller.commentAvg}
-                            </Typography>
+                            {/* <StarIcon sx={{ color: '#FFD700', fontSize: 16 }} /> */}
+                            {/* <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#4CAF50', ml: 0.5 }}>
+                                {seller.commentAvg}
+                              </Typography> */}
                           </Box>
                         </Box>
                       </Box>

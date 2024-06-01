@@ -23,7 +23,7 @@ const PrevArrow = (props) => {
     );
 };
 
-const ImageSlider = ({ images }) => {
+const ImageSlider = ({ images, links }) => {
     const settings = {
         dots: false,
         infinite: true,
@@ -37,11 +37,17 @@ const ImageSlider = ({ images }) => {
         prevArrow: <PrevArrow />
     };
 
+    const handleSlideClick = (index) => {
+        if (links && links[index]) {
+            window.location.href = links[index];
+        }
+    };
+
     return (
         <div className="slider-container0">
             <Slider {...settings}>
                 {images.map((img, index) => (
-                    <div key={index} className="slider-image-container0">
+                    <div key={index} className="slider-image-container0" onClick={() => handleSlideClick(index)}>
                         <img src={img} alt={`Slide ${index}`} className="slider-image0" />
                     </div>
                 ))}

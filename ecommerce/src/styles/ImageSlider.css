@@ -2,6 +2,7 @@
     margin: 20px 40px;
     overflow: hidden; /* Kayarken köşelerin yuvarlak kalmasını sağlamak için */
     border-radius: 12px; /* Kayarken köşelerin yuvarlak kalmasını sağlamak için */
+    cursor: pointer;
 }
 
 .slider-image-container0 {
