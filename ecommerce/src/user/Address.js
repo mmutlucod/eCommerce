@@ -90,7 +90,7 @@ const AddressesPage = () => {
   const fetchAddresses = async () => {
     try {
       const response = await api.get('/user/addresses');
-      setAddresses(response.data.addresses);
+      setAddresses(response.data);
     } catch (error) {
       console.error('Adresler alınırken hata oluştu:', error);
     }
@@ -135,7 +135,19 @@ const AddressesPage = () => {
   const handleEditSubmit = async () => {
     try {
       const response = await api.put(`/user/addresses/${addressToEdit.address_id}`, addressToEdit);
-      if (response.status === 200) {
+
+
+      //create metodunda id olmamalı!!!
+      const addressDetails = {
+        address_line: addressToEdit.address_line,
+        street: addressToEdit.street,
+        city: addressToEdit.city,
+        state: addressToEdit.state,
+        postal_code: addressToEdit.postal_code
+      }
+
+      const response1 = await api.post('/user/create-address', addressDetails);
+      if (response.status === 200 && response1.status === 201) {
         // Adres listesini güncelleyin veya yeniden fetch edin
         fetchAddresses();
         closeEditDialog();
@@ -276,7 +288,6 @@ const AddressesPage = () => {
                     />
                   </Grid>
 
-                  {console.log(addressToEdit)}
                   <Grid item xs={12}>
                     <TextField
                       select

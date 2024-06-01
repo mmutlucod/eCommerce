@@ -741,12 +741,7 @@ const getAddresses = async (req, res) => {
       where: { user_id: user.user_id, is_deleted: 0 } // user.id, bulunan kullanıcının ID'sidir
     });
 
-    // Adresler varsa, dönüyoruz
-    if (addresses.length > 0) {
-      return res.status(200).json({ success: true, addresses });
-    } else {
-      return res.status(404).json({ success: false, message: "Adres bulunamadı." });
-    }
+    return res.status(200).json(addresses);
   } catch (error) {
     // Bir hata oluşursa, hatayı döndürüyoruz
     return res.status(500).json({ success: false, message: error.message });
@@ -785,14 +780,17 @@ const updateAddress = async (req, res) => {
       return res.status(404).json({ success: false, message: "Adres bulunamadı veya erişim yetkiniz yok." });
     }
 
-    // Adresi güncelle
-    await address.update(updatedData);
-    return res.status(200).json({ success: true, message: "Adres başarıyla güncellendi.", address: address });
+    // Mevcut adresin is_deleted alanını 1 yap
+    await address.update({ is_deleted: 1 });
+
+
+    return res.status(200).json({ success: true, message: 'Adres başarıyla güncellendi' });
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 const deleteAddress = async (req, res) => {
   try {
     const { addressId } = req.params; // URL'den adres ID'si alınır
