@@ -103,7 +103,7 @@ function App() {
             <Route path="/seller/orders" element={<SellerOrders />} />
             <Route path="/seller/question" element={<SellerQuestion />} />
 
-
+            {/** USER*/}
             <Route path="/anasayfa" element={< UserMainPage />} />
             <Route path="/giris-yap" element={< UserRegister />} />
             <Route path="/kayit-ol" element={< UserRegister />} />
@@ -122,6 +122,7 @@ function App() {
             <Route path="/arama/:query" element={<UserSearchProducts />} />
             <Route path="/satici/:sellerSlug" element={<UserSellerPage />} />
 
+            {/** ERROR */}
             <Route path="/hata404" element={<UserErrorPage />} />
             <Route path="*" element={<UserErrorPage />} />
 
