@@ -688,6 +688,7 @@ const updateShippingCodeOrderItem = async (req, res) => {
             { where: { order_item_id: id } }
         );
 
+
         return res.status(200).json({ success: true, message: 'Kargo takip kodu eklendi.' });
     } catch (error) {
         console.error('Kargo kodu eklenirken hata!', error);
@@ -710,6 +711,14 @@ const updateOrderStatus = async (req, res) => {
         await orderItem.update(
             { order_status_id: 4 }
         );
+        // console.log(orderItem);
+
+        // await Order.update({
+        //     order_status_id: 4,
+        //     where: {
+        //         order_id: orderItem.order_id
+        //     }
+        // })
 
         return res.status(200).json({ success: true, message: 'Order status updated successfully.' });
     } catch (error) {
