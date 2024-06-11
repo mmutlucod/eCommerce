@@ -1,0 +1,43 @@
+/* EmptyCart.css */
+.empty-cart-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 20vh; /* Yükseklik ayarlandı */
+  padding: 20px;
+  background-color: #fff;
+  border: 2px solid #ccc; /* Sınır kalınlığı artırıldı */
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Gölge efekti */
+  margin-top: 17vh;
+  margin-left: 26px;
+  width: 94%;
+}
+
+.empty-cart-info {
+  display: flex;
+  align-items: center;
+  flex-direction: row; /* İçerikleri yatay olarak hizalayın */
+  text-align: left; /* Metni sola hizala */
+  flex-grow: 1; /* Tüm kullanılabilir alanı kaplaması için */
+}
+
+.empty-cart-info p {
+  margin-left: 20px; /* İkon ile metin arasında boşluk */
+  color: #333;
+  font-size: 20px;
+  font-weight: 500; /* Yazı tipi kalınlığı */
+  font-family: 'Arial', sans-serif; /* Modern bir yazı tipi */
+}
+
+.start-shopping-button {
+  padding: 10px 20px;
+  margin-right: 30px;
+  background-color: #ff6600;
+  color: white;
+  text-decoration: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
