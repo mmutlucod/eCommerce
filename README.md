@@ -1,6 +1,6 @@
 # eCommerce Projesi
 
-Bu proje, modern ve kullanıcı dostu bir e-ticaret platformu geliştirmeyi amaçlayan bir bitirme projesidir. Bu platform, ürün arama ve filtreleme, güvenli ödeme ve gerçek zamanlı stok bilgisi gibi özellikleri içermektedir.
+Bu proje, Bandırma Onyedi Eylül Üniversitesi Yazılım Mühendisliği bitirme projesi olarak Umut Karakaş ve Mustafa Mutlu tarafından geliştirilmiştir. Modern ve kullanıcı dostu bir e-ticaret platformu geliştirmeyi amaçlamaktadır. Bu platform, ürün arama ve filtreleme, satıcı ve yönetici panelleri ile gerçek zamanlı stok bilgisi gibi özellikleri içermektedir.
 
 ## Proje Özeti
 
@@ -11,7 +11,7 @@ Bu proje, modern ve kullanıcı dostu bir e-ticaret platformu geliştirmeyi ama�
 ## Özellikler
 
 - Kullanıcılar ürünleri kolayca arayabilir ve filtreleyebilir
-- Güvenli ödeme işlemleri
+- Satıcı ve yönetici panelleri
 - Gerçek zamanlı stok bilgisi
 - Satıcılar hesap oluşturabilir ve ürün satabilir
 - Kullanıcılar hızlıca sipariş verebilir
@@ -76,6 +76,12 @@ Bu proje, modern ve kullanıcı dostu bir e-ticaret platformu geliştirmeyi ama�
 
 - Hesap oluşturun ve giriş yapın.
 - Yeni ürünler ekleyin ve mevcut ürünlerinizi yönetin.
+
+### Yönetici Paneli
+
+- Yönetici olarak giriş yapın.
+- Tüm kullanıcıları, ürünleri ve siparişleri yönetin.
+- Platformun genel ayarlarını düzenleyin.
 
 ## Ekran Görüntüleri
 
