@@ -106,6 +106,51 @@ Arama Sonuçları:
 Ürün Yorumları:
 ![Ürün Yorumları](./screenshots/9.png)
 
+Değerlendirme Ekle:
+![Değerlendirme Ekle](./screenshots/10.png)
+
+Sorular ve Cevaplar:
+![Sorular ve Cevaplar](./screenshots/11.png)
+
+Soru Sor:
+![Soru Sor](./screenshots/12.png)
+
+Diğer Satıcılar:
+![Diğer Satıcılar](./screenshots/13.png)
+
+Kategori Sonuçları:
+![Kategori Sonuçları](./screenshots/14.png)
+
+Marka Sonuçları:
+![Marka Sonuçları](./screenshots/15.png)
+
+Satıcı Bilgileri:
+![Satıcı Bilgileri](./screenshots/16.png)
+
+Siparişlerim:
+![Siparişlerim](./screenshots/17.png)
+
+Sipariş Detayları:
+![Sipariş Detayları](./screenshots/18.png)
+
+Profilim:
+![Profilim](./screenshots/19.png)
+
+Adres Bilgilerim:
+![Adres Bilgilerim](./screenshots/20.png)
+
+Adres Ekle:
+![Adres Ekle](./screenshots/21.png)
+
+Favorilerim:
+![Favorilerim](./screenshots/22.png)
+
+Sorularım:
+![Sorularım](./screenshots/23.png)
+
+Değerlendirmelerim:
+![Değerlendirmelerim](./screenshots/24.png)
+
 ## Katkıda Bulunma
 
 Katkıda bulunmak isterseniz, lütfen bir pull request gönderin veya bir sorun (issue) açın.
