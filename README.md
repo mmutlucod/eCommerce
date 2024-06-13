@@ -128,29 +128,29 @@ Marka Sonuçları:
 Satıcı Bilgileri:
 ![Satıcı Bilgileri](./screenshots/17.png)
 
+Satıcı Detayları:
+![Satıcı Detayları](./screenshots/18.png)
+
 Siparişlerim:
-![Siparişlerim](./screenshots/18.png)
+![Siparişlerim](./screenshots/19.png)
 
 Sipariş Detayları:
-![Sipariş Detayları](./screenshots/19.png)
+![Sipariş Detayları](./screenshots/20.png)
 
 Profilim:
-![Profilim](./screenshots/20.png)
+![Profilim](./screenshots/21.png)
 
 Adres Bilgilerim:
-![Adres Bilgilerim](./screenshots/21.png)
+![Adres Bilgilerim](./screenshots/22.png)
 
 Adres Ekle:
-![Adres Ekle](./screenshots/22.png)
+![Adres Ekle](./screenshots/23.png)
 
 Favorilerim:
-![Favorilerim](./screenshots/23.png)
+![Favorilerim](./screenshots/24.png)
 
 Sorularım:
-![Sorularım](./screenshots/24.png)
-
-Değerlendirmelerim:
-![Değerlendirmelerim](./screenshots/25.png)
+![Sorularım](./screenshots/25.png)
 
 Değerlendirmelerim:
 ![Değerlendirmelerim](./screenshots/26.png)
