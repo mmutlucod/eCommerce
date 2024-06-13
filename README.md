@@ -84,72 +84,73 @@ Ana Sayfa:
 
 Ürün Listesi:
 ![Ürün Listesi](./screenshots/2.png)
+![Ürün Listesi](./screenshots/3.png)
 
 Giriş Yap:
-![Giriş Yap](./screenshots/3.png)
+![Giriş Yap](./screenshots/4.png)
 
 Üye Ol:
-![Üye Ol](./screenshots/4.png)
+![Üye Ol](./screenshots/5.png)
 
 Arama:
-![Arama](./screenshots/5.png)
+![Arama](./screenshots/6.png)
 
 Arama Sonuçları:
-![Arama Sonuçları](./screenshots/6.png)
+![Arama Sonuçları](./screenshots/7.png)
 
 Ürün Detay:
-![Ürün Detay](./screenshots/7.png)
+![Ürün Detay](./screenshots/8.png)
 
 Ürün Açıklaması:
-![Ürün Açıklaması](./screenshots/8.png)
+![Ürün Açıklaması](./screenshots/9.png)
 
 Ürün Yorumları:
-![Ürün Yorumları](./screenshots/9.png)
+![Ürün Yorumları](./screenshots/10.png)
 
 Değerlendirme Ekle:
-![Değerlendirme Ekle](./screenshots/10.png)
+![Değerlendirme Ekle](./screenshots/11.png)
 
 Sorular ve Cevaplar:
-![Sorular ve Cevaplar](./screenshots/11.png)
+![Sorular ve Cevaplar](./screenshots/12.png)
 
 Soru Sor:
-![Soru Sor](./screenshots/12.png)
+![Soru Sor](./screenshots/13.png)
 
 Diğer Satıcılar:
-![Diğer Satıcılar](./screenshots/13.png)
+![Diğer Satıcılar](./screenshots/14.png)
 
 Kategori Sonuçları:
-![Kategori Sonuçları](./screenshots/14.png)
+![Kategori Sonuçları](./screenshots/15.png)
 
 Marka Sonuçları:
-![Marka Sonuçları](./screenshots/15.png)
+![Marka Sonuçları](./screenshots/16.png)
 
 Satıcı Bilgileri:
-![Satıcı Bilgileri](./screenshots/16.png)
+![Satıcı Bilgileri](./screenshots/17.png)
 
 Siparişlerim:
-![Siparişlerim](./screenshots/17.png)
+![Siparişlerim](./screenshots/18.png)
 
 Sipariş Detayları:
-![Sipariş Detayları](./screenshots/18.png)
+![Sipariş Detayları](./screenshots/19.png)
 
 Profilim:
-![Profilim](./screenshots/19.png)
+![Profilim](./screenshots/20.png)
 
 Adres Bilgilerim:
-![Adres Bilgilerim](./screenshots/20.png)
+![Adres Bilgilerim](./screenshots/21.png)
 
 Adres Ekle:
-![Adres Ekle](./screenshots/21.png)
+![Adres Ekle](./screenshots/22.png)
 
 Favorilerim:
-![Favorilerim](./screenshots/22.png)
+![Favorilerim](./screenshots/23.png)
 
 Sorularım:
-![Sorularım](./screenshots/23.png)
+![Sorularım](./screenshots/24.png)
 
 Değerlendirmelerim:
-![Değerlendirmelerim](./screenshots/24.png)
+![Değerlendirmelerim](./screenshots/25.png)
 
 ## Katkıda Bulunma
 
