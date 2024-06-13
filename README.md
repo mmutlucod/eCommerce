@@ -138,7 +138,7 @@ Sipariş Detayları:
 ![Sipariş Detayları](./screenshots/20.png)
 
 Profilim:
-![Profilim](./screenshots/22.png)
+![Profilim](./screenshots/21.png)
 
 Adres Bilgilerim:
 ![Adres Bilgilerim](./screenshots/22.png)
