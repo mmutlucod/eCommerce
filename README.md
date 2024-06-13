@@ -152,6 +152,9 @@ Sorularım:
 Değerlendirmelerim:
 ![Değerlendirmelerim](./screenshots/25.png)
 
+Değerlendirmelerim:
+![Değerlendirmelerim](./screenshots/26.png)
+
 ## Katkıda Bulunma
 
 Katkıda bulunmak isterseniz, lütfen bir pull request gönderin veya bir sorun (issue) açın.
