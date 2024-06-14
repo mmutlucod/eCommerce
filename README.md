@@ -22,6 +22,9 @@ Bu proje, Bandırma Onyedi Eylül Üniversitesi Yazılım Mühendisliği bitirme
 
 - Node.js
 - MySQL
+- React
+- Sequelize
+
 
 ### Adımlar
 
