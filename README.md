@@ -1,4 +1,4 @@
-# eCommerce Projesi
+# E-Ticaret Projesi
 
 Bu proje, Bandırma Onyedi Eylül Üniversitesi Yazılım Mühendisliği bitirme projesi olarak Umut Karakaş ve Mustafa Mutlu tarafından geliştirilmiştir. Modern ve kullanıcı dostu bir e-ticaret platformu geliştirmeyi amaçlamaktadır. Bu platform, ürün arama ve filtreleme, satıcı ve yönetici panelleri ile gerçek zamanlı stok bilgisi gibi özellikleri içermektedir.
 
@@ -40,7 +40,7 @@ Bu proje, Bandırma Onyedi Eylül Üniversitesi Yazılım Mühendisliği bitirme
     npm install
     ```
 
-4. Veritabanı ayarlarını yapın ve veritabanını oluşturun. `config/config.json` dosyasını düzenleyin:
+4. Veritabanı ayarlarını yapın ve veritabanını oluşturun. `utility/db.js` dosyasını düzenleyin:
     ```json
     {
       "development": {
@@ -53,10 +53,7 @@ Bu proje, Bandırma Onyedi Eylül Üniversitesi Yazılım Mühendisliği bitirme
     }
     ```
 
-5. Veritabanı migrasyonlarını çalıştırın:
-    ```bash
-    npx sequelize-cli db:migrate
-    ```
+5. Veritabanı migrasyonlarını çalıştırın(app.js dosyasındaki sequelize.sync kodunu yorum satırından çıkarın)
 
 6. Uygulamayı başlatın:
     ```bash
