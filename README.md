@@ -40,17 +40,17 @@ Bu proje, Bandırma Onyedi Eylül Üniversitesi Yazılım Mühendisliği bitirme
     npm install
     ```
 
-4. Veritabanı ayarlarını yapın ve veritabanını oluşturun. `utility/db.js` dosyasını düzenleyin:
-    ```json
-    {
-      "development": {
-        "username": "root",
-        "password": null,
-        "database": "ecommerce_db",
-        "host": "127.0.0.1",
-        "dialect": "mysql"
-      }
-    }
+4. Veritabanı ayarlarını yapın ve veritabanını oluşturun. `ecommerce-backend/utility/db.js` dosyasını düzenleyin:
+
+    ```javascript
+    const Sequelize = require('sequelize');
+
+    const sequelize = new Sequelize('shopping', 'root', 'yourpassword', {
+        dialect: 'mysql',
+        host: 'localhost'
+    });
+
+    module.exports = sequelize;
     ```
 
 5. Veritabanı migrasyonlarını çalıştırın(app.js dosyasındaki sequelize.sync kodunu yorum satırından çıkarın)
