@@ -43,7 +43,7 @@ Bu proje, Bandırma Onyedi Eylül Üniversitesi Yazılım Mühendisliği bitirme
     npm install
     ```
 
-4. Veritabanı ayarlarını yapın ve veritabanını oluşturun. `ecommerce-backend/utility/db.js` dosyasını düzenleyin:
+4. Veritabanı ayarlarını yapın ve veritabanını oluşturun. `eCommerce-backend/utility/db.js` dosyasını düzenleyin:
 
     ```javascript
     const Sequelize = require('sequelize');
