@@ -53,9 +53,9 @@ const login = async (req, res) => {
     }
 
     // Token oluştur (token içinde yalnızca gerekli ve güvenli bilgileri sakla)
-    const tokenPayload = { id: user.user_id, email: user.email, role: "user" };
+    const tokenPayload = { id: user.id, email: user.email, role: "user" };
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-      expiresIn: "100y", // Token süresi (örneğin 1 saat)
+      expiresIn: "30m", // Token süresi (örneğin 1 saat)
     });
 
     // Başarılı giriş yanıtı ve token dön
@@ -65,9 +65,10 @@ const login = async (req, res) => {
   } catch (error) {
     // Hata yakalama ve loglama
     console.error("Giriş sırasında bir hata oluştu:", error);
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: "Sunucu hatası." });
   }
 };
+
 const register = async (req, res) => {
   const { email, password } = req.body;
 
@@ -87,14 +88,18 @@ const register = async (req, res) => {
       password: hashedPassword,
     });
 
+    const cart = await Cart.create({
+      user_id: newUser.user_id
+    });
+
     // Token oluştur
     const tokenPayload = {
       id: newUser.id,
-      username: newUser.username,
+      email: newUser.email,
       role: "user",
     };
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-      expiresIn: "1h", // Token süresi (örneğin 1 saat)
+      expiresIn: "30m", // Token süresi (örneğin 1 saat)
     });
 
     return res.status(201).json({
@@ -107,6 +112,7 @@ const register = async (req, res) => {
     return res.status(500).json({ message: "Sunucu hatası." });
   }
 };
+
 const listUsers = async (req, res) => {
   try {
     // Tüm admin kullanıcılarını veritabanından çek
@@ -442,7 +448,7 @@ const clearCart = async (req, res) => {
 
     // Sepet bulunamazsa hata ver
     if (!cart) {
-      return res.status(404).json({ success: false, message: 'Sepet bulunamadı.' });
+      res.status(408).json({ success: false, message: 'Sepet bulunamadı.' });
     }
 
     // Sepete ait tüm ürünleri bul
@@ -735,12 +741,7 @@ const getAddresses = async (req, res) => {
       where: { user_id: user.user_id, is_deleted: 0 } // user.id, bulunan kullanıcının ID'sidir
     });
 
-    // Adresler varsa, dönüyoruz
-    if (addresses.length > 0) {
-      return res.status(200).json({ success: true, addresses });
-    } else {
-      return res.status(404).json({ success: false, message: "Adres bulunamadı." });
-    }
+    return res.status(200).json(addresses);
   } catch (error) {
     // Bir hata oluşursa, hatayı döndürüyoruz
     return res.status(500).json({ success: false, message: error.message });
@@ -779,14 +780,17 @@ const updateAddress = async (req, res) => {
       return res.status(404).json({ success: false, message: "Adres bulunamadı veya erişim yetkiniz yok." });
     }
 
-    // Adresi güncelle
-    await address.update(updatedData);
-    return res.status(200).json({ success: true, message: "Adres başarıyla güncellendi.", address: address });
+    // Mevcut adresin is_deleted alanını 1 yap
+    await address.update({ is_deleted: 1 });
+
+
+    return res.status(200).json({ success: true, message: 'Adres başarıyla güncellendi' });
 
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 const deleteAddress = async (req, res) => {
   try {
     const { addressId } = req.params; // URL'den adres ID'si alınır
@@ -2242,78 +2246,32 @@ const getSellerProductByProductId = async (req, res) => {
       }
     }
 
-    let products = await sellerProduct.findAll({
+    const products = await sellerProduct.findAll({
       where: {
         is_active: 1,
         approval_status_id: 1,
+        product_id: productId,
         ...(sellerProductId && { seller_product_id: { [Op.ne]: sellerProductId } })
       },
       include: [
         {
           model: Product,
-          include: [{ model: Brand }, { model: Category }],
-          where: {
-            product_id: productId // productId ile filtreleme
-          }
+          include: [{ model: Brand }, { model: Category }]
         },
         {
-          model: Seller, // Satıcı bilgilerini çekmek için eklenen model
+          model: Seller,
           attributes: ['seller_id', 'username', 'slug']
         }
       ],
       order: [['price', 'ASC']]
     });
-    const uniqueProductsMap = new Map();
-    products.forEach(product => {
-      const id = product.product.product_id;
-      if (product.stock > 0 && (!uniqueProductsMap.has(id) || product.price < uniqueProductsMap.get(id).price)) {
-        uniqueProductsMap.set(id, product);
-      }
-    });
-    const uniqueLowestPriceProducts = Array.from(uniqueProductsMap.values());
 
-    for (let product of uniqueLowestPriceProducts) {
-      const ratingsData = await ProductComment.findAll({
-        where: {
-          '$sellerProduct.product_id$': product.product.product_id
-        },
-        include: [{
-          model: sellerProduct,
-          attributes: [],
-          include: [{
-            model: Product,
-            attributes: []
-          }]
-        }],
-        attributes: [
-          [sequelize.fn('AVG', sequelize.col('rating')), 'averageRating'],
-          [sequelize.fn('COUNT', sequelize.col('rating')), 'RatingCount']
-        ],
-        group: ['sellerProduct.product_id'],
-        raw: true
-      });
-
-      product.dataValues.commentAvg = ratingsData[0] && ratingsData[0].averageRating ? parseFloat(ratingsData[0].averageRating).toFixed(1) : "0";
-      product.dataValues.commentCount = ratingsData[0] && ratingsData[0].RatingCount ? ratingsData[0].RatingCount : "0";
-    }
-
-    const productsWithFavoritesAndPrice = uniqueLowestPriceProducts.map(product => {
-      const isFavorite = user ? favoriteProductsIds.includes(product.product.product_id) : false;
-      const stockStatus = product.stock === 0 ? 'Stokta yok' : 'Stokta var';
-      return {
-        ...product.toJSON(),
-        isFavorite,
-        stockStatus,
-        commentAvg: product.dataValues.commentAvg,
-        commentCount: product.dataValues.commentCount
-      };
-    });
-
-    return res.status(200).json(productsWithFavoritesAndPrice);
+    return res.status(200).json(products);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 }
+
 
 //Satıcı bilgileri
 const getSellerInfo = async (req, res) => {

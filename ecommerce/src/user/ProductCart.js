@@ -14,7 +14,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ImageSlider from '../components/ImageSlider';
 import MenuBar from '../components/MenuBar';
-import { images } from '../App';
+import { images, links } from '../App';
 import ImageCarousel from '../components/ImageCarousel';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateItem, fetchCart, addItem } from '../redux/cartSlice';
@@ -233,7 +233,7 @@ const ProductCards = () => {
 
   return (
     <>
-      <ImageSlider images={images} />
+      <ImageSlider images={images} links={links} />
       <Snackbar open={alertOpen} autoHideDuration={800} onClose={handleCloseAlert}>
         <Alert onClose={handleCloseAlert} severity={alertSeverity}>
           {alertMessage}

@@ -53,10 +53,17 @@ import QuestionsPage from './user/QuestionPage';
 import UserErrorPage from './user/ErrorPage';
 
 export const images = [
-  "https://n11scdn.akamaized.net/a1/org/24/04/26/50/30/87/81/38/19/97/83/96/43595415462427475004.jpg",
-  "https://n11scdn.akamaized.net/a1/org/24/04/26/63/89/62/43/75/83/27/68/78/01130236963544872031.jpg",
-  "https://n11scdn.akamaized.net/a1/org/24/04/24/81/55/40/56/74/28/01/14/99/1646350707450756961.jpg"
+  "https://cdn.vatanbilgisayar.com/Upload/BANNER//0banner/2024/005/samsung-galaxy-ailesi-21-5-24-web.jpg",
+  "https://cdn.vatanbilgisayar.com/Upload/BANNER//0banner/2024/005/microsoft-copilot-28-5-24-web.jpg",
+  "https://cdn.vatanbilgisayar.com/Upload/BANNER//0banner/2024/003/philips-tv-21-3-24-web-reklam.jpg"
 ];
+
+export const links = [
+  "http://localhost:3000/arama/samsung%20galaxy",
+  "http://localhost:3000/kategori/bilgisayar-tablet",
+  "http://localhost:3000/kategori/tv-goruntu-ve-ses-sistemleri"
+];
+
 function App() {
 
   const dispatch = useDispatch();
@@ -96,7 +103,7 @@ function App() {
             <Route path="/seller/orders" element={<SellerOrders />} />
             <Route path="/seller/question" element={<SellerQuestion />} />
 
-
+            {/** USER*/}
             <Route path="/anasayfa" element={< UserMainPage />} />
             <Route path="/giris-yap" element={< UserRegister />} />
             <Route path="/kayit-ol" element={< UserRegister />} />
@@ -115,6 +122,7 @@ function App() {
             <Route path="/arama/:query" element={<UserSearchProducts />} />
             <Route path="/satici/:sellerSlug" element={<UserSellerPage />} />
 
+            {/** ERROR */}
             <Route path="/hata404" element={<UserErrorPage />} />
             <Route path="*" element={<UserErrorPage />} />
 

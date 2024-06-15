@@ -71,11 +71,10 @@ const theme = createTheme({
 
 const AddAddressPage = () => {
   const [addressDetails, setAddressDetails] = useState({
-    adres_line: '',
+    address_line: '',
     street: '',
     city: '',
     state: '',
-
     postal_code: ''
   });
 
@@ -128,8 +127,8 @@ const AddAddressPage = () => {
                   <TextField
                     fullWidth
                     label="Adres Satırı"
-                    name="adres_line"
-                    value={addressDetails.adres_line}
+                    name="address_line"
+                    value={addressDetails.address_line}
                     onChange={handleChange}
                   />
                 </Grid>

@@ -96,7 +96,7 @@ const QuestionsPage = () => {
                                     Object.keys(groupedQuestions).map((productName, index) => (
                                         <ListItem key={index} sx={{ flexDirection: 'column', alignItems: 'flex-start' }}>
                                             <Paper elevation={3} sx={{ p: 2, width: '100%' }}>
-                                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'black', ml: '30%', mb: 2 }}>
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'black', mb: 2 }}>
                                                     Ürün Adı:  <Link style={{ textDecoration: 'none' }} to={'/urun/' + groupedQuestions[productName][0].product.slug}>{productName}</Link>
                                                 </Typography>
                                                 {groupedQuestions[productName].map((question, qIndex) => (

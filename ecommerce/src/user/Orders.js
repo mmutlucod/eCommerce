@@ -206,20 +206,19 @@ const OrdersPage = () => {
                     <Typography variant="h6">Teslimat Adresi</Typography>
                     <Box display="flex" flexDirection="row" flexWrap="wrap">
                       <Typography>{selectedOrderAddress.address_line}</Typography>
-                      <Typography>, {selectedOrderAddress.street}</Typography>
-                      <Typography>, {selectedOrderAddress.city}</Typography>
-                      <Typography>, {selectedOrderAddress.state}</Typography>
+                      <Typography>{selectedOrderAddress.street}</Typography>
+                      <Typography>{selectedOrderAddress.state}</Typography>
+                      <Typography>/{selectedOrderAddress.city}</Typography>
                       <Typography>, {selectedOrderAddress.postal_code}</Typography>
-                      <Typography>, {selectedOrderAddress.country}</Typography>
                     </Box>
                   </Box>
                   <Box sx={{ flex: 1, ml: 2, p: 2, border: '1px solid #ddd', borderRadius: '8px' }}>
                     <Typography variant="h6">Fatura Adresi</Typography>
                     <Box display="flex" flexDirection="row" flexWrap="wrap">
                       <Typography>{selectedOrderAddress.address_line}</Typography>
-                      <Typography>, {selectedOrderAddress.street}</Typography>
-                      <Typography>, {selectedOrderAddress.city}</Typography>
-                      <Typography>, {selectedOrderAddress.state}</Typography>
+                      <Typography>{selectedOrderAddress.street}</Typography>
+                      <Typography>{selectedOrderAddress.state}</Typography>
+                      <Typography>/{selectedOrderAddress.city}</Typography>
                       <Typography>, {selectedOrderAddress.postal_code}</Typography>
                     </Box>
                   </Box>

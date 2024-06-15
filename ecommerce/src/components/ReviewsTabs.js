@@ -222,10 +222,10 @@ function ReviewsTab({ productId, sellerProductId }) {
                   subheaderTypographyProps={{ variant: 'caption' }}
                 />
                 <CardContent>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography sx={{ ml: 8 }} variant="body2" color="text.secondary">
                     {review.content}
                   </Typography>
-                  <Rating value={review.rating} readOnly sx={{ mt: 1, mb: 2 }} />
+                  <Rating value={review.rating} readOnly sx={{ mt: 1, mb: 2, ml: '8%' }} />
                   {/* <Button variant="text" size="small" sx={{ mt: 1 }}>
                     Bildir
                   </Button> */}

@@ -732,7 +732,7 @@ const createBrand = async (req, res) => {
         const currentDateTime = new Date(); // Geçerli tarih ve saat bilgisini al
         const slugDatePart = `${(currentDateTime.getMonth() + 1).toString().padStart(2, '0')}${currentDateTime.getDate().toString().padStart(2, '0')}`; // YYYYMMDD formatında tarih kısmını oluştur
         const slugTimePart = `${currentDateTime.getMinutes().toString().padStart(2, '0')}${currentDateTime.getSeconds().toString().padStart(2, '0')}`; // HHMMSS formatında saat kısmını oluştur
-        const slug = slugify(`${req.body.name}-${slugDatePart}-x-${slugTimePart}`, {
+        const slug = slugify(`${req.body.brand_name}-${slugDatePart}-x-${slugTimePart}`, {
             replacement: '-',  // Boşlukları '-' ile değiştir
             lower: true,       // Küçük harfe çevir
             remove: /[*+~.()'"!:@]/g // Slug oluştururken kaldırılacak karakterler

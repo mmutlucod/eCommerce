@@ -17,17 +17,20 @@ import {
   List,
   Paper,
   Snackbar,
-  Alert
+  Alert,
 } from '@mui/material';
 import { renderMenuItems } from './RenderMenuItems';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import CloseIcon from '@mui/icons-material/Close';
 import Navbar from '../components/UserNavbar';
+import UserFooter from '../components/UserFooter'
 import api from '../api/api';
 import { Link } from 'react-router-dom';
 import { addItem } from '../redux/cartSlice'; // cartSlice dosyanızın doğru yolunu kullanın
 import { useDispatch } from 'react-redux';
+import { styled } from '@mui/system';
+
 
 const ProductCard = ({ product, onRemove }) => (
   <Card sx={{ maxWidth: 345, m: 2 }}>
@@ -92,6 +95,15 @@ const theme = createTheme({
     },
   },
 });
+
+const TruncatedTypography = styled(Typography)(({ theme }) => ({
+  display: '-webkit-box',
+  WebkitBoxOrient: 'vertical',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  WebkitLineClamp: 2, // Maksimum satır sayısı
+}));
+
 
 const FavoritesPage = () => {
   const [selectedItem, setSelectedItem] = useState('favorites'); // Yan menüde seçili öğe
@@ -171,9 +183,9 @@ const FavoritesPage = () => {
                     return (
                       <Grid item key={product.id} xs={12} sm={6} md={4}>
                         <Card>
-                          <Typography gutterBottom component="h4" sx={{ marginY: '12px' }}>
+                          <TruncatedTypography gutterBottom component="h4" sx={{ marginY: '12px' }}>
                             {product.product.name}
-                          </Typography>
+                          </TruncatedTypography>
                           <CardActionArea>
                             <Link to={'/urun/' + product.product.slug}>
                               <CardMedia
@@ -219,7 +231,9 @@ const FavoritesPage = () => {
             Ürün favorilerden çıkarıldı.
           </Alert>
         </Snackbar>
+        <UserFooter />
       </ThemeProvider>
+
     </>
   );
 };
