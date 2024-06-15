@@ -39,9 +39,9 @@ function CartItem({ item }) {
         if (showNotification) {
             const timer = setTimeout(() => {
                 setShowNotification(false);
-            }, 3000); // 3 saniye sonra kaybolur
+            }, 3000); 
 
-            return () => clearTimeout(timer); // Cleanup on unmount
+            return () => clearTimeout(timer); 
         }
     }, [showNotification]);
 

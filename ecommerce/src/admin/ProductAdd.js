@@ -162,7 +162,7 @@ const ProductAdd = () => {
     }
 
     try {
-      const response = await api.post('/admin/create-product', formDataWithFiles, {
+      const response = await api.post('/seller/create-product', formDataWithFiles, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
